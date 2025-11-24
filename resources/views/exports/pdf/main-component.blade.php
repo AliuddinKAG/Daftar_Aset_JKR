@@ -11,7 +11,7 @@
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Arial', 'DejaVu Sans', sans-serif;
             font-size: 9pt;
             line-height: 1.2;
             color: #000;
@@ -98,7 +98,7 @@
         }
         
         .checkbox-box.checked::after {
-            content: '✓';
+            /* content: '✓'; */
             position: absolute;
             top: -4px;
             left: 1px;
