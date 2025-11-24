@@ -1,0 +1,429 @@
+@extends('layouts.app')
+
+@section('title', 'Borang 2: Komponen Utama')
+
+@section('content')
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">BORANG PENGUMPULAN DATA DAFTAR ASET KHUSUS</h5>
+                <small>Peringkat Komponen Utama</small>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('main-components.store') }}" method="POST" enctype="multipart/form-data" id="mainComponentForm">
+                    @csrf
+
+                    <!-- MAKLUMAT KOMPONEN UTAMA -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary text-white">
+                            MAKLUMAT KOMPONEN UTAMA
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Nama Premis <span class="text-danger">*</span></label>
+                                    <select class="form-select @error('component_id') is-invalid @enderror" name="component_id" id="component_id" required>
+                                        <option value="">-- Pilih Komponen --</option>
+                                        @foreach($components as $component)
+                                            <option value="{{ $component->id }}" 
+                                                data-dpa="{{ $component->nombor_dpa }}"
+                                                data-nama="{{ $component->nama_premis }}"
+                                                {{ old('component_id') == $component->id ? 'selected' : '' }}>
+                                                {{ $component->nama_premis }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('component_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Nombor DPA</label>
+                                    <input type="text" class="form-control bg-light" id="display_dpa" readonly placeholder="Auto-fill dari komponen">
+                                    <small class="text-muted">Auto-fill berdasarkan komponen dipilih</small>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Kod Lokasi <span class="text-danger">*</span></label>
+                                    <input type="text" 
+                                        class="form-control bg-light @error('kod_lokasi') is-invalid @enderror" 
+                                        name="kod_lokasi" 
+                                        id="kod_lokasi"
+                                        value="{{ old('kod_lokasi') }}" 
+                                        placeholder="Auto-generated"
+                                        readonly
+                                        required>
+                                    @error('kod_lokasi')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="text-muted">Format: KU-[ID]-[NO]</small>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3" style="background: #f8f9fa;">
+                                <div class="card-header bg-dark text-white">
+                                    <strong>Maklumat Utama</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Komponen Utama <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('nama_komponen_utama') is-invalid @enderror" 
+                                               name="nama_komponen_utama" value="{{ old('nama_komponen_utama') }}" required>
+                                        @error('nama_komponen_utama')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>                   
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Sistem</label>
+                                            <div class="input-group">
+                                                <select class="form-select select2-sistem" name="sistem" id="sistem">
+                                                    <option value="">-- Pilih atau Taip Sistem --</option>
+                                                    @foreach($sistems as $sistem)
+                                                        <option value="{{ $sistem->kod }}" 
+                                                            data-id="{{ $sistem->id }}"
+                                                            {{ old('sistem') == $sistem->kod ? 'selected' : '' }}>
+                                                            {{ $sistem->kod }} - {{ $sistem->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">SubSistem</label>
+                                            <div class="input-group">
+                                                <select class="form-select select2-subsistem" name="subsistem" id="subsistem">
+                                                    <option value="">-- Pilih atau Taip SubSistem --</option>
+                                                    @foreach($subsistems as $subsistem)
+                                                        <option value="{{ $subsistem->kod }}" 
+                                                            data-sistem-id="{{ $subsistem->sistem_id }}"
+                                                            {{ old('subsistem') == $subsistem->kod ? 'selected' : '' }}>
+                                                            {{ $subsistem->kod }} - {{ $subsistem->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Kuantiti</label>
+                                            <input type="number" class="form-control" name="kuantiti" value="{{ old('kuantiti', 1) }}" min="1">
+                                            <small class="form-text text-muted">(Komponen yang sama jenis)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bidang Kejuruteraan -->
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <strong>Bidang Kejuruteraan Komponen:</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="awam_arkitek" id="awam" value="1" {{ old('awam_arkitek') ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="awam">Awam/Arkitek</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="elektrikal" id="elektrikal" value="1" {{ old('elektrikal') ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="elektrikal">Elektrikal</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="elv_ict" id="elv" value="1" {{ old('elv_ict') ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="elv">ELV/ICT</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="mekanikal" id="mekanikal" value="1" {{ old('mekanikal') ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="mekanikal">Mekanikal</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="bio_perubatan" id="bio" value="1" {{ old('bio_perubatan') ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="bio">Bio Perubatan</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" name="lain_lain" placeholder="Lain-lain:" value="{{ old('lain_lain') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Catatan:</label>
+                                <textarea class="form-control" name="catatan" rows="2">{{ old('catatan') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MAKLUMAT PEROLEHAN -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-dark text-white">
+                            MAKLUMAT PEROLEHAN
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td width="50%">Tarikh Perolehan</td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_perolehan" value="{{ old('tarikh_perolehan') }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kos Perolehan/Kontrak</td>
+                                            <td><input type="text" class="form-control form-control-sm" name="kos_perolehan" value="{{ old('kos_perolehan') }}" placeholder="RM"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>No. Pesanan Rasmi Kerajaan/Kontrak</td>
+                                            <td><input type="text" class="form-control form-control-sm" name="no_pesanan_rasmi_kontrak" value="{{ old('no_pesanan_rasmi_kontrak') }}"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td width="50%">Tarikh Dipasang</td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_dipasang" value="{{ old('tarikh_dipasang') }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tarikh Waranti Tamat</td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_waranti_tamat" value="{{ old('tarikh_waranti_tamat') }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tarikh Tamat DLP</td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_tamat_dlp" value="{{ old('tarikh_tamat_dlp') }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Jangka Hayat</td>
+                                            <td><input type="text" class="form-control form-control-sm" name="jangka_hayat" value="{{ old('jangka_hayat') }}" placeholder="Tahun"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Pengilang, Pembekal, Kontraktor -->
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <h6 class="fw-bold">Pengilang</h6>
+                                    <div class="mb-2">
+                                        <label class="form-label small">Nama:</label>
+                                        <input type="text" class="form-control form-control-sm" name="nama_pengilang" value="{{ old('nama_pengilang') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="fw-bold">Pembekal</h6>
+                                    <div class="mb-2">
+                                        <label class="form-label small">Nama:</label>
+                                        <input type="text" class="form-control form-control-sm" name="nama_pembekal" value="{{ old('nama_pembekal') }}">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small">Alamat:</label>
+                                        <textarea class="form-control form-control-sm" name="alamat_pembekal" rows="2">{{ old('alamat_pembekal') }}</textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small">No. Telefon:</label>
+                                        <input type="text" class="form-control form-control-sm" name="no_telefon_pembekal" value="{{ old('no_telefon_pembekal') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="fw-bold">Kontraktor</h6>
+                                    <div class="mb-2">
+                                        <label class="form-label small">Nama:</label>
+                                        <input type="text" class="form-control form-control-sm" name="nama_kontraktor" value="{{ old('nama_kontraktor') }}">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small">Alamat:</label>
+                                        <textarea class="form-control form-control-sm" name="alamat_kontraktor" rows="2">{{ old('alamat_kontraktor') }}</textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label small">No. Telefon:</label>
+                                        <input type="text" class="form-control form-control-sm" name="no_telefon_kontraktor" value="{{ old('no_telefon_kontraktor') }}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label">Catatan:</label>
+                                <textarea class="form-control" name="catatan_maklumat" rows="2">{{ old('catatan_maklumat') }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MAKLUMAT KOMPONEN -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-dark text-white">
+                            MAKLUMAT KOMPONEN
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Deskripsi</label>
+                                    <textarea class="form-control" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-2">
+                                        <label class="form-label">Status Komponen</label>
+                                        <select class="form-select" name="status_komponen">
+                                            <option value="">-- Pilih Status --</option>
+                                            <option value="operational" {{ old('status_komponen') == 'operational' ? 'selected' : '' }}>Operational</option>
+                                            <option value="under_maintenance" {{ old('status_komponen') == 'under_maintenance' ? 'selected' : '' }}>Under Maintenance</option>
+                                            <option value="rosak" {{ old('status_komponen') == 'rosak' ? 'selected' : '' }}>Rosak</option>
+                                            <option value="retired" {{ old('status_komponen') == 'retired' ? 'selected' : '' }}>Retired</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Jenama</label>
+                                    <input type="text" class="form-control" name="jenama" value="{{ old('jenama') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Model</label>
+                                    <input type="text" class="form-control" name="model" value="{{ old('model') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">No. Siri</label>
+                                    <input type="text" class="form-control" name="no_siri" value="{{ old('no_siri') }}">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">No. Tag / Label (Jika berkenaan)</label>
+                                    <input type="text" class="form-control" name="no_tag_label" value="{{ old('no_tag_label') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">No Sijil Pendaftaran (Jika ada)</label>
+                                    <input type="text" class="form-control" name="no_sijil_pendaftaran" value="{{ old('no_sijil_pendaftaran') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Button to show attributes section -->
+                    <div class="d-flex justify-content-between" id="mainButtons">
+                        <a href="{{ route('components.index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Kembali
+                        </a>
+                        <button type="button" class="btn btn-info text-white" onclick="showAttributesSection()">
+                            Seterusnya: Atribut Spesifikasi <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Hidden section for attributes -->
+                    <div id="attributesSection" style="display: none; margin-top: 20px;">
+                        @include('components.partials.main-component-attributes')
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Inline script untuk show attributes --}}
+<script>
+function showAttributesSection() {
+    document.getElementById('attributesSection').style.display = 'block';
+    document.getElementById('mainButtons').style.display = 'none';
+    document.getElementById('attributesSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize Select2 untuk Sistem
+    $('.select2-sistem').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Cari atau taip sistem baru',
+        allowClear: true,
+        createTag: function(params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            return { id: term, text: term + ' ✓ (Baru)', newTag: true };
+        }
+    });
+
+    // Initialize Select2 untuk SubSistem
+    $('.select2-subsistem').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Cari atau taip subsistem baru',
+        allowClear: true,
+        createTag: function(params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            return { id: term, text: term + ' ✓ (Baru)', newTag: true };
+        }
+    });
+
+    // Filter SubSistem berdasarkan Sistem yang dipilih
+    $('#sistem').on('change', function() {
+        var sistemId = $(this).find(':selected').data('id');
+        var $subsistem = $('#subsistem');
+        
+        if (sistemId) {
+            $subsistem.find('option').each(function() {
+                var optionSistemId = $(this).data('sistem-id');
+                $(this).toggle(!optionSistemId || optionSistemId == sistemId);
+            });
+        } else {
+            $subsistem.find('option').show();
+        }
+        $subsistem.val('').trigger('change');
+    });
+
+    // Auto-fill DPA dan generate Kod Lokasi
+    $('#component_id').on('change', function() {
+        var $selected = $(this).find(':selected');
+        var componentId = $(this).val();
+        
+        // Auto-fill DPA
+        $('#display_dpa').val($selected.data('dpa') || '');
+        
+        // Generate Kod Lokasi automatically via AJAX
+        if (componentId) {
+            $.ajax({
+                url: '/main-components/generate-kod-lokasi',
+                type: 'GET',
+                data: { component_id: componentId },
+                success: function(response) {
+                    $('#kod_lokasi').val(response.kod_lokasi);
+                },
+                error: function() {
+                    // Fallback: generate simple kod lokasi
+                    var timestamp = Date.now().toString().slice(-6);
+                    $('#kod_lokasi').val('KU-' + componentId + '-' + timestamp);
+                }
+            });
+        } else {
+            $('#kod_lokasi').val('');
+        }
+    });
+    
+    // Trigger on page load if component already selected
+    if ($('#component_id').val()) {
+        $('#component_id').trigger('change');
+    }
+});
+</script>
+@endsection

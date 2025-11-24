@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class KodRuang extends Model
+{
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'kod_ruangs';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'kod',
+        'nama',
+        'kategori',
+        'is_active',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Scope a query to only include active kod ruang.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true)
+                     ->orderBy('kod');
+    }
+
+    /**
+     * Scope a query to search by kod or nama.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $search
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, $search)
+    {
+        return $query->where(function($q) use ($search) {
+            $q->where('kod', 'like', "%{$search}%")
+              ->orWhere('nama', 'like', "%{$search}%");
+        });
+    }
+
+    /**
+     * Scope a query to filter by kategori.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $kategori
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByKategori($query, $kategori)
+    {
+        return $query->where('kategori', $kategori);
+    }
+
+    /**
+     * Get the full display name (kod + nama).
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return $this->kod . ' - ' . $this->nama;
+    }
+
+    /**
+     * Get all unique categories.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getCategories()
+    {
+        return self::where('is_active', true)
+                   ->distinct()
+                   ->pluck('kategori')
+                   ->filter()
+                   ->sort()
+                   ->values();
+    }
+}

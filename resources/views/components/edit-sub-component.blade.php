@@ -1,0 +1,140 @@
+@extends('layouts.app')
+
+@section('title', 'Edit Sub Komponen')
+
+@section('content')
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">EDIT BORANG PENGUMPULAN DATA DAFTAR ASET KHUSUS</h5>
+                <small>Peringkat Sub Komponen</small>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('sub-components.update', $subComponent) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- MAKLUMAT SUB KOMPONEN -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary text-white">
+                            MAKLUMAT SUB KOMPONEN
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nama Komponen Utama <span class="text-danger">*</span></label>
+                                    <select class="form-select @error('main_component_id') is-invalid @enderror" 
+                                            name="main_component_id" id="mainComponentSelect" required>
+                                        <option value="">-- Pilih Komponen Utama --</option>
+                                        @foreach($mainComponents as $mainComp)
+                                            <option value="{{ $mainComp->id }}" 
+                                                    data-komponen="{{ $mainComp->component->nama_premis }}"
+                                                    {{ old('main_component_id', $subComponent->main_component_id) == $mainComp->id ? 'selected' : '' }}>
+                                                {{ $mainComp->nama_komponen_utama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('main_component_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nama Komponen</label>
+                                    <input type="text" class="form-control" id="displayKomponen" readonly
+                                           value="{{ $subComponent->mainComponent->component->nama_premis }}">
+                                    <small class="form-text text-muted">Nama komponen akan dipaparkan automatik</small>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3" style="background: #f8f9fa;">
+                                <div class="card-header bg-dark text-white">
+                                    <strong>Maklumat Sub Komponen</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Sub Komponen <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control @error('nama_sub_komponen') is-invalid @enderror" 
+                                               name="nama_sub_komponen" value="{{ old('nama_sub_komponen', $subComponent->nama_sub_komponen) }}" required>
+                                        @error('nama_sub_komponen')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Deskripsi</label>
+                                        <textarea class="form-control" name="deskripsi" rows="3">{{ old('deskripsi', $subComponent->deskripsi) }}</textarea>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Status Komponen</label>
+                                            <select class="form-select" name="status_komponen">
+                                                <option value="">-- Pilih Status --</option>
+                                                <option value="operational" {{ old('status_komponen', $subComponent->status_komponen) == 'operational' ? 'selected' : '' }}>Operational</option>
+                                                <option value="under_maintenance" {{ old('status_komponen', $subComponent->status_komponen) == 'under_maintenance' ? 'selected' : '' }}>Under Maintenance</option>
+                                                <option value="rosak" {{ old('status_komponen', $subComponent->status_komponen) == 'rosak' ? 'selected' : '' }}>Rosak</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">No. Siri</label>
+                                            <input type="text" class="form-control" name="no_siri" value="{{ old('no_siri', $subComponent->no_siri) }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">No. Sijil Pendaftaran (Jika ada)</label>
+                                            <input type="text" class="form-control" name="no_sijil_pendaftaran" 
+                                                   value="{{ old('no_sijil_pendaftaran', $subComponent->no_sijil_pendaftaran) }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Jenama</label>
+                                            <input type="text" class="form-control" name="jenama" value="{{ old('jenama', $subComponent->jenama) }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Model</label>
+                                            <input type="text" class="form-control" name="model" value="{{ old('model', $subComponent->model) }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Kuantiti (Sama Jenis)</label>
+                                        <input type="number" class="form-control" name="kuantiti" 
+                                               value="{{ old('kuantiti', $subComponent->kuantiti) }}" min="1">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Catatan:</label>
+                                        <textarea class="form-control" name="catatan" rows="2">{{ old('catatan', $subComponent->catatan) }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-info text-white">
+                            <i class="bi bi-save"></i> Kemaskini Sub Komponen
+                        </button>
+                        <a href="{{ route('components.index') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+// Auto-fill komponen name when main component changes
+document.getElementById('mainComponentSelect').addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex];
+    const komponenName = selected.getAttribute('data-komponen');
+    document.getElementById('displayKomponen').value = komponenName || '';
+});
+</script>
+@endsection
