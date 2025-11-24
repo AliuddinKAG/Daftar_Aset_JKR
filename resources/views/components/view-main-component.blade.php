@@ -15,9 +15,10 @@
                     <a href="{{ route('export.main-component.pdf', $mainComponent) }}" class="btn btn-danger">
                         <i class="bi bi-file-pdf"></i> Download PDF
                     </a>
+                   <!-- Export Buttons 
                     <a href="{{ route('export.main-component.excel', $mainComponent) }}" class="btn btn-success">
                         <i class="bi bi-file-excel"></i> Download Excel
-                    </a>
+                    </a> -->
                 </div>
             </div>
         </div>
