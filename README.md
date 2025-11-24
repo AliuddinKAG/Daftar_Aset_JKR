@@ -11,7 +11,7 @@
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd hrc-attendance-system
+   cd Daftar_Aset_JKR
    ```
 
 2. **Install PHP dependencies**
