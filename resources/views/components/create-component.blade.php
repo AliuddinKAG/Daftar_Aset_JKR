@@ -215,7 +215,7 @@
                                                    value="{{ old('nama_ruang_binaan') }}"></td>
                                     </tr>
                                     <tr>
-                                        <td>Catatan:</td>
+                                        <td>Catatan: <br></td>
                                         <td><textarea class="form-control" name="catatan_binaan" rows="3">{{ old('catatan_binaan') }}</textarea></td>
                                     </tr>
                                 </tbody>

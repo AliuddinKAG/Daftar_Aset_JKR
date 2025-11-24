@@ -20,7 +20,6 @@
             background: #fff;
         }
         
-        /* SCALE KESELURUHAN SUPAYA MUAT 1 PAGE */
         .page-wrapper {
             transform: scale(0.95);
             transform-origin: top center;
@@ -52,22 +51,6 @@
             right: 30px;
             font-size: 10pt;
             font-weight: bold;
-        }
-        
-        .section-header {
-            background-color: #000;
-            color: white;
-            padding: 3px 8px;
-            font-weight: bold;
-            font-size: 9pt;
-            margin-top: 8px;
-            margin-bottom: 0;
-            text-align: center;
-            text-transform: uppercase;
-        }
-        
-        .info-group {
-            margin-bottom: 10px;
         }
         
         .info-row {
@@ -103,7 +86,6 @@
         .checkbox-section {
             padding: 5px 8px;
             margin: 8px 0;
-            position: relative;
         }
         
         .checkbox-header {
@@ -170,60 +152,9 @@
             background-color: #fff;
         }
         
-        .catatan-box {
-            border: 1px solid #000;
-            min-height: 40px;
-            padding: 4px;
-            margin-top: 2px;
-            font-size: 9pt;
-        }
-        
-        .signature-section {
-            margin-top: 25px;
-            display: table;
-            width: 100%;
-        }
-        
-        .signature-box {
-            display: table-cell;
-            width: 48%;
-            padding: 0 8px;
-            vertical-align: top;
-        }
-        
-        .signature-box:first-child {
-            border-right: 1px solid #ccc;
-        }
-        
-        .signature-title {
-            font-weight: bold;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            font-size: 9pt;
-        }
-        
-        .signature-field {
-            margin-bottom: 10px;
-        }
-        
-        .signature-field label {
-            display: block;
-            margin-bottom: 2px;
-            font-size: 9pt;
-        }
-        
-        .signature-field .field-line {
-            border-bottom: 1px solid #000;
-            min-height: 18px;
-            padding: 2px 4px;
-        }
-        
-        .bottom-note {
-            position: fixed;
-            bottom: 15px;
-            right: 25px;
-            font-size: 8pt;
-            font-style: italic;
+        /* Catatan row styling */
+        .catatan-row {
+            min-height: 50px;
         }
         
         @media print {
@@ -235,15 +166,10 @@
                 transform: scale(0.95);
                 transform-origin: top center;
             }
-            
-            .page-break {
-                page-break-before: always;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Page Wrapper untuk scaling -->
     <div class="page-wrapper">
     
     <!-- Document Code -->
@@ -280,7 +206,6 @@
             <span style="margin-left: 10px; font-size: 10pt; font-family: 'Courier New', monospace;">(Tandakan 'v' jika berkenaan)</span>
         </div>
         
-        @if($component->ada_blok)
         <table>
             <thead>
                 <tr>
@@ -290,61 +215,29 @@
             <tbody>
                 <tr>
                     <td class="label-col">Kod Blok</td>
-                    <td class="value-col">{{ $component->kod_blok ?? '' }}</td>
+                    <td class="value-col">{{ $component->kod_blok ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Aras</td>
-                    <td class="value-col">{{ $component->kod_aras ?? '' }}</td>
+                    <td class="value-col">{{ $component->kod_aras ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Ruang</td>
-                    <td class="value-col">{{ $component->kod_ruang ?? '' }}</td>
+                    <td class="value-col">{{ $component->kod_ruang ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Nama Ruang</td>
-                    <td class="value-col">{{ $component->nama_ruang ?? '' }}</td>
+                    <td class="value-col">{{ $component->nama_ruang ?? ' ' }}</td>
                 </tr>
+                <!-- CATATAN MERGED DALAM TABLE -->
                 <tr>
-                    <td class="label-col" style="vertical-align: top;">Catatan:</td>
-                    <td class="value-col">
-                        <div class="catatan-box">{{ $component->catatan_blok ?? '' }}</div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        @else
-        <table>
-            <thead>
-                <tr>
-                    <th colspan="2">Maklumat Lokasi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="label-col">Kod Blok</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label-col">Kod Aras</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label-col">Kod Ruang</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label-col">Nama Ruang</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="border: 1px solid #000; padding: 4px; font-size: 9pt; vertical-align: top; height: 55px;">
+                    <td colspan="2" class="catatan-row">
                         <strong>Catatan:</strong><br>
-                        &nbsp;
+                        {{ $component->catatan_blok ?? '' }}
                     </td>
                 </tr>
             </tbody>
         </table>
-        @endif
     </div>
 
     <!-- BINAAN LUAR Section -->
@@ -355,7 +248,6 @@
             <span style="margin-left: 10px; font-size: 10pt; font-family: 'Courier New', monospace;">(Tandakan 'v' jika berkenaan)</span>
         </div>
         
-        @if($component->ada_binaan_luar)
         <table>
             <thead>
                 <tr>
@@ -365,93 +257,50 @@
             <tbody>
                 <tr>
                     <td class="label-col">Nama Binaan Luar</td>
-                    <td class="value-col">{{ $component->nama_binaan_luar ?? '' }}</td>
+                    <td class="value-col">{{ $component->nama_binaan_luar ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Binaan Luar</td>
-                    <td class="value-col">{{ $component->kod_binaan_luar ?? '' }}</td>
+                    <td class="value-col">{{ $component->kod_binaan_luar ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Koordinat GPS (WGS 84)</td>
                     <td class="value-col">
-                        X : {{ $component->koordinat_x ?? '' }}<br>
-                        Y : {{ $component->koordinat_y ?? '' }}
+                        @if($component->koordinat_x || $component->koordinat_y)
+                            X : {{ $component->koordinat_x ?? '' }}<br>
+                            Y : {{ $component->koordinat_y ?? '' }}
+                        @else
+                            X : <span style="margin-left: 100px;"></span> <br>
+                            Y : <span style="margin-left: 100px;"></span> 
+                        @endif
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="background-color: #e8e8e8; font-weight: bold;">
+                    <td colspan="2" style="background-color: #e8e8e8; font-weight: bold; text-align: left;">
                         Diisi Jika Binaan Luar Mempunyai Aras dan Ruang
                     </td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Aras</td>
-                    <td class="value-col">{{ $component->kod_aras_binaan ?? '' }}</td>
+                    <td class="value-col">{{ $component->kod_aras_binaan ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Ruang</td>
-                    <td class="value-col">{{ $component->kod_ruang_binaan ?? '' }}</td>
+                    <td class="value-col">{{ $component->kod_ruang_binaan ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Nama Ruang</td>
-                    <td class="value-col">{{ $component->nama_ruang_binaan ?? '' }}</td>
+                    <td class="value-col">{{ $component->nama_ruang_binaan ?? ' ' }}</td>
                 </tr>
+                <!-- CATATAN MERGED DALAM TABLE -->
                 <tr>
-                    <td class="label-col" style="vertical-align: top;">Catatan:</td>
-                    <td class="value-col">
-                        <div class="catatan-box">{{ $component->catatan_binaan ?? '' }}</div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        @else
-        <table>
-            <thead>
-                <tr>
-                    <th colspan="2">Maklumat Lokasi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="label-col">Nama Binaan Luar</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label-col">Kod Binaan Luar</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label-col">Koordinat GPS (WGS 84)</td>
-                    <td class="value-col">
-                        X : <span style="margin-left: 100px;"></span> ( Cth X : 2.935905 )<br>
-                        Y : <span style="margin-left: 100px;"></span> ( Cth Y : 101.700286)
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="background-color: #e8e8e8; font-weight: bold;">
-                        Diisi Jika Binaan Luar Mempunyai Aras dan Ruang
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label-col">Kod Aras</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label-col">Kod Ruang</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label-col">Nama Ruang</td>
-                    <td class="value-col">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="border: 1px solid #000; padding: 4px; font-size: 9pt; vertical-align: top; height: 55px;">
+                    <td colspan="2" class="catatan-row">
                         <strong>Catatan:</strong><br>
-                        &nbsp;
+                        {{ $component->catatan_binaan ?? '' }}
                     </td>
                 </tr>
             </tbody>
         </table>
-        @endif
     </div>
 
     <!-- SIGNATURE SECTION -->
