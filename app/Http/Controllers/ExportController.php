@@ -94,7 +94,7 @@ class ExportController extends Controller
         
         $filename = 'Laporan-Lengkap-Komponen-' . $component->id . '-' . date('YmdHis') . '.pdf';
         
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
 
     /**
