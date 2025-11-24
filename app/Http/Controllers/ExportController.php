@@ -33,7 +33,9 @@ class ExportController extends Controller
         // Generate filename
         $filename = 'Borang-1-Komponen-' . $component->id . '-' . date('YmdHis') . '.pdf';
         
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
+
+        // return $pdf->download($filename);
     }
 
     /**

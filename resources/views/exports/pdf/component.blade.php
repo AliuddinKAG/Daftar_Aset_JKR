@@ -12,7 +12,7 @@
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Arial', 'DejaVu Sans', sans-serif;
             font-size: 9pt;
             line-height: 1.2;
             color: #000;
@@ -99,12 +99,13 @@
             border: 2px solid #000;
             margin-right: 6px;
             vertical-align: middle;
-            position: relative;
-            background: #fff;
+            text-align: center;
+            font-size: 12px;
+            line-height: 12px;
         }
         
         .checkbox-box.checked::after {
-            content: '✓';
+            /* content: '✓'; */
             position: absolute;
             top: -4px;
             left: 1px;
@@ -201,9 +202,14 @@
     <!-- BLOK Section -->
     <div class="checkbox-section">
         <div class="checkbox-header">
-            <span class="checkbox-box {{ $component->ada_blok ? 'checked' : '' }}"></span>
-            <span class="checkbox-label">Blok</span>
-            <span style="margin-left: 10px; font-size: 10pt; font-family: 'Courier New', monospace;">(Tandakan 'v' jika berkenaan)</span>
+            {{-- <span class="checkbox-box">{{ $component->ada_blok ? 'checked' : '' }}</span> --}}
+            <span class="checkbox-box">
+                @if($component->ada_blok)
+                    ✓
+                @endif
+            </span>
+            <span class="checkbox-label">Blok   (Tandakan '✓' jika berkenaan)</span>
+            {{-- <span style="margin-left: 10px; font-size: 10pt;">(Tandakan '✓' jika berkenaan)</span> --}}
         </div>
         
         <table>
@@ -243,7 +249,7 @@
     <!-- BINAAN LUAR Section -->
     <div class="checkbox-section">
         <div class="checkbox-header">
-            <span class="checkbox-box {{ $component->ada_binaan_luar ? 'checked' : '' }}"></span>
+            <span class="checkbox-box {{ $component->ada_binaan_luar ? '✓' : '' }}"></span>
             <span class="checkbox-label">Binaan Luar</span>
             <span style="margin-left: 10px; font-size: 10pt; font-family: 'Courier New', monospace;">(Tandakan 'v' jika berkenaan)</span>
         </div>
