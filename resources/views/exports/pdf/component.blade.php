@@ -308,52 +308,82 @@
         <table style="width: 100%; border-collapse: collapse; border: none;">
             <tr>
                 <!-- PENGUMPUL DATA -->
-                <td style="width: 50%; vertical-align: top; padding-right: 30px; border: none;">
-                    <div style="font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 9pt;">PENGUMPUL DATA :</div>
-                    
-                    <div style="position: relative; margin-bottom: 0;">
-                        <div style="position: absolute; left: 0; top: 13px; font-size: 9pt;">Tandatangan :</div>
-                        <div style="border: 1px solid #000; height: 40px; margin-left: 90px;"></div>
-                    </div>
-                    
-                    <div style="position: relative; margin-bottom: 0;">
-                        <div style="position: absolute; left: 0; top: 7px; font-size: 9pt;">Nama :</div>
-                        <div style="border: 1px solid #000; height: 28px; margin-left: 90px;"></div>
-                    </div>
-                    
-                    <div style="position: relative; margin-bottom: 0;">
-                        <div style="position: absolute; left: 0; top: 7px; font-size: 9pt;">Jawatan :</div>
-                        <div style="border: 1px solid #000; height: 28px; margin-left: 90px;"></div>
-                    </div>
-                    
-                    <div style="position: relative;">
-                        <div style="position: absolute; left: 0; top: 7px; font-size: 9pt;">Tarikh :</div>
-                        <div style="border: 1px solid #000; height: 28px; margin-left: 90px;"></div>
+                <td style="width: 50%; vertical-align: top; padding-right: 20px; border: none;">
+                    <div style="position: relative; margin-left: 90px;">
+                        <!-- Title tanpa border atas, kiri, kanan -->
+                        <div style="font-weight: bold; text-transform: uppercase; font-size: 9pt; padding: 6px 0; text-align: left; border-bottom: 1px solid #ffffffff;">
+                            PENGUMPUL DATA :
+                        </div>
+                        
+                        <!-- Kotak dengan border penuh -->
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #ffffffff; border-top: none;">
+                            <tr>
+                                <td style="height: 55px; border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr>
+                                <td style="height: 30px; border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr>
+                                <td style="height: 30px; border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr>
+                                <td style="height: 30px;"></td>
+                            </tr>
+                        </table>
+                        
+                        <!-- Labels di luar kotak (sebelah kiri, rapat dengan row) -->
+                        <div style="position: absolute; top: 47px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Tandatangan :
+                        </div>
+                        <div style="position: absolute; top: 107px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Nama :
+                        </div>
+                        <div style="position: absolute; top: 147px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Jawatan :
+                        </div>
+                        <div style="position: absolute; top: 187px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Tarikh :
+                        </div>
                     </div>
                 </td>
                 
                 <!-- PENGESAH DATA -->
-                <td style="width: 50%; vertical-align: top; padding-left: 30px; border: none;">
-                    <div style="font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 9pt;">PENGESAH DATA :</div>
-                    
-                    <div style="position: relative; margin-bottom: 0;">
-                        <div style="position: absolute; left: 0; top: 13px; font-size: 9pt;">Tandatangan :</div>
-                        <div style="border: 1px solid #000; height: 40px; margin-left: 90px;"></div>
-                    </div>
-                    
-                    <div style="position: relative; margin-bottom: 0;">
-                        <div style="position: absolute; left: 0; top: 7px; font-size: 9pt;">Nama :</div>
-                        <div style="border: 1px solid #000; height: 28px; margin-left: 90px;"></div>
-                    </div>
-                    
-                    <div style="position: relative; margin-bottom: 0;">
-                        <div style="position: absolute; left: 0; top: 7px; font-size: 9pt;">Jawatan :</div>
-                        <div style="border: 1px solid #000; height: 28px; margin-left: 90px;"></div>
-                    </div>
-                    
-                    <div style="position: relative;">
-                        <div style="position: absolute; left: 0; top: 7px; font-size: 9pt;">Tarikh :</div>
-                        <div style="border: 1px solid #000; height: 28px; margin-left: 90px;"></div>
+                <td style="width: 50%; vertical-align: top; padding-left: 20px; border: none;">
+                    <div style="position: relative; margin-left: 90px;">
+                        <!-- Title tanpa border atas, kiri, kanan -->
+                        <div style="font-weight: bold; text-transform: uppercase; font-size: 9pt; padding: 6px 0; text-align: left; border-bottom: 1px solid #ffffffff;">
+                            PENGESAH DATA :
+                        </div>
+                        
+                        <!-- Kotak dengan border penuh -->
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #ffffffff; border-top: none;">
+                            <tr>
+                                <td style="height: 55px; border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr>
+                                <td style="height: 30px; border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr>
+                                <td style="height: 30px; border-bottom: 1px solid #000;"></td>
+                            </tr>
+                            <tr>
+                                <td style="height: 30px;"></td>
+                            </tr>
+                        </table>
+                        
+                        <!-- Labels di luar kotak (sebelah kiri, rapat dengan row) -->
+                        <div style="position: absolute; top: 47px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Tandatangan :
+                        </div>
+                        <div style="position: absolute; top: 107px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Nama :
+                        </div>
+                        <div style="position: absolute; top: 147px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Jawatan :
+                        </div>
+                        <div style="position: absolute; top: 187px; left: -90px; font-size: 9pt; white-space: nowrap;">
+                            Tarikh :
+                        </div>
                     </div>
                 </td>
             </tr>
