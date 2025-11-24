@@ -33,9 +33,7 @@ class ExportController extends Controller
         // Generate filename
         $filename = 'Borang-1-Komponen-' . $component->id . '-' . date('YmdHis') . '.pdf';
         
-        return $pdf->stream($filename);
-
-        // return $pdf->download($filename);
+        return $pdf->download($filename);
     }
 
     /**
@@ -94,7 +92,7 @@ class ExportController extends Controller
         
         $filename = 'Laporan-Lengkap-Komponen-' . $component->id . '-' . date('YmdHis') . '.pdf';
         
-        return $pdf->stream($filename);
+        return $pdf->download($filename);
     }
 
     /**
