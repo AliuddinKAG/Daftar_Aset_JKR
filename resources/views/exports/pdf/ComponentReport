@@ -1,227 +1,268 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borang 1 - Komponen</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.6;
-            color: #333;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-bottom: 3px solid #2563eb;
-        }
-        .header h1 {
-            margin: 0;
-            color: #2563eb;
-            font-size: 20px;
-        }
-        .header p {
-            margin: 5px 0;
-            color: #666;
-        }
-        .info-section {
-            margin-bottom: 20px;
-            page-break-inside: avoid;
-        }
-        .info-section h2 {
-            background-color: #2563eb;
-            color: white;
-            padding: 8px 12px;
-            margin: 0 0 10px 0;
-            font-size: 14px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table th,
-        table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        table th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-            width: 35%;
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 11px;
-        }
-        .badge-success {
-            background-color: #10b981;
-            color: white;
-        }
-        .badge-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        .footer {
-            margin-top: 30px;
-            padding-top: 10px;
-            border-top: 2px solid #ddd;
-            text-align: center;
-            font-size: 10px;
-            color: #666;
-        }
-        .yes-no {
-            font-weight: bold;
-            color: #10b981;
-        }
-        .yes-no.no {
-            color: #ef4444;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>BORANG PENGUMPULAN DATA DAFTAR ASET KHUSUS</h1>
-        <p>Peringkat Komponen (Borang 1)</p>
-        <p>ID: {{ $component->id }} | 
-           Status: <span class="badge {{ $component->status == 'aktif' ? 'badge-success' : 'badge-secondary' }}">
-               {{ strtoupper($component->status) }}
-           </span>
-        </p>
-    </div>
+<!-- Bidang Kejuruteraan -->
+    <tr>
+        <td colspan="1" class="checkbox-row">
+            <strong>Bidang Kejuruteraan</strong><br><strong>Komponen:</strong>
+        </td>
+        <td colspan="6" class="value-cell">
 
-    <!-- MAKLUMAT LOKASI KOMPONEN -->
-    <div class="info-section">
-        <h2>MAKLUMAT LOKASI KOMPONEN</h2>
-        <table>
-            <tr>
-                <th>Nama Premis</th>
-                <td>{{ $component->nama_premis }}</td>
-            </tr>
-            <tr>
-                <th>Nombor DPA</th>
-                <td>{{ $component->nombor_dpa }}</td>
-            </tr>
-            <tr>
-                <th>Kod Lokasi</th>
-                <td><strong>{{ $component->kod_lokasi }}</strong></td>
-            </tr>
-        </table>
-    </div>
+            <div style="margin-top: 4px;">
+                <span class="checkbox">{{ $mainComponent->awam_arkitek ? '' : '' }}
+                <span class="checkbox-box">
+                @if($mainComponent->awam_arkitek)
+                    ✓
+                @endif
+            </span>
+                </span> Awam/Arkitek
+                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->elektrikal ? '' : '' }}
+                                <span class="checkbox-box">
+                @if($mainComponent->elektrikal)
+                    ✓
+                @endif
+            </span>
+                </span> Elektrikal
+                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->elv_ict ? '' : '' }}
+                            <span class="checkbox-box">
+                @if($mainComponent->elv_ict)
+                    ✓
+                @endif
+                </span>    
+                </span> ELV/ICT
+                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->mekanikal ? '' : '' }}
+                            <span class="checkbox-box">
+                @if($mainComponent->mekanikal)
+                    ✓
+                @endif
+                </span>    
+                </span> Mekanikal<br>
+                <span class="checkbox">{{ $mainComponent->bio_perubatan ? '' : '' }}
+                                <span class="checkbox-box">
+                @if($mainComponent->bio_perubatan)
+                    ✓
+                @endif
+                </span>
+                </span> Bio Perubatan
+                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->lain_lain ? '' : '' }}
+                            <span class="checkbox-box">
+                @if($mainComponent->lain_lain)
+                    ✓
+                @endif
+                </span>    
+                </span> Lain-lain: 
+                <span class="inline-field">{{ $mainComponent->lain_lain ?? '' }}</span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="7" style="min-height: 30px;">
+            <strong>Catatan:</strong> {{ $mainComponent->catatan ?? '' }}
+        </td>
+    </tr>
 
-    <!-- MAKLUMAT BLOK -->
-    @if($component->ada_blok)
-    <div class="info-section">
-        <h2>MAKLUMAT BLOK</h2>
-        <table>
-            <tr>
-                <th>Ada Blok</th>
-                <td><span class="yes-no">✓ YA</span></td>
-            </tr>
-            @if($component->kod_blok)
-            <tr>
-                <th>Kod Blok</th>
-                <td>{{ $component->kod_blok }}</td>
-            </tr>
-            @endif
-            @if($component->kod_aras)
-            <tr>
-                <th>Kod Aras</th>
-                <td>{{ $component->kod_aras }}</td>
-            </tr>
-            @endif
-            @if($component->kod_ruang)
-            <tr>
-                <th>Kod Ruang</th>
-                <td>{{ $component->kod_ruang }}</td>
-            </tr>
-            @endif
-            @if($component->nama_ruang)
-            <tr>
-                <th>Nama Ruang</th>
-                <td>{{ $component->nama_ruang }}</td>
-            </tr>
-            @endif
-            @if($component->catatan_blok)
-            <tr>
-                <th>Catatan</th>
-                <td>{{ $component->catatan_blok }}</td>
-            </tr>
-            @endif
-        </table>
-    </div>
+
+<!-- MAKLUMAT PEROLEHAN -->
+    <tr>
+        <td colspan="7" class="section-title">Maklumat Perolehan</td>
+    </tr>
+
+    <tr>
+        <td class="label-cell">Tarikh Perolehan</td>
+        <td class="value-cell">{{ $mainComponent->tarikh_perolehan?->format('d/m/Y') ?? '' }}</td>
+        <td class="label-cell">Tarikh Dipasang</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_dipasang?->format('d/m/Y') ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">Kos Perolehan/Kontrak</td>
+        <td class="value-cell">{{ $mainComponent->kos_perolehan ? 'RM ' . number_format($mainComponent->kos_perolehan, 2) : '' }}</td>
+        <td class="label-cell">Tarikh Waranti Tamat</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_waranti_tamat?->format('d/m/Y') ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">No. Pesanan Rasmi Kerajaan/Kontrak</td>
+        <td class="value-cell">{{ $mainComponent->no_pesanan_rasmi_kontrak ?? '' }}</td>
+        <td class="label-cell">Tarikh Tamat DLP</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_tamat_dlp?->format('d/m/Y') ?? '' }}</td>
+    </tr>
+    <tr>
+        <td colspan="2" class="label-cell">Kod PTJ</td>
+        <td class="label-cell">Jangka Hayat</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->jangka_hayat ? $mainComponent->jangka_hayat . ' Tahun' : '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">Pengilang</td>
+        <td colspan="6" class="value-cell">{{ $mainComponent->nama_pengilang ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">Pembekal</td>
+        <td class="value-cell">{{ $mainComponent->nama_pembekal ?? '' }}</td>
+        <td class="value-cell">No. Telefon</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->no_telefon_pembekal ?? '' }}</td>        
+    </tr>
+    <tr>
+        <td class="label-cell">Alamat Pembekal</td>
+        <td colspan="6" class="value-cell">
+            {{ $mainComponent->alamat_pembekal ?? '' }}
+        </td>
+    </tr>
+    <tr>
+        <td class="label-cell">Pengilang</td>
+        <td colspan="6" class="value-cell">{{ $mainComponent->nama_pengilang ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">Kontraktor</td>
+        <td class="value-cell">{{ $mainComponent->nama_kontraktor ?? '' }}</td>
+        <td class="value-cell">No. Telefon</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->no_telefon_kontraktor ?? '' }}</td>        
+    </tr>
+    <tr>
+        <td class="label-cell">Alamat Kontraktor</td>
+        <td colspan="6" class="value-cell">
+            {{ $mainComponent->alamat_pembekal ?? '' }}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="7" style="min-height: 25px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_maklumat ?? '' }}</td>
+    </tr>
+
+<!-- MAKLUMAT KOMPONEN -->
+    <tr>
+        <td colspan="7" class="section-title">Komponen</td>
+    </tr>
+    <tr>
+        <td class="label-cell" style="width: 15%;">Deskripsi</td>
+        <td class="value-cell" style="width: 35%;">{{ $mainComponent->deskripsi ?? '' }}</td>
+        <td class="label-cell" style="width: 15%;">Status Komponen</td>
+        <td colspan="4" class="value-cell" style="width: 35%;">
+            @switch($mainComponent->status_komponen)
+                @case('operational') Operational @break
+                @case('under_maintenance') Under Maintenance @break
+                @case('rosak') Rosak @break
+                @case('retired') Retired @break
+                @default {{ $mainComponent->status_komponen ?? '' }}
+            @endswitch
+        </td>
+    </tr>
+    <tr>
+        <td class="label-cell">Jenama</td>
+        <td class="value-cell">{{ $mainComponent->jenama ?? '' }}</td>
+        <td class="label-cell">No. Siri</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->no_siri ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">Model</td>
+        <td class="value-cell">{{ $mainComponent->model ?? '' }}</td>
+        <td class="label-cell">No. Tag / Label (Jika berkenaan)</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->no_tag_label ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell" colspan="2"></td>
+        <td class="label-cell">No Sijil Pendaftaran (Jika ada)</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->no_sijil_pendaftaran ?? '' }}</td>
+    </tr>
+
+<!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
+    <tr>
+        <td colspan="7" class="section-title">** Maklumat Atribut Spesifikasi</td>
+    </tr>
+    <tr>
+        <td class="label-cell" style="width: 15%;">Jenis</td>
+        <td class="value-cell" style="width: 35%;">{{ $mainComponent->jenis ?? '' }}</td>
+        <td class="label-cell" style="width: 15%;">Bahan</td>
+        <td colspan="4" class="value-cell" style="width: 35%;">{{ $mainComponent->bahan ?? '' }}</td>
+    </tr>
+    <tr>
+        <td class="label-cell">Bekalan Elektrik<br><small>(MSB/SSB/PP/DB...)</small></td>
+        <td class="value-cell">{{ $mainComponent->bekalan_elektrik ?? '' }}</td>
+        <td class="label-cell">Kaedah Pemasangan</td>
+        <td colspan="4" class="value-cell">{{ $mainComponent->kaedah_pemasangan ?? '' }}</td>
+    </tr>
+
+    <tr style="background-color: #ffffffff;">
+        <td style="text-align: center; font-weight: bold;" colspan="1">Saiz Fizikal</td>
+        <td style="text-align: center; font-weight: bold;" colspan="2">Unit</td>
+        <td style="text-align: center; font-weight: bold;" colspan="1">Kadaran</td>
+        <td style="text-align: center; font-weight: bold;" colspan="3">Unit</td>
+    </tr>
+    <tr>
+        <td style="text-align: center;">{{ $mainComponent->saiz ?? '' }}</td>
+        <td >{{ $mainComponent->saiz_unit ?? '' }}</td>
+        <td ><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
+        <td style="text-align: center;">{{ $mainComponent->kadaran ?? '' }}</td>
+        <td >{{ $mainComponent->kadaran_unit ?? '' }}</td>
+        <td ><span>(Voltan/Arus/Kuasa/Rating/Ratio/Keamatan Bunyi/Fluks/Faktor/Kuasa/Kecekapan/<br>Fotometri/Bandwidth dll)</span></td>
+    </tr>
+    <tr>
+        <td style="text-align: center; font-weight: bold;" colspan="1">Kapasiti</td>
+        <td style="text-align: center; font-weight: bold;" colspan="2">Unit</td>
+        <td colspan="4" class="value-cell" rowspan="2" style="min-height: 30px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_atribut ?? '' }}</td>
+
+    </tr>
+    <tr>
+        <td style="text-align: center;">{{ $mainComponent->kapasiti ?? '' }}</td>
+        <td>{{ $mainComponent->kapasiti_unit ?? '' }}</td>
+        <td><span>(Isipadu/Head/Berat/Btu/Velocity/Speed dll)</span></td>
+    </tr>
+
+<!-- KOMPONEN YANG BERHUBUNGKAIT -->
+    <tr>
+        <td colspan="7" class="section-title">** Komponen Yang Berhubungkait (Jika Ada)</td>
+    </tr>
+
+    <tr style="background-color: #ffffffff; font-weight: bold;">
+        <td colspan="1" style="width: 5%; text-align: center;">Bil</td>
+        <td colspan="2" style="width: 45%; text-align: center;">Nama Komponen</td>
+        <td colspan="2" style="width: 30%; text-align: center;">No. DPA / Kod Ruang / Kod Binaan Luar</td>
+        <td colspan="2" style="width: 20%; text-align: center;">No. Tag / Label</td>
+    </tr>
+    @if($mainComponent->relatedComponents && $mainComponent->relatedComponents->count() > 0)
+        @foreach($mainComponent->relatedComponents->take(5) as $related)
+        <tr>
+            <td colspan="1" style="text-align: center;">{{ $related->bil ?? '' }}</td>
+            <td colspan="2"style="text-align: center;">{{ $related->nama_komponen ?? '' }}</td>
+            <td colspan="2" style="text-align: center;">{{ $related->no_dpa_kod_ruang ?? '' }}</td>
+            <td colspan="2" style="text-align: center;">{{ $related->no_tag_label ?? '' }}</td>
+        </tr>
+        @endforeach
+    @else
+        @for($i = 0; $i < 3; $i++)
+        <tr>
+            <td colspan="1">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        @endfor
     @endif
+    <tr>
+        <td colspan="7" style="min-height: 25px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_komponen_berhubung ?? '' }}</td>
+    </tr>
 
-    <!-- MAKLUMAT BINAAN LUAR -->
-    @if($component->ada_binaan_luar)
-    <div class="info-section">
-        <h2>MAKLUMAT BINAAN LUAR</h2>
-        <table>
-            <tr>
-                <th>Ada Binaan Luar</th>
-                <td><span class="yes-no">✓ YA</span></td>
-            </tr>
-            @if($component->nama_binaan_luar)
-            <tr>
-                <th>Nama Binaan Luar</th>
-                <td>{{ $component->nama_binaan_luar }}</td>
-            </tr>
-            @endif
-            @if($component->kod_binaan_luar)
-            <tr>
-                <th>Kod Binaan Luar</th>
-                <td>{{ $component->kod_binaan_luar }}</td>
-            </tr>
-            @endif
-            @if($component->koordinat_x || $component->koordinat_y)
-            <tr>
-                <th>Koordinat GPS (WGS 84)</th>
-                <td>X: {{ $component->koordinat_x ?? '-' }} | Y: {{ $component->koordinat_y ?? '-' }}</td>
-            </tr>
-            @endif
-            @if($component->catatan_binaan)
-            <tr>
-                <th>Catatan</th>
-                <td>{{ $component->catatan_binaan }}</td>
-            </tr>
-            @endif
-        </table>
-    </div>
+<!-- DOKUMEN BERKAITAN -->
+    <tr>
+        <td colspan="7" class="section-title">** Dokumen Berkaitan (Jika Ada)</td>
+    </tr>
+    <tr style="background-color: #ffffffff; font-weight: bold;">
+        <td colspan="1" style="width: 5%; text-align: center;">Bil</td>
+        <td colspan="2" style="width: 35%; text-align: center;">Nama Dokumen</td>
+        <td colspan="2" style="width: 30%; text-align: center;">No Rujukan Berkaitan</td>
+        <td colspan="2" style="width: 30%; text-align: center;">Catatan</td>
+    </tr>
+    @if($mainComponent->relatedDocuments && $mainComponent->relatedDocuments->count() > 0)
+        @foreach($mainComponent->relatedDocuments->take(3) as $doc)
+        <tr>
+            <td colspan="1" style="text-align: center;">{{ $doc->bil ?? '' }}</td>
+            <td colspan="2" style="text-align: center;">{{ $doc->nama_dokumen ?? '' }}</td>
+            <td colspan="2" style="text-align: center;">{{ $doc->no_rujukan_berkaitan ?? '' }}</td>
+            <td colspan="2" style="text-align: center;">{{ $doc->catatan ?? '' }}</td>
+        </tr>
+        @endforeach
+    @else
+        @for($i = 0; $i < 2; $i++)
+        <tr>
+            <td colspan="1">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        @endfor
     @endif
-
-    <!-- RINGKASAN -->
-    <div class="info-section">
-        <h2>RINGKASAN</h2>
-        <table>
-            <tr>
-                <th>Total Komponen Utama</th>
-                <td><strong>{{ $component->mainComponents->count() }}</strong></td>
-            </tr>
-            <tr>
-                <th>Total Sub Komponen</th>
-                <td><strong>{{ $component->mainComponents->sum(fn($mc) => $mc->subComponents->count()) }}</strong></td>
-            </tr>
-            <tr>
-                <th>Tarikh Dicipta</th>
-                <td>{{ $component->created_at->format('d/m/Y H:i:s') }}</td>
-            </tr>
-            <tr>
-                <th>Tarikh Kemaskini</th>
-                <td>{{ $component->updated_at->format('d/m/Y H:i:s') }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="footer">
-        <p>Dokumen ini dijana secara automatik oleh Sistem Daftar Aset Khusus</p>
-        <p>Tarikh Cetak: {{ now()->format('d/m/Y H:i:s') }}</p>
-    </div>
-</body>
-</html>
+</table>
