@@ -11,16 +11,16 @@
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Arial', 'DejaVu Sans', sans-serif;
             font-size: 8pt;
             line-height: 1.1;
             color: #000;
-            padding: 15mm 15mm 15mm 15mm;
+            padding: 15mm ;
             background: #fff;
         }
         
         .page-wrapper {
-            transform: scale(0.92);
+            transform: scale(0.75);
             transform-origin: top center;
         }
         

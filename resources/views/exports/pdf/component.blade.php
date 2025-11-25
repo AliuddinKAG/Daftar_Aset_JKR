@@ -144,7 +144,7 @@
         
         .label-col {
             width: 30%;
-            background-color: #e8e8e8;
+            background-color: #ffffffff;
             font-weight: normal;
         }
         
