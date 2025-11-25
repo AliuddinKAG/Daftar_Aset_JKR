@@ -55,7 +55,7 @@ class ExportController extends Controller
         
         $filename = 'Borang-2-Komponen-Utama-' . $mainComponent->id . '-' . date('YmdHis') . '.pdf';
         
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
 
     /**
@@ -94,7 +94,7 @@ class ExportController extends Controller
         
         $filename = 'Laporan-Lengkap-Komponen-' . $component->id . '-' . date('YmdHis') . '.pdf';
         
-        return $pdf->download($filename);
+        return $pdf->stream($filename);
     }
 
     /**
