@@ -2,7 +2,8 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>Borang 2 - Komponen Utama</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $component->nama_premis ?? 'Komponen' }}</title>
     <style>
         * {
             margin: 0;
@@ -44,10 +45,12 @@
             text-decoration: underline;
         }
         
-        .section-header {
+        .doc-code {
+            position: absolute;
+            top: 50px;
+            right: 30px;
+            font-size: 10pt;
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 9pt;
         }
         
         .info-row {
@@ -81,9 +84,12 @@
         }
         
         .checkbox-section {
-            border: 1px solid #000;
             padding: 5px 8px;
             margin: 8px 0;
+        }
+        
+        .checkbox-header {
+            margin-bottom: 5px;
         }
         
         .checkbox-box {
@@ -105,6 +111,12 @@
             left: 1px;
             font-size: 16px;
             font-weight: bold;
+        }
+        
+        .checkbox-label {
+            font-weight: bold;
+            display: inline-block;
+            vertical-align: middle;
         }
         
         table {
@@ -141,12 +153,9 @@
             background-color: #fff;
         }
         
-        .catatan-box {
-            border: 1px solid #000;
-            min-height: 40px;
-            padding: 4px;
-            margin-top: 2px;
-            font-size: 9pt;
+        /* Catatan row styling */
+        .catatan-row {
+            min-height: 50px;
         }
         
         @media print {
