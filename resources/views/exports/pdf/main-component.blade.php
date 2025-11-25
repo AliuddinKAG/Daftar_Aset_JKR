@@ -12,33 +12,33 @@
         
         body {
             font-family: 'Arial', 'DejaVu Sans', sans-serif;
-            font-size: 8pt;
-            line-height: 1.1;
+            font-size: 7pt;
+            line-height: 1.0;
             color: #000;
-            padding: 15mm ;
+            padding: 8mm;
             background: #fff;
         }
         
         .page-wrapper {
-            transform: scale(0.75);
+            transform: scale(0.85);
             transform-origin: top center;
         }
         
         .page-header {
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             border-bottom: 2px solid #ffffffff;
-            padding-bottom: 4px;
+            padding-bottom: 2px;
         }
         
         .page-header h1 {
-            font-size: 11pt;
+            font-size: 10pt;
             font-weight: bold;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
         
         .page-header h2 {
-            font-size: 9pt;
+            font-size: 8pt;
             font-weight: normal;
         }
         
@@ -46,6 +46,7 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
+            margin-bottom: 1px;
         }
 
         .info-group {
@@ -64,10 +65,10 @@
         .section-title {
             background-color: #000;
             color: white;
-            padding: 3px 6px;
+            padding: 2px 4px;
             font-weight: bold;
-            font-size: 8pt;
-            margin-top: 6px;
+            font-size: 7pt;
+            margin-top: 2px;
             margin-bottom: 0;
         }
         
@@ -79,13 +80,13 @@
         
         table td {
             border: 1px solid #000;
-            padding: 2px 4px;
+            padding: 1px 3px;
             vertical-align: top;
-            font-size: 8pt;
+            font-size: 7pt;
         }
         
         .label-cell {
-            background-color: #ffffffff;
+            background-color: #f5f5f5;
             font-weight: normal;
             width: 25%;
         }
@@ -95,31 +96,44 @@
         }
         
         .checkbox-row {
-            padding: 4px 6px;
+            padding: 2px 4px;
         }
         
         .checkbox {
             display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 1.5px solid #000;
-            margin-right: 4px;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #000;
+            margin-right: 3px;
             vertical-align: middle;
             text-align: center;
-            line-height: 10px;
-            font-size: 10px;
+            line-height: 9px;
+            font-size: 8px;
         }
         
         .inline-field {
             border-bottom: 1px solid #000;
             display: inline-block;
-            min-width: 100px;
-            padding: 0 4px;
+            min-width: 80px;
+            padding: 0 3px;
+        }
+        
+        div > strong {
+            font-size: 7pt;
         }
         
         @media print {
-            body { padding: 15mm; }
-            .page-wrapper { transform: scale(0.92); }
+            body { 
+                padding: 8mm;
+            }
+            .page-wrapper { 
+                transform: scale(0.95);
+                page-break-inside: avoid;
+            }
+            @page {
+                size: A4;
+                margin: 8mm;
+            }
         }
     </style>
 </head>
@@ -133,8 +147,8 @@
     </div>
 
     <!-- MAKLUMAT LOKASI KOMPONEN -->
-    <div style="margin-top: 10px;">
-        <div style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">MAKLUMAT LOKASI KOMPONEN</div>
+    <div style="margin-top: 4px; margin-bottom: 3px;">
+        <div style="font-weight: bold; margin-bottom: 2px; font-size: 8pt;">MAKLUMAT LOKASI KOMPONEN</div>
         
         <div class="info-row">
             <span class="info-label">Nama Premis</span>
@@ -163,7 +177,7 @@
     <tr>
         <td colspan="7" class="section-title">Maklumat Utama</td>
     </tr>
-    
+    <tr>
         <td class="label-cell">Nama Komponen Utama</td>
         <td colspan="6" class="value-cell">{{ $mainComponent->nama_komponen_utama ?? '' }}</td>
     </tr>
@@ -174,9 +188,8 @@
     <tr>
         <td class="label-cell">SubSistem</td>
         <td colspan="6"class="value-cell">{{ $mainComponent->subsistem ?? '' }}</td>
-        
     </tr>
-    <<tr>
+    <tr>
         <td class="label-cell">Kuantiti<br><small>(Komponen yang sama jenis)</small></td>
         <td colspan="1" class="value-cell">{{ $mainComponent->kuantiti ?? '' }}</td>
         <td class="label-cell" rowspan="2" style="vertical-align: middle;">Gambar Komponen</td>
@@ -186,73 +199,33 @@
         <td colspan="2" class="label-cell">No Perolehan (Gemas)</td>
     </tr>
 
-
 <!-- Bidang Kejuruteraan -->
     <tr>
         <td colspan="1" class="checkbox-row">
             <strong>Bidang Kejuruteraan</strong><br><strong>Komponen:</strong>
         </td>
         <td colspan="6" class="value-cell">
-
-            <div style="margin-top: 4px;">
-                <span class="checkbox">{{ $mainComponent->awam_arkitek ? '' : '' }}
-                <span class="checkbox-box">
-                @if($mainComponent->awam_arkitek)
-                    ✓
-                @endif
-            </span>
-                </span> Awam/Arkitek
-                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->elektrikal ? '' : '' }}
-                                <span class="checkbox-box">
-                @if($mainComponent->elektrikal)
-                    ✓
-                @endif
-            </span>
-                </span> Elektrikal
-                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->elv_ict ? '' : '' }}
-                            <span class="checkbox-box">
-                @if($mainComponent->elv_ict)
-                    ✓
-                @endif
-                </span>    
-                </span> ELV/ICT
-                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->mekanikal ? '' : '' }}
-                            <span class="checkbox-box">
-                @if($mainComponent->mekanikal)
-                    ✓
-                @endif
-                </span>    
-                </span> Mekanikal<br>
-                <span class="checkbox">{{ $mainComponent->bio_perubatan ? '' : '' }}
-                                <span class="checkbox-box">
-                @if($mainComponent->bio_perubatan)
-                    ✓
-                @endif
-                </span>
-                </span> Bio Perubatan
-                <span style="margin-left: 15px;" class="checkbox">{{ $mainComponent->lain_lain ? '' : '' }}
-                            <span class="checkbox-box">
-                @if($mainComponent->lain_lain)
-                    ✓
-                @endif
-                </span>    
-                </span> Lain-lain: 
+            <div style="margin-top: 2px;">
+                <span class="checkbox">{{ $mainComponent->awam_arkitek ? '✓' : '' }}</span> Awam/Arkitek
+                <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->elektrikal ? '✓' : '' }}</span> Elektrikal
+                <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->elv_ict ? '✓' : '' }}</span> ELV/ICT
+                <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->mekanikal ? '✓' : '' }}</span> Mekanikal<br>
+                <span class="checkbox">{{ $mainComponent->bio_perubatan ? '✓' : '' }}</span> Bio Perubatan
+                <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->lain_lain ? '✓' : '' }}</span> Lain-lain: 
                 <span class="inline-field">{{ $mainComponent->lain_lain ?? '' }}</span>
             </div>
         </td>
     </tr>
     <tr>
-        <td colspan="7" style="min-height: 30px;">
+        <td colspan="7" style="min-height: 15px;">
             <strong>Catatan:</strong> {{ $mainComponent->catatan ?? '' }}
         </td>
     </tr>
-
 
 <!-- MAKLUMAT PEROLEHAN -->
     <tr>
         <td colspan="7" class="section-title">Maklumat Perolehan</td>
     </tr>
-
     <tr>
         <td class="label-cell">Tarikh Perolehan</td>
         <td class="value-cell">{{ $mainComponent->tarikh_perolehan?->format('d/m/Y') ?? '' }}</td>
@@ -288,9 +261,7 @@
     </tr>
     <tr>
         <td class="label-cell">Alamat Pembekal</td>
-        <td colspan="6" class="value-cell">
-            {{ $mainComponent->alamat_pembekal ?? '' }}
-        </td>
+        <td colspan="6" class="value-cell">{{ $mainComponent->alamat_pembekal ?? '' }}</td>
     </tr>
     <tr>
         <td class="label-cell">Pengilang</td>
@@ -304,12 +275,10 @@
     </tr>
     <tr>
         <td class="label-cell">Alamat Kontraktor</td>
-        <td colspan="6" class="value-cell">
-            {{ $mainComponent->alamat_pembekal ?? '' }}
-        </td>
+        <td colspan="6" class="value-cell">{{ $mainComponent->alamat_pembekal ?? '' }}</td>
     </tr>
     <tr>
-        <td colspan="7" style="min-height: 25px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_maklumat ?? '' }}</td>
+        <td colspan="7" style="min-height: 15px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_maklumat ?? '' }}</td>
     </tr>
 
 <!-- MAKLUMAT KOMPONEN -->
@@ -364,8 +333,7 @@
         <td class="label-cell">Kaedah Pemasangan</td>
         <td colspan="4" class="value-cell">{{ $mainComponent->kaedah_pemasangan ?? '' }}</td>
     </tr>
-
-    <tr style="background-color: #ffffffff;">
+    <tr style="background-color: #f5f5f5;">
         <td style="text-align: center; font-weight: bold;" colspan="1">Saiz Fizikal</td>
         <td style="text-align: center; font-weight: bold;" colspan="2">Unit</td>
         <td style="text-align: center; font-weight: bold;" colspan="1">Kadaran</td>
@@ -373,17 +341,16 @@
     </tr>
     <tr>
         <td style="text-align: center;">{{ $mainComponent->saiz ?? '' }}</td>
-        <td >{{ $mainComponent->saiz_unit ?? '' }}</td>
-        <td ><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
+        <td>{{ $mainComponent->saiz_unit ?? '' }}</td>
+        <td><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
         <td style="text-align: center;">{{ $mainComponent->kadaran ?? '' }}</td>
-        <td >{{ $mainComponent->kadaran_unit ?? '' }}</td>
-        <td ><span>(Voltan/Arus/Kuasa/Rating/Ratio/Keamatan Bunyi/Fluks/Faktor/Kuasa/Kecekapan/<br>Fotometri/Bandwidth dll)</span></td>
+        <td>{{ $mainComponent->kadaran_unit ?? '' }}</td>
+        <td><span>(Voltan/Arus/Kuasa/Rating/Ratio/Keamatan Bunyi/Fluks/Faktor/Kuasa/Kecekapan/Fotometri/Bandwidth dll)</span></td>
     </tr>
     <tr>
         <td style="text-align: center; font-weight: bold;" colspan="1">Kapasiti</td>
         <td style="text-align: center; font-weight: bold;" colspan="2">Unit</td>
-        <td colspan="4" class="value-cell" rowspan="2" style="min-height: 30px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_atribut ?? '' }}</td>
-
+        <td colspan="4" class="value-cell" rowspan="2" style="min-height: 15px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_atribut ?? '' }}</td>
     </tr>
     <tr>
         <td style="text-align: center;">{{ $mainComponent->kapasiti ?? '' }}</td>
@@ -395,15 +362,14 @@
     <tr>
         <td colspan="7" class="section-title">** Komponen Yang Berhubungkait (Jika Ada)</td>
     </tr>
-
-    <tr style="background-color: #ffffffff; font-weight: bold;">
+    <tr style="background-color: #f5f5f5; font-weight: bold;">
         <td colspan="1" style="width: 5%; text-align: center;">Bil</td>
         <td colspan="2" style="width: 45%; text-align: center;">Nama Komponen</td>
         <td colspan="2" style="width: 30%; text-align: center;">No. DPA / Kod Ruang / Kod Binaan Luar</td>
         <td colspan="2" style="width: 20%; text-align: center;">No. Tag / Label</td>
     </tr>
     @if($mainComponent->relatedComponents && $mainComponent->relatedComponents->count() > 0)
-        @foreach($mainComponent->relatedComponents->take(5) as $related)
+        @foreach($mainComponent->relatedComponents->take(3) as $related)
         <tr>
             <td colspan="1" style="text-align: center;">{{ $related->bil ?? '' }}</td>
             <td colspan="2"style="text-align: center;">{{ $related->nama_komponen ?? '' }}</td>
@@ -412,7 +378,7 @@
         </tr>
         @endforeach
     @else
-        @for($i = 0; $i < 3; $i++)
+        @for($i = 0; $i < 2; $i++)
         <tr>
             <td colspan="1">&nbsp;</td>
             <td colspan="2">&nbsp;</td>
@@ -422,21 +388,21 @@
         @endfor
     @endif
     <tr>
-        <td colspan="7" style="min-height: 25px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_komponen_berhubung ?? '' }}</td>
+        <td colspan="7" style="min-height: 15px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_komponen_berhubung ?? '' }}</td>
     </tr>
 
 <!-- DOKUMEN BERKAITAN -->
     <tr>
         <td colspan="7" class="section-title">** Dokumen Berkaitan (Jika Ada)</td>
     </tr>
-    <tr style="background-color: #ffffffff; font-weight: bold;">
+    <tr style="background-color: #f5f5f5; font-weight: bold;">
         <td colspan="1" style="width: 5%; text-align: center;">Bil</td>
         <td colspan="2" style="width: 35%; text-align: center;">Nama Dokumen</td>
         <td colspan="2" style="width: 30%; text-align: center;">No Rujukan Berkaitan</td>
         <td colspan="2" style="width: 30%; text-align: center;">Catatan</td>
     </tr>
     @if($mainComponent->relatedDocuments && $mainComponent->relatedDocuments->count() > 0)
-        @foreach($mainComponent->relatedDocuments->take(3) as $doc)
+        @foreach($mainComponent->relatedDocuments->take(2) as $doc)
         <tr>
             <td colspan="1" style="text-align: center;">{{ $doc->bil ?? '' }}</td>
             <td colspan="2" style="text-align: center;">{{ $doc->nama_dokumen ?? '' }}</td>
@@ -457,14 +423,14 @@
 </table>
 
 <!-- Nota -->
-<div>
+<div style="margin-top: 3px; font-size: 7pt;">
     <strong>Nota:</strong><br>
     * Sila gunakan lampiran jika Maklumat Aset / Komponen diperolehi bagi kuantiti yang melebihi 1.<br>
     ** Maklumat Spesifikasi itu merujuk kepada Kategori Aset Khusus yang telah dan berkaitan spesifikasi sahaja.
 </div>
 
 <!-- Muka Surat -->
-<div style="margin-top: 12px; text-align: right; font-size: 8pt; font-style: italic; border: 1px solid #000; padding: 5px 10px; display: inline-block; float: right;">
+<div style="margin-top: 4px; text-align: right; font-size: 7pt; font-style: italic; border: 1px solid #000; padding: 3px 8px; display: inline-block; float: right;">
     Muka surat _____ dari _____
 </div>
 
