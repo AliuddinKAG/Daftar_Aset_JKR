@@ -93,8 +93,9 @@
             border: 2px solid #000;
             margin-right: 6px;
             vertical-align: middle;
-            position: relative;
-            background: #fff;
+            text-align: center;
+            font-size: 12px;
+            line-height: 12px;
         }
         
         .checkbox-box.checked::after {
