@@ -22,7 +22,7 @@
         
         .page-wrapper {
             transform: scale(0.95);
-            transform-origin: top center;
+            transform-origin:center;
             width: 100%;
         }
         
