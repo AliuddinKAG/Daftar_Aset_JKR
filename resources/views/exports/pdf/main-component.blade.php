@@ -11,7 +11,7 @@
         }
         
         body {
-            font-family: 'Arial', 'DejaVu Sans', sans-serif;
+            font-family: 'Arial', 'DejaVu Sans', 'sans-serif';
             font-size: 7pt;
             line-height: 1.0;
             color: #000;
@@ -169,7 +169,7 @@
             
             <span style="margin-left: 40px;">Kod Lokasi</span>
             <span style="margin: 0 5px;">:</span>
-            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 450px); min-height: 12px; padding-left: 5px;">{{ $mainComponent->kod_lokasi ?? '' }}</span>
+            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 410px); min-height: 12px; padding-left: 5px;">{{ $mainComponent->kod_lokasi ?? '' }}</span>
         </div>
     </div>
 
