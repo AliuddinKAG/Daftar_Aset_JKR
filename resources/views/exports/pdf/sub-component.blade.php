@@ -146,14 +146,14 @@
             
             <span style="margin-left: 40px;">Kod Lokasi</span>
             <span style="margin: 0 5px;">:</span>
-            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 450px); min-height: 12px; padding-left: 5px;">{{ $subComponet->mainComponent->kod_lokasi ?? '' }}</span>
+            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 450px); min-height: 12px; padding-left: 5px;">{{ $subComponent->mainComponent->kod_lokasi ?? '' }}</span>
         </div>
     </div>
 
 <table>
 <!-- MAKLUMAT SUB KOMPONEN -->
     <tr>
-        <td colspan="7" class="section-title">Maklumat Sub Komponen</td>
+        <td colspan="7" class="section-title" style="text-align: center;">Maklumat Sub Komponen</td>
     </tr>
     <tr>
         <td class="label-cell">Nama Sub Komponen</td>
@@ -165,7 +165,7 @@
     </tr>
     <tr>
         <td class="label-cell">Status Komponen</td>
-        <td colspan="2" class="value-cell">
+        <td colspan="1" class="value-cell">
             @switch($subComponent->status_komponen)
                 @case('operational') Operational @break
                 @case('under_maintenance') Under Maintenance @break
@@ -174,19 +174,19 @@
             @endswitch
         </td>
         <td class="label-cell">No. Siri</td>
-        <td colspan="3" class="value-cell">{{ $subComponent->no_siri ?? '' }}</td>
+        <td colspan="4" class="value-cell">{{ $subComponent->no_siri ?? '' }}</td>
     </tr>
     <tr>
         <td class="label-cell">Jenama</td>
-        <td colspan="2" class="value-cell">{{ $subComponent->jenama ?? '' }}</td>
+        <td colspan="1" class="value-cell">{{ $subComponent->jenama ?? '' }}</td>
         <td class="label-cell">No. Sijil Pendaftaran (Jika ada)</td>
-        <td colspan="3" class="value-cell">{{ $subComponent->no_sijil_pendaftaran ?? '' }}</td>
+        <td colspan="4" class="value-cell">{{ $subComponent->no_sijil_pendaftaran ?? '' }}</td>
     </tr>
     <tr>
         <td class="label-cell">Model</td>
-        <td colspan="2" class="value-cell">{{ $subComponent->model ?? '' }}</td>
+        <td colspan="1" class="value-cell">{{ $subComponent->model ?? '' }}</td>
         <td class="label-cell">Kuantiti (Sama Jenis)</td>
-        <td colspan="3" class="value-cell">{{ $subComponent->kuantiti ?? '' }}</td>
+        <td colspan="4" class="value-cell">{{ $subComponent->kuantiti ?? '' }}</td>
     </tr>
     <tr>
         <td colspan="7" style="min-height: 15px;">
@@ -196,7 +196,7 @@
 
 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
     <tr>
-        <td colspan="7" class="section-title">** Maklumat Atribut Spesifikasi</td>
+        <td colspan="7" class="section-title" style="text-align: center;">** Maklumat Atribut Spesifikasi</td>
     </tr>
     <tr>
         <td class="label-cell" style="width: 15%;">Jenis</td>
@@ -303,7 +303,7 @@
 
 <!-- MAKLUMAT PEMBELIAN -->
     <tr>
-        <td colspan="7" class="section-title">Maklumat Pembelian</td>
+        <td colspan="7" class="section-title" style="text-align: center;">Maklumat Pembelian</td>
     </tr>
     <tr>
         <td class="label-cell">Tarikh Pembelian</td>
@@ -359,9 +359,9 @@
 
 <!-- DOKUMEN BERKAITAN -->
     <tr>
-        <td colspan="7" class="section-title">Dokumen Berkaitan (Jika Ada)</td>
+        <td colspan="7" class="section-title" style="text-align: center;">Dokumen Berkaitan (Jika Ada)</td>
     </tr>
-    <tr style="background-color: #f5f5f5; font-weight: bold;">
+    <tr style="background-color: #ffffffff; font-weight: bold;">
         <td colspan="1" style="width: 5%; text-align: center;">Bil</td>
         <td colspan="2" style="width: 45%; text-align: center;">Nama Dokumen</td>
         <td colspan="2" style="width: 30%; text-align: center;">No Rujukan Berkaitan</td>
@@ -379,7 +379,7 @@
                 <td colspan="1" style="text-align: center;">{{ $doc['bil'] ?? '' }}</td>
                 <td colspan="2">{{ $doc['nama'] ?? '' }}</td>
                 <td colspan="2">{{ $doc['rujukan'] ?? '' }}</td>
-                <td colspan="1">{{ $doc['catatan'] ?? '' }}</td>
+                <td colspan="2">{{ $doc['catatan'] ?? '' }}</td>
             </tr>
             @endif
         @endforeach
@@ -389,7 +389,7 @@
             <td colspan="1">&nbsp;</td>
             <td colspan="2">&nbsp;</td>
             <td colspan="2">&nbsp;</td>
-            <td colspan="1">&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
         </tr>
         @endfor
     @endif

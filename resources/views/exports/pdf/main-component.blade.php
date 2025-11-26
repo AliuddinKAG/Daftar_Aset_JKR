@@ -174,7 +174,7 @@
 <table>
 <!-- MAKLUMAT KOMPONEN UTAMA -->
     <tr>
-        <td colspan="7" class="section-title">Maklumat Utama</td>
+        <td colspan="7" class="section-title" style="text-align: center;">Maklumat Utama</td>
     </tr>
     <tr>
         <td class="label-cell">Nama Komponen Utama</td>
@@ -223,7 +223,7 @@
 
 <!-- MAKLUMAT PEROLEHAN -->
     <tr>
-        <td colspan="7" class="section-title">Maklumat Perolehan</td>
+        <td colspan="7" class="section-title" style="text-align: center;">Maklumat Perolehan</td>
     </tr>
     <tr>
         <td class="label-cell">Tarikh Perolehan</td>
@@ -282,7 +282,7 @@
 
 <!-- MAKLUMAT KOMPONEN -->
     <tr>
-        <td colspan="7" class="section-title">Komponen</td>
+        <td colspan="7" class="section-title" style="text-align: center;">Komponen</td>
     </tr>
     <tr>
         <td class="label-cell" style="width: 15%;">Deskripsi</td>
@@ -318,7 +318,7 @@
 
 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
     <tr>
-        <td colspan="7" class="section-title">** Maklumat Atribut Spesifikasi</td>
+        <td colspan="7" class="section-title" style="text-align: center;">** Maklumat Atribut Spesifikasi</td>
     </tr>
     <tr>
         <td class="label-cell" style="width: 15%;">Jenis</td>
@@ -359,7 +359,7 @@
 
 <!-- KOMPONEN YANG BERHUBUNGKAIT -->
     <tr>
-        <td colspan="7" class="section-title">** Komponen Yang Berhubungkait (Jika Ada)</td>
+        <td colspan="7" class="section-title"style="text-align: center;">** Komponen Yang Berhubungkait (Jika Ada)</td>
     </tr>
     <tr style="background-color: #f5f5f5; font-weight: bold;">
         <td colspan="1" style="width: 5%; text-align: center;">Bil</td>
@@ -392,7 +392,7 @@
 
 <!-- DOKUMEN BERKAITAN -->
     <tr>
-        <td colspan="7" class="section-title">** Dokumen Berkaitan (Jika Ada)</td>
+        <td colspan="7" class="section-title"style="text-align: center;">** Dokumen Berkaitan (Jika Ada)</td>
     </tr>
     <tr style="background-color: #f5f5f5; font-weight: bold;">
         <td colspan="1" style="width: 5%; text-align: center;">Bil</td>
