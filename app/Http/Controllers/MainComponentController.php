@@ -11,38 +11,32 @@ use Illuminate\Http\Request;
 class MainComponentController extends Controller
 {
     /**
-     * Generate Kod Lokasi automatically
+     * Helper: Process array field to JSON array (structured)
+     * Simpan sebagai array of objects untuk maintain relationship antara nilai dan unit
      */
-    public function generateKodLokasi(Request $request)
+    private function processArrayFieldToJson($values, $units): ?string
     {
-        $componentId = $request->get('component_id');
-        $component = Component::find($componentId);
-        
-        if (!$component) {
-            return response()->json(['kod_lokasi' => ''], 400);
+        if (empty($values) && empty($units)) {
+            return null;
         }
         
-        // Count existing main components for this component + 1
-        $count = MainComponent::where('component_id', $componentId)->count() + 1;
+        $result = [];
         
-        // Format: KU-[ComponentID]-[XXX]
-        $kodLokasi = 'KU-' . $componentId . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+        // Convert to arrays if not already
+        $valuesArray = is_array($values) ? $values : [$values];
+        $unitsArray = is_array($units) ? $units : [$units];
         
-        return response()->json(['kod_lokasi' => $kodLokasi]);
-    }
-
-    /**
-     * Show the form for creating a new main component
-     */
-    public function create()
-    {
-        $components = Component::where('status', 'aktif')->get();
-        $sistems = Sistem::orderBy('kod')->get();
-        $subsistems = Subsistem::orderBy('kod')->get();
+        // Pair each value with its corresponding unit
+        foreach ($valuesArray as $index => $value) {
+            if ($value !== null && $value !== '') {
+                $result[] = [
+                    'nilai' => $value,
+                    'unit' => $unitsArray[$index] ?? null
+                ];
+            }
+        }
         
-        return view('components.create-main-component', compact(
-            'components', 'sistems', 'subsistems'
-        ));
+        return !empty($result) ? json_encode($result) : null;
     }
 
     /**
@@ -59,13 +53,24 @@ class MainComponentController extends Controller
         $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
         $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-        // Handle array fields - gabungkan dengan comma
-        $validated['saiz'] = $this->processArrayField($request->input('saiz'));
-        $validated['saiz_unit'] = $this->processArrayField($request->input('saiz_unit'));
-        $validated['kadaran'] = $this->processArrayField($request->input('kadaran'));
-        $validated['kadaran_unit'] = $this->processArrayField($request->input('kadaran_unit'));
-        $validated['kapasiti'] = $this->processArrayField($request->input('kapasiti'));
-        $validated['kapasiti_unit'] = $this->processArrayField($request->input('kapasiti_unit'));
+        // Handle array fields - simpan sebagai JSON yang terstruktur
+        $validated['saiz'] = $this->processArrayFieldToJson(
+            $request->input('saiz'),
+            $request->input('saiz_unit')
+        );
+        $validated['saiz_unit'] = null; // Unit already included in JSON
+        
+        $validated['kadaran'] = $this->processArrayFieldToJson(
+            $request->input('kadaran'),
+            $request->input('kadaran_unit')
+        );
+        $validated['kadaran_unit'] = null;
+        
+        $validated['kapasiti'] = $this->processArrayFieldToJson(
+            $request->input('kapasiti'),
+            $request->input('kapasiti_unit')
+        );
+        $validated['kapasiti_unit'] = null;
 
         // Atribut tambahan dari partial
         $validated['jenis'] = $request->input('jenis');
@@ -102,35 +107,6 @@ class MainComponentController extends Controller
     }
 
     /**
-     * Display the specified main component
-     */
-    public function show(MainComponent $mainComponent)
-    {
-        $mainComponent->load([
-            'component', 
-            'subComponents', 
-            'relatedComponents', 
-            'relatedDocuments'
-        ]);
-        
-        return view('components.view-main-component', compact('mainComponent'));
-    }
-
-    /**
-     * Show the form for editing the main component
-     */
-    public function edit(MainComponent $mainComponent)
-    {
-        $components = Component::where('status', 'aktif')->get();
-        $sistems = Sistem::orderBy('kod')->get();
-        $subsistems = Subsistem::orderBy('kod')->get();
-        
-        return view('components.edit-main-component', compact(
-            'mainComponent', 'components', 'sistems', 'subsistems'
-        ));
-    }
-
-    /**
      * Update the specified main component
      */
     public function update(Request $request, MainComponent $mainComponent)
@@ -144,13 +120,24 @@ class MainComponentController extends Controller
         $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
         $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-        // Handle array fields - gabungkan dengan comma
-        $validated['saiz'] = $this->processArrayField($request->input('saiz'));
-        $validated['saiz_unit'] = $this->processArrayField($request->input('saiz_unit'));
-        $validated['kadaran'] = $this->processArrayField($request->input('kadaran'));
-        $validated['kadaran_unit'] = $this->processArrayField($request->input('kadaran_unit'));
-        $validated['kapasiti'] = $this->processArrayField($request->input('kapasiti'));
-        $validated['kapasiti_unit'] = $this->processArrayField($request->input('kapasiti_unit'));
+        // Handle array fields - simpan sebagai JSON yang terstruktur
+        $validated['saiz'] = $this->processArrayFieldToJson(
+            $request->input('saiz'),
+            $request->input('saiz_unit')
+        );
+        $validated['saiz_unit'] = null;
+        
+        $validated['kadaran'] = $this->processArrayFieldToJson(
+            $request->input('kadaran'),
+            $request->input('kadaran_unit')
+        );
+        $validated['kadaran_unit'] = null;
+        
+        $validated['kapasiti'] = $this->processArrayFieldToJson(
+            $request->input('kapasiti'),
+            $request->input('kapasiti_unit')
+        );
+        $validated['kapasiti_unit'] = null;
 
         // Atribut tambahan dari partial
         $validated['jenis'] = $request->input('jenis');
@@ -186,54 +173,8 @@ class MainComponentController extends Controller
             ->with('success', 'Komponen Utama berjaya dikemaskini');
     }
 
-    /**
-     * Soft delete the specified main component
-     */
-    public function destroy(MainComponent $mainComponent)
-    {
-        $mainComponent->delete();
-        
-        return redirect()->route('components.index')
-            ->with('success', 'Komponen Utama berjaya dipadam');
-    }
-
-    /**
-     * Display a listing of trashed main components
-     */
-    public function trashed()
-    {
-        $mainComponents = MainComponent::onlyTrashed()
-            ->with(['component', 'subComponents'])
-            ->orderBy('deleted_at', 'desc')
-            ->paginate(10);
-        
-        return view('main-components.trashed', compact('mainComponents'));
-    }
-
-    /**
-     * Restore a trashed main component
-     */
-    public function restore($id)
-    {
-        $mainComponent = MainComponent::onlyTrashed()->findOrFail($id);
-        $mainComponent->restore();
-        
-        return redirect()->route('main-components.trashed')
-            ->with('success', 'Komponen Utama berjaya dipulihkan');
-    }
-
-    /**
-     * Permanently delete a trashed main component
-     */
-    public function forceDestroy($id)
-    {
-        $mainComponent = MainComponent::onlyTrashed()->findOrFail($id);
-        $mainComponent->forceDelete();
-        
-        return redirect()->route('main-components.trashed')
-            ->with('success', 'Komponen Utama berjaya dipadam secara kekal');
-    }
-
+    // ... rest of the methods remain the same ...
+    
     /**
      * Get validation rules for store and update
      */
@@ -294,9 +235,6 @@ class MainComponentController extends Controller
         ];
     }
 
-    /**
-     * Helper: Save Sistem if doesn't exist
-     */
     private function saveSistem(string $kod): void
     {
         $exists = Sistem::where('kod', $kod)->exists();
@@ -309,9 +247,6 @@ class MainComponentController extends Controller
         }
     }
 
-    /**
-     * Helper: Save Subsistem if doesn't exist
-     */
     private function saveSubsistem(string $kod, ?string $sistemKod = null): void
     {
         $exists = Subsistem::where('kod', $kod)->exists();
@@ -331,29 +266,6 @@ class MainComponentController extends Controller
         }
     }
 
-    /**
-     * Helper: Process array field to string (comma separated)
-     */
-    private function processArrayField($input): ?string
-    {
-        if (empty($input)) {
-            return null;
-        }
-        
-        if (is_array($input)) {
-            // Filter empty values and join with comma
-            $filtered = array_filter($input, function($v) {
-                return $v !== null && $v !== '';
-            });
-            return !empty($filtered) ? implode(', ', $filtered) : null;
-        }
-        
-        return $input;
-    }
-
-    /**
-     * Helper: Save Related Components
-     */
     private function saveRelatedComponents(MainComponent $mainComponent, Request $request): void
     {
         $bils = $request->input('related_bil', []);
@@ -363,7 +275,6 @@ class MainComponentController extends Controller
 
         if (!empty($namas) && is_array($namas)) {
             foreach ($namas as $index => $nama) {
-                // Skip jika nama kosong
                 if (empty(trim($nama ?? ''))) {
                     continue;
                 }
@@ -379,9 +290,6 @@ class MainComponentController extends Controller
         }
     }
 
-    /**
-     * Helper: Save Related Documents
-     */
     private function saveRelatedDocuments(MainComponent $mainComponent, Request $request): void
     {
         $bils = $request->input('doc_bil', []);
@@ -391,7 +299,6 @@ class MainComponentController extends Controller
 
         if (!empty($namas) && is_array($namas)) {
             foreach ($namas as $index => $nama) {
-                // Skip jika nama kosong
                 if (empty(trim($nama ?? ''))) {
                     continue;
                 }
@@ -405,5 +312,90 @@ class MainComponentController extends Controller
                 ]);
             }
         }
+    }
+
+    public function generateKodLokasi(Request $request)
+    {
+        $componentId = $request->get('component_id');
+        $component = Component::find($componentId);
+        
+        if (!$component) {
+            return response()->json(['kod_lokasi' => ''], 400);
+        }
+        
+        $count = MainComponent::where('component_id', $componentId)->count() + 1;
+        $kodLokasi = 'KU-' . $componentId . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+        
+        return response()->json(['kod_lokasi' => $kodLokasi]);
+    }
+
+    public function create()
+    {
+        $components = Component::where('status', 'aktif')->get();
+        $sistems = Sistem::orderBy('kod')->get();
+        $subsistems = Subsistem::orderBy('kod')->get();
+        
+        return view('components.create-main-component', compact(
+            'components', 'sistems', 'subsistems'
+        ));
+    }
+
+    public function show(MainComponent $mainComponent)
+    {
+        $mainComponent->load([
+            'component', 
+            'subComponents', 
+            'relatedComponents', 
+            'relatedDocuments'
+        ]);
+        
+        return view('components.view-main-component', compact('mainComponent'));
+    }
+
+    public function edit(MainComponent $mainComponent)
+    {
+        $components = Component::where('status', 'aktif')->get();
+        $sistems = Sistem::orderBy('kod')->get();
+        $subsistems = Subsistem::orderBy('kod')->get();
+        
+        return view('components.edit-main-component', compact(
+            'mainComponent', 'components', 'sistems', 'subsistems'
+        ));
+    }
+
+    public function destroy(MainComponent $mainComponent)
+    {
+        $mainComponent->delete();
+        
+        return redirect()->route('components.index')
+            ->with('success', 'Komponen Utama berjaya dipadam');
+    }
+
+    public function trashed()
+    {
+        $mainComponents = MainComponent::onlyTrashed()
+            ->with(['component', 'subComponents'])
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(10);
+        
+        return view('main-components.trashed', compact('mainComponents'));
+    }
+
+    public function restore($id)
+    {
+        $mainComponent = MainComponent::onlyTrashed()->findOrFail($id);
+        $mainComponent->restore();
+        
+        return redirect()->route('main-components.trashed')
+            ->with('success', 'Komponen Utama berjaya dipulihkan');
+    }
+
+    public function forceDestroy($id)
+    {
+        $mainComponent = MainComponent::onlyTrashed()->findOrFail($id);
+        $mainComponent->forceDelete();
+        
+        return redirect()->route('main-components.trashed')
+            ->with('success', 'Komponen Utama berjaya dipadam secara kekal');
     }
 }

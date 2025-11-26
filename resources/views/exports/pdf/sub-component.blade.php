@@ -223,7 +223,7 @@
                 {{ $subComponent->saiz ?? '' }}
             @endif
         </td>
-        <td colspan="1">
+        <td colspan="1" style="width: 150px;">
             @php
                 $saiz_unit = is_string($subComponent->saiz_unit) ? json_decode($subComponent->saiz_unit, true) : $subComponent->saiz_unit;
             @endphp
@@ -260,7 +260,7 @@
                 {{ $subComponent->kadaran_unit ?? '' }}
             @endif
         </td>
-        <td colspan="2"><span>(Voltan/Arus/<br>Kuasa/Rating/<br>Ratio/<br>Keamatan Bunyi/Fluks/<br>Faktor Kuasa/<br>Kecekapan/<br>Fotometri/<br>Bandwidth dll)</span></td>
+        <td colspan="2"><span>(Voltan/Arus/Kuasa/Rating/<br>Ratio/Keamatan Bunyi/Fluks/<br>Faktor Kuasa/Kecekapan/<br>Fotometri/Bandwidth dll)</span></td>
     </tr>
     <tr style="background-color: #f5f5f5;">
         <td style="text-align: center; font-weight: bold;" colspan="1">Kapasiti</td>
