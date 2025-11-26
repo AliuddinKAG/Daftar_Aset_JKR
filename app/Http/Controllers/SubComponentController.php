@@ -23,6 +23,7 @@ class SubComponentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            // Maklumat Utama
             'main_component_id' => 'required|exists:main_components,id',
             'nama_sub_komponen' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -33,15 +34,87 @@ class SubComponentController extends Controller
             'model' => 'nullable|string|max:255',
             'kuantiti' => 'nullable|integer|min:1',
             'catatan' => 'nullable|string',
-            'saiz' => 'nullable|string|max:255',
-            'saiz_unit' => 'nullable|string|max:50',
-            'kadaran' => 'nullable|string|max:255',
-            'kadaran_unit' => 'nullable|string|max:50',
-            'kapasiti' => 'nullable|string|max:255',
-            'kapasiti_unit' => 'nullable|string|max:50',
+            
+            // Atribut Spesifikasi
+            'jenis' => 'nullable|string|max:255',
+            'bahan' => 'nullable|string|max:255',
+            'saiz' => 'nullable|array',
+            'saiz_unit' => 'nullable|array',
+            'kadaran' => 'nullable|array',
+            'kadaran_unit' => 'nullable|array',
+            'kapasiti' => 'nullable|array',
+            'kapasiti_unit' => 'nullable|array',
+            'catatan_atribut' => 'nullable|string',
+            
+            // Maklumat Pembelian
+            'tarikh_pembelian' => 'nullable|date',
+            'kos_perolehan' => 'nullable|numeric',
+            'no_pesanan_rasmi_kontrak' => 'nullable|string|max:255',
+            'kod_ptj' => 'nullable|string|max:255',
+            'tarikh_dipasang' => 'nullable|date',
+            'tarikh_waranti_tamat' => 'nullable|date',
+            'jangka_hayat' => 'nullable|string|max:255',
+            
+            // Pengilang, Pembekal, Kontraktor
+            'nama_pengilang' => 'nullable|string|max:255',
+            'nama_pembekal' => 'nullable|string|max:255',
+            'alamat_pembekal' => 'nullable|string',
+            'no_telefon_pembekal' => 'nullable|string|max:50',
+            'nama_kontraktor' => 'nullable|string|max:255',
+            'alamat_kontraktor' => 'nullable|string',
+            'no_telefon_kontraktor' => 'nullable|string|max:50',
+            'catatan_pembelian' => 'nullable|string',
+            
+            // Dokumen Berkaitan
+            'doc_bil' => 'nullable|array',
+            'doc_nama' => 'nullable|array',
+            'doc_rujukan' => 'nullable|array',
+            'doc_catatan' => 'nullable|array',
+            'catatan_dokumen' => 'nullable|string',
+            
+            // Status & Nota
+            'nota' => 'nullable|string',
+            'status' => 'required|string|in:aktif,tidak_aktif',
         ]);
 
-        $validated['status'] = 'aktif';
+        // Convert arrays to JSON for storage
+        if (isset($validated['saiz']) && is_array($validated['saiz'])) {
+            $validated['saiz'] = json_encode($validated['saiz']);
+        }
+        if (isset($validated['saiz_unit']) && is_array($validated['saiz_unit'])) {
+            $validated['saiz_unit'] = json_encode($validated['saiz_unit']);
+        }
+        if (isset($validated['kadaran']) && is_array($validated['kadaran'])) {
+            $validated['kadaran'] = json_encode($validated['kadaran']);
+        }
+        if (isset($validated['kadaran_unit']) && is_array($validated['kadaran_unit'])) {
+            $validated['kadaran_unit'] = json_encode($validated['kadaran_unit']);
+        }
+        if (isset($validated['kapasiti']) && is_array($validated['kapasiti'])) {
+            $validated['kapasiti'] = json_encode($validated['kapasiti']);
+        }
+        if (isset($validated['kapasiti_unit']) && is_array($validated['kapasiti_unit'])) {
+            $validated['kapasiti_unit'] = json_encode($validated['kapasiti_unit']);
+        }
+        
+        // Store documents as JSON
+        if (isset($validated['doc_bil']) && is_array($validated['doc_bil'])) {
+            $documents = [];
+            foreach ($validated['doc_bil'] as $index => $bil) {
+                if (!empty($bil) || !empty($validated['doc_nama'][$index] ?? '')) {
+                    $documents[] = [
+                        'bil' => $bil,
+                        'nama' => $validated['doc_nama'][$index] ?? '',
+                        'rujukan' => $validated['doc_rujukan'][$index] ?? '',
+                        'catatan' => $validated['doc_catatan'][$index] ?? '',
+                    ];
+                }
+            }
+            $validated['dokumen_berkaitan'] = json_encode($documents);
+            
+            // Remove array fields
+            unset($validated['doc_bil'], $validated['doc_nama'], $validated['doc_rujukan'], $validated['doc_catatan']);
+        }
         
         SubComponent::create($validated);
 
@@ -73,6 +146,7 @@ class SubComponentController extends Controller
     public function update(Request $request, SubComponent $subComponent)
     {
         $validated = $request->validate([
+            // Maklumat Utama
             'main_component_id' => 'required|exists:main_components,id',
             'nama_sub_komponen' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -83,13 +157,87 @@ class SubComponentController extends Controller
             'model' => 'nullable|string|max:255',
             'kuantiti' => 'nullable|integer|min:1',
             'catatan' => 'nullable|string',
-            'saiz' => 'nullable|string|max:255',
-            'saiz_unit' => 'nullable|string|max:50',
-            'kadaran' => 'nullable|string|max:255',
-            'kadaran_unit' => 'nullable|string|max:50',
-            'kapasiti' => 'nullable|string|max:255',
-            'kapasiti_unit' => 'nullable|string|max:50',
+            
+            // Atribut Spesifikasi
+            'jenis' => 'nullable|string|max:255',
+            'bahan' => 'nullable|string|max:255',
+            'saiz' => 'nullable|array',
+            'saiz_unit' => 'nullable|array',
+            'kadaran' => 'nullable|array',
+            'kadaran_unit' => 'nullable|array',
+            'kapasiti' => 'nullable|array',
+            'kapasiti_unit' => 'nullable|array',
+            'catatan_atribut' => 'nullable|string',
+            
+            // Maklumat Pembelian
+            'tarikh_pembelian' => 'nullable|date',
+            'kos_perolehan' => 'nullable|numeric',
+            'no_pesanan_rasmi_kontrak' => 'nullable|string|max:255',
+            'kod_ptj' => 'nullable|string|max:255',
+            'tarikh_dipasang' => 'nullable|date',
+            'tarikh_waranti_tamat' => 'nullable|date',
+            'jangka_hayat' => 'nullable|string|max:255',
+            
+            // Pengilang, Pembekal, Kontraktor
+            'nama_pengilang' => 'nullable|string|max:255',
+            'nama_pembekal' => 'nullable|string|max:255',
+            'alamat_pembekal' => 'nullable|string',
+            'no_telefon_pembekal' => 'nullable|string|max:50',
+            'nama_kontraktor' => 'nullable|string|max:255',
+            'alamat_kontraktor' => 'nullable|string',
+            'no_telefon_kontraktor' => 'nullable|string|max:50',
+            'catatan_pembelian' => 'nullable|string',
+            
+            // Dokumen Berkaitan
+            'doc_bil' => 'nullable|array',
+            'doc_nama' => 'nullable|array',
+            'doc_rujukan' => 'nullable|array',
+            'doc_catatan' => 'nullable|array',
+            'catatan_dokumen' => 'nullable|string',
+            
+            // Status & Nota
+            'nota' => 'nullable|string',
+            'status' => 'required|string|in:aktif,tidak_aktif',
         ]);
+
+        // Convert arrays to JSON for storage
+        if (isset($validated['saiz']) && is_array($validated['saiz'])) {
+            $validated['saiz'] = json_encode($validated['saiz']);
+        }
+        if (isset($validated['saiz_unit']) && is_array($validated['saiz_unit'])) {
+            $validated['saiz_unit'] = json_encode($validated['saiz_unit']);
+        }
+        if (isset($validated['kadaran']) && is_array($validated['kadaran'])) {
+            $validated['kadaran'] = json_encode($validated['kadaran']);
+        }
+        if (isset($validated['kadaran_unit']) && is_array($validated['kadaran_unit'])) {
+            $validated['kadaran_unit'] = json_encode($validated['kadaran_unit']);
+        }
+        if (isset($validated['kapasiti']) && is_array($validated['kapasiti'])) {
+            $validated['kapasiti'] = json_encode($validated['kapasiti']);
+        }
+        if (isset($validated['kapasiti_unit']) && is_array($validated['kapasiti_unit'])) {
+            $validated['kapasiti_unit'] = json_encode($validated['kapasiti_unit']);
+        }
+        
+        // Store documents as JSON
+        if (isset($validated['doc_bil']) && is_array($validated['doc_bil'])) {
+            $documents = [];
+            foreach ($validated['doc_bil'] as $index => $bil) {
+                if (!empty($bil) || !empty($validated['doc_nama'][$index] ?? '')) {
+                    $documents[] = [
+                        'bil' => $bil,
+                        'nama' => $validated['doc_nama'][$index] ?? '',
+                        'rujukan' => $validated['doc_rujukan'][$index] ?? '',
+                        'catatan' => $validated['doc_catatan'][$index] ?? '',
+                    ];
+                }
+            }
+            $validated['dokumen_berkaitan'] = json_encode($documents);
+            
+            // Remove array fields
+            unset($validated['doc_bil'], $validated['doc_nama'], $validated['doc_rujukan'], $validated['doc_catatan']);
+        }
 
         $subComponent->update($validated);
 

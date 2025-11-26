@@ -34,6 +34,26 @@
                     <a href="{{ route('sub-components.edit', $subComponent) }}" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Edit
                     </a>
+                    
+                    <!-- Export Buttons -->
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-download"></i> Export
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('export.sub-component.pdf', $subComponent) }}" target="_blank">
+                                    <i class="bi bi-file-pdf text-danger"></i> Export PDF
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('export.sub-component.excel', $subComponent) }}">
+                                    <i class="bi bi-file-excel text-success"></i> Export Excel
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
                     <form action="{{ route('sub-components.delete', $subComponent) }}" method="POST" class="d-inline"
                           onsubmit="return confirm('Adakah anda pasti ingin memadam sub komponen ini?')">
                         @csrf
@@ -44,6 +64,7 @@
                     </form>
                 </div>
 
+                <!-- Rest of the content remains the same -->
                 <!-- BREADCRUMB HIERARCHY -->
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb bg-light p-3 rounded">
