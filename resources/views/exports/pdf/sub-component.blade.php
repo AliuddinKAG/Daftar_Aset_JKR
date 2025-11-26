@@ -12,7 +12,7 @@
         
         body {
             font-family: 'Arial', 'DejaVu Sans', sans-serif;
-            font-size: 7pt;
+            font-size: 8pt;
             line-height: 1.0;
             color: #000;
             padding: 8mm;
@@ -35,11 +35,13 @@
             font-size: 10pt;
             font-weight: bold;
             margin-bottom: 1px;
+            text-decoration: underline;
         }
         
         .page-header h2 {
             font-size: 8pt;
             font-weight: normal;
+            text-decoration: underline;
         }
         
         .section-title {
@@ -47,7 +49,7 @@
             color: white;
             padding: 2px 4px;
             font-weight: bold;
-            font-size: 7pt;
+            font-size: 8pt;
             margin-top: 2px;
             margin-bottom: 0;
         }
@@ -62,7 +64,7 @@
             border: 1px solid #000;
             padding: 1px 3px;
             vertical-align: top;
-            font-size: 7pt;
+            font-size: 8pt;
         }
         
         .label-cell {
@@ -260,14 +262,16 @@
                 {{ $subComponent->kadaran_unit ?? '' }}
             @endif
         </td>
-        <td colspan="2"><span>(Voltan/Arus/Kuasa/Rating/<br>Ratio/Keamatan Bunyi/Fluks/<br>Faktor Kuasa/Kecekapan/<br>Fotometri/Bandwidth dll)</span></td>
+        <td colspan="2"><span>(Voltan/Arus/Kuasa/<br>Rating/Ratio/Keamatan Bunyi/Fluks/<br>Faktor Kuasa/Kecekapan/<br>Fotometri/Bandwidth dll)</span></td>
     </tr>
-    <tr style="background-color: #f5f5f5;">
+    <tr style="background-color: #ffffffff;">
         <td style="text-align: center; font-weight: bold;" colspan="1">Kapasiti</td>
         <td style="text-align: center; font-weight: bold;" colspan="2">Unit</td>
-        <td colspan="4" class="value-cell" rowspan="2" style="min-height: 15px; vertical-align: top;">
+        <td colspan="2" class="value-cell" rowspan="2" style="min-height: 15px; vertical-align: top;">
             <strong>Gambar Sub Komponen</strong><br>
-            <span style="font-size: 6pt;">Sila lampirkan gambar jika perlu, dan pastikan dimuat naik ke dalam Sistem mySPATA</span>
+        </td>
+        <td colspan="2" class="value-cell" rowspan="2">
+            <span style="font-size: 7pt;">Sila lampirkan gambar jika perlu, dan pastikan dimuat naik ke dalam Sistem mySPATA</span>
         </td>
     </tr>
     <tr>

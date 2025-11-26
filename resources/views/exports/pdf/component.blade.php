@@ -37,6 +37,7 @@
             margin-bottom: 3px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            text-decoration: underline;
         }
         
         .page-header h2 {
@@ -184,7 +185,7 @@
 
     <!-- MAKLUMAT LOKASI KOMPONEN -->
     <div style="margin-top: 10px;">
-        <div style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">MAKLUMAT LOKASI KOMPONEN</div>
+        <div style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;text-decoration: underline;">MAKLUMAT LOKASI KOMPONEN</div>
         
         <div class="info-row">
             <span class="info-label">Nama Premis</span>

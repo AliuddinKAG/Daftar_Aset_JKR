@@ -35,11 +35,13 @@
             font-size: 10pt;
             font-weight: bold;
             margin-bottom: 1px;
+            text-decoration: underline;
         }
         
         .page-header h2 {
             font-size: 8pt;
             font-weight: normal;
+            text-decoration: underline;
         }
         
         .info-row {
