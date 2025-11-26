@@ -339,12 +339,12 @@
         <td style="text-align: center; font-weight: bold;" colspan="3">Unit</td>
     </tr>
     <tr>
-        <td style="text-align: center;">{{ $mainComponent->saiz ?? '' }}</td>
-        <td>{{ $mainComponent->saiz_unit ?? '' }}</td>
-        <td><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
+        <td style="text-align: center; width: 120px;">{{ $mainComponent->saiz ?? '' }}</td>
+        <td style="width: 120px;">{{ $mainComponent->saiz_unit ?? '' }}</td>
+        <td style="width: 120px;"><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
         <td style="text-align: center;">{{ $mainComponent->kadaran ?? '' }}</td>
         <td>{{ $mainComponent->kadaran_unit ?? '' }}</td>
-        <td><span>(Voltan/Arus/Kuasa/Rating/Ratio/Keamatan Bunyi/Fluks/Faktor/Kuasa/Kecekapan/Fotometri/Bandwidth dll)</span></td>
+        <td colspan="2" ><span>(Voltan/Arus/Kuasa/<br>Rating/Ratio/Keamatan Bunyi/Fluks/Faktor/Kuasa/<br>Kecekapan/Fotometri/<br>Bandwidth dll)</span></td>
     </tr>
     <tr>
         <td style="text-align: center; font-weight: bold;" colspan="1">Kapasiti</td>
