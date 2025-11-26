@@ -148,30 +148,29 @@
 
     <!-- MAKLUMAT LOKASI KOMPONEN -->
     <div style="margin-top: 4px; margin-bottom: 3px;">
-        <div style="font-weight: bold; margin-bottom: 2px; font-size: 8pt;">MAKLUMAT LOKASI KOMPONEN</div>
-        
-        <div class="info-row">
-            <span class="info-label">Nama Premis</span>
-            <span class="info-separator">:</span>
-            <span class="info-value">{{ $mainComponent->component->nama_premis ?? '' }}</span>
-        </div>
-        
-        <div class="info-row">
-
-        <!-- Left Side -->
-        <div class="info-group">
-            <span class="info-label">Nombor DPA</span>
-            <span class="info-separator">:</span>
-            <span class="info-value">{{ $mainComponent->component->nombor_dpa ?? '' }}</span>
+        <div style="font-weight: bold; margin-bottom: 3px; font-size: 7.4pt; text-decoration: underline;">
+            MAKLUMAT LOKASI KOMPONEN
         </div>
 
-        <!-- Right Side -->
-        <div class="info-group info-group-right">
-            <span class="info-label">Kod Lokasi</span>
-            <span class="info-separator">:</span>
-            <span class="info-value">{{ $mainComponent->kod_lokasi ?? '' }}</span>
+        <!-- Nama Premis -->
+        <div style="margin-bottom: 2px; font-size: 7.4pt;">
+            <span>Nama Premis</span>
+            <span style="margin: 0 5px;">:</span>
+            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 95px); min-height: 12px; padding-left: 5px;">{{ $mainComponent->component->nama_premis ?? '' }}</span>
+        </div>
+
+        <!-- Nombor DPA + Kod Lokasi (SEBARIS) -->
+        <div style="font-size: 7.4pt;">
+            <span>Nombor DPA</span>
+            <span style="margin: 0 5px;">:</span>
+            <span style="border-bottom: 1px solid #000; display: inline-block; width: 200px; min-height: 12px; padding-left: 5px;">{{ $mainComponent->component->nombor_dpa ?? '' }}</span>
+            
+            <span style="margin-left: 40px;">Kod Lokasi</span>
+            <span style="margin: 0 5px;">:</span>
+            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 450px); min-height: 12px; padding-left: 5px;">{{ $mainComponent->kod_lokasi ?? '' }}</span>
         </div>
     </div>
+
 <table>
 <!-- MAKLUMAT KOMPONEN UTAMA -->
     <tr>

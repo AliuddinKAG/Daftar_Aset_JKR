@@ -282,7 +282,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="background-color: #e8e8e8; font-weight: bold; text-align: left;">
+                    <td colspan="2" style="background-color: #ffffffff; font-weight: bold; text-align: left;">
                         Diisi Jika Binaan Luar Mempunyai Aras dan Ruang
                     </td>
                 </tr>
