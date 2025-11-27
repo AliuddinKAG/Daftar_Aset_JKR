@@ -142,7 +142,7 @@
 
         <!-- Id Komponen Utama + Kod Lokasi (SEBARIS) -->
         <div style="font-size: 7.4pt;">
-            <span>Nombor DPA</span>
+            <span>Id Komponen Utama</span>
             <span style="margin: 0 5px;">:</span>
             <span style="border-bottom: 1px solid #000; display: inline-block; width: 200px; min-height: 12px; padding-left: 5px;">{{ $subComponent->mainComponent->id ?? '' }}</span>
             
