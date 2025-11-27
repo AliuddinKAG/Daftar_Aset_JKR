@@ -133,13 +133,11 @@
             MAKLUMAT SUB KOMPONEN
         </div>
 
-        <!-- Nama Komponen Utama -->
+    <!-- Nama Komponen Utama -->
         <div style="margin-bottom: 2px; font-size: 7.4pt;">
             <span>Nama Komponen Utama</span>
             <span style="margin: 0 5px;">:</span>
-            <span style="border-bottom: 1px solid #000; display: block; width: calc(100% - 450px); min-height: 12px; padding-left: 5px;">
-            {{ $subComponent->mainComponent->nama_komponen_utama ?? '' }}
-            </span>
+            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 200px); min-height: 12px; padding-left: 5px;">{{ $subComponent->mainComponent->nama_komponen_utama ?? '' }}</span>
         </div>
 
         <!-- Id Komponen Utama + Kod Lokasi (SEBARIS) -->
@@ -377,8 +375,15 @@
         $documents = is_string($subComponent->dokumen_berkaitan) 
             ? json_decode($subComponent->dokumen_berkaitan, true) 
             : $subComponent->dokumen_berkaitan;
+        
+        $hasData = is_array($documents) && !empty($documents) && collect($documents)->contains(function($doc) {
+            return !empty($doc['nama']) || !empty($doc['rujukan']);
+        });
+        
+        $minRows = 2;
     @endphp
-    @if(is_array($documents) && !empty($documents))
+    
+    @if($hasData)
         @foreach($documents as $doc)
             @if(!empty($doc['nama']) || !empty($doc['rujukan']))
             <tr>
@@ -390,9 +395,9 @@
             @endif
         @endforeach
     @else
-        @for($i = 0; $i < 2; $i++)
+        @for($i = 0; $i < $minRows; $i++)
         <tr>
-            <td colspan="1">&nbsp;</td>
+            <td colspan="1" style="text-align: center;">&nbsp;</td>
             <td colspan="2">&nbsp;</td>
             <td colspan="2">&nbsp;</td>
             <td colspan="2">&nbsp;</td>
