@@ -7,154 +7,173 @@ use App\Models\Component;
 use App\Models\Sistem;
 use App\Models\Subsistem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class MainComponentController extends Controller
 {
+    /**
+     * Helper: Process array field to JSON array (structured)
+     */
+    private function processArrayFieldToJson($values, $units): ?string
+    {
+        if (empty($values) && empty($units)) {
+            return null;
+        }
+        
+        $result = [];
+        $valuesArray = is_array($values) ? $values : [$values];
+        $unitsArray = is_array($units) ? $units : [$units];
+        
+        foreach ($valuesArray as $index => $value) {
+            if ($value !== null && $value !== '') {
+                $result[] = [
+                    'nilai' => $value,
+                    'unit' => $unitsArray[$index] ?? null
+                ];
+            }
+        }
+        
+        return !empty($result) ? json_encode($result) : null;
+    }
+
+    /**
+     * Helper: Decode JSON field for editing
+     */
+    private function decodeJsonField($jsonString)
+    {
+        if (empty($jsonString)) {
+            return ['nilai' => '', 'unit' => ''];
+        }
+        
+        $data = is_string($jsonString) ? json_decode($jsonString, true) : $jsonString;
+        
+        if (is_array($data) && !empty($data)) {
+            return [
+                'nilai' => $data[0]['nilai'] ?? '',
+                'unit' => $data[0]['unit'] ?? ''
+            ];
+        }
+        
+        return ['nilai' => '', 'unit' => ''];
+    }
+
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate($this->validationRules());
+        $validated = $request->validate($this->validationRules());
 
-            // Handle checkboxes
-            $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
-            $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
-            $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
-            $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
-            $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
+        // Handle checkboxes
+        $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
+        $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
+        $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
+        $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
+        $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-            // Handle array fields - simpan berasingan
-            $saizInput = $request->input('saiz');
-            $validated['saiz'] = is_array($saizInput) ? json_encode($saizInput) : $saizInput;
-            
-            $saizUnitInput = $request->input('saiz_unit');
-            $validated['saiz_unit'] = is_array($saizUnitInput) ? json_encode($saizUnitInput) : $saizUnitInput;
-            
-            $kadaranInput = $request->input('kadaran');
-            $validated['kadaran'] = is_array($kadaranInput) ? json_encode($kadaranInput) : $kadaranInput;
-            
-            $kadaranUnitInput = $request->input('kadaran_unit');
-            $validated['kadaran_unit'] = is_array($kadaranUnitInput) ? json_encode($kadaranUnitInput) : $kadaranUnitInput;
-            
-            $kapasitiInput = $request->input('kapasiti');
-            $validated['kapasiti'] = is_array($kapasitiInput) ? json_encode($kapasitiInput) : $kapasitiInput;
-            
-            $kapasitiUnitInput = $request->input('kapasiti_unit');
-            $validated['kapasiti_unit'] = is_array($kapasitiUnitInput) ? json_encode($kapasitiUnitInput) : $kapasitiUnitInput;
+        // Handle array fields
+        $saizInput = $request->input('saiz');
+        $validated['saiz'] = is_array($saizInput) ? json_encode($saizInput) : $saizInput;
+        
+        $saizUnitInput = $request->input('saiz_unit');
+        $validated['saiz_unit'] = is_array($saizUnitInput) ? json_encode($saizUnitInput) : $saizUnitInput;
+        
+        $kadaranInput = $request->input('kadaran');
+        $validated['kadaran'] = is_array($kadaranInput) ? json_encode($kadaranInput) : $kadaranInput;
+        
+        $kadaranUnitInput = $request->input('kadaran_unit');
+        $validated['kadaran_unit'] = is_array($kadaranUnitInput) ? json_encode($kadaranUnitInput) : $kadaranUnitInput;
+        
+        $kapasitiInput = $request->input('kapasiti');
+        $validated['kapasiti'] = is_array($kapasitiInput) ? json_encode($kapasitiInput) : $kapasitiInput;
+        
+        $kapasitiUnitInput = $request->input('kapasiti_unit');
+        $validated['kapasiti_unit'] = is_array($kapasitiUnitInput) ? json_encode($kapasitiUnitInput) : $kapasitiUnitInput;
 
-            // Atribut tambahan
-            $validated['jenis'] = $request->input('jenis');
-            $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
-            $validated['bahan'] = $request->input('bahan');
-            $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
-            $validated['catatan_atribut'] = $request->input('catatan_atribut');
-            $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
-            $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
-            $validated['nota'] = $request->input('nota');
+        // Atribut tambahan
+        $validated['jenis'] = $request->input('jenis');
+        $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
+        $validated['bahan'] = $request->input('bahan');
+        $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
+        $validated['catatan_atribut'] = $request->input('catatan_atribut');
+        $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
+        $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
+        $validated['nota'] = $request->input('nota');
 
-            DB::beginTransaction();
-
-            // Save Sistem & Subsistem
-            if (!empty($validated['sistem'])) {
-                $this->saveSistem($validated['sistem']);
-            }
-            
-            if (!empty($validated['subsistem'])) {
-                $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
-            }
-
-            $validated['status'] = $request->input('status', 'aktif');
-            
-            $mainComponent = MainComponent::create($validated);
-
-            $this->saveRelatedComponents($mainComponent, $request);
-            $this->saveRelatedDocuments($mainComponent, $request);
-
-            DB::commit();
-
-            return redirect()->route('components.index')
-                ->with('success', 'Komponen Utama berjaya ditambah');
-                
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Error saving main component: ' . $e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Gagal menyimpan data: ' . $e->getMessage())
-                ->withInput();
+        // Save Sistem & Subsistem
+        if (!empty($validated['sistem'])) {
+            $this->saveSistem($validated['sistem']);
         }
+        
+        if (!empty($validated['subsistem'])) {
+            $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
+        }
+
+        $validated['status'] = $request->input('status', 'aktif');
+        
+        $mainComponent = MainComponent::create($validated);
+
+        $this->saveRelatedComponents($mainComponent, $request);
+        $this->saveRelatedDocuments($mainComponent, $request);
+
+        return redirect()->route('components.index')
+            ->with('success', 'Komponen Utama berjaya ditambah');
     }
 
     public function update(Request $request, MainComponent $mainComponent)
     {
-        try {
-            $validated = $request->validate($this->validationRules());
+        $validated = $request->validate($this->validationRules());
 
-            // Handle checkboxes
-            $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
-            $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
-            $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
-            $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
-            $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
+        // Handle checkboxes
+        $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
+        $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
+        $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
+        $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
+        $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-            // Handle array fields - simpan berasingan
-            $saizInput = $request->input('saiz');
-            $validated['saiz'] = is_array($saizInput) ? json_encode($saizInput) : $saizInput;
-            
-            $saizUnitInput = $request->input('saiz_unit');
-            $validated['saiz_unit'] = is_array($saizUnitInput) ? json_encode($saizUnitInput) : $saizUnitInput;
-            
-            $kadaranInput = $request->input('kadaran');
-            $validated['kadaran'] = is_array($kadaranInput) ? json_encode($kadaranInput) : $kadaranInput;
-            
-            $kadaranUnitInput = $request->input('kadaran_unit');
-            $validated['kadaran_unit'] = is_array($kadaranUnitInput) ? json_encode($kadaranUnitInput) : $kadaranUnitInput;
-            
-            $kapasitiInput = $request->input('kapasiti');
-            $validated['kapasiti'] = is_array($kapasitiInput) ? json_encode($kapasitiInput) : $kapasitiInput;
-            
-            $kapasitiUnitInput = $request->input('kapasiti_unit');
-            $validated['kapasiti_unit'] = is_array($kapasitiUnitInput) ? json_encode($kapasitiUnitInput) : $kapasitiUnitInput;
+        // Handle array fields
+        $validated['saiz'] = $this->processArrayFieldToJson(
+            $request->input('saiz'),
+            $request->input('saiz_unit')
+        );
+        $validated['saiz_unit'] = null;
+        
+        $validated['kadaran'] = $this->processArrayFieldToJson(
+            $request->input('kadaran'),
+            $request->input('kadaran_unit')
+        );
+        $validated['kadaran_unit'] = null;
+        
+        $validated['kapasiti'] = $this->processArrayFieldToJson(
+            $request->input('kapasiti'),
+            $request->input('kapasiti_unit')
+        );
+        $validated['kapasiti_unit'] = null;
 
-            // Atribut tambahan
-            $validated['jenis'] = $request->input('jenis');
-            $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
-            $validated['bahan'] = $request->input('bahan');
-            $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
-            $validated['catatan_atribut'] = $request->input('catatan_atribut');
-            $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
-            $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
-            $validated['nota'] = $request->input('nota');
+        // Atribut tambahan
+        $validated['jenis'] = $request->input('jenis');
+        $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
+        $validated['bahan'] = $request->input('bahan');
+        $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
+        $validated['catatan_atribut'] = $request->input('catatan_atribut');
+        $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
+        $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
+        $validated['nota'] = $request->input('nota');
 
-            DB::beginTransaction();
-
-            if (!empty($validated['sistem'])) {
-                $this->saveSistem($validated['sistem']);
-            }
-            
-            if (!empty($validated['subsistem'])) {
-                $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
-            }
-
-            $mainComponent->update($validated);
-
-            $mainComponent->relatedComponents()->delete();
-            $this->saveRelatedComponents($mainComponent, $request);
-
-            $mainComponent->relatedDocuments()->delete();
-            $this->saveRelatedDocuments($mainComponent, $request);
-
-            DB::commit();
-
-            return redirect()->route('components.index')
-                ->with('success', 'Komponen Utama berjaya dikemaskini');
-                
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Error updating main component: ' . $e->getMessage());
-            return redirect()->back()
-                ->with('error', 'Gagal mengemaskini data: ' . $e->getMessage())
-                ->withInput();
+        if (!empty($validated['sistem'])) {
+            $this->saveSistem($validated['sistem']);
         }
+        
+        if (!empty($validated['subsistem'])) {
+            $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
+        }
+
+        $mainComponent->update($validated);
+
+        $mainComponent->relatedComponents()->delete();
+        $this->saveRelatedComponents($mainComponent, $request);
+
+        $mainComponent->relatedDocuments()->delete();
+        $this->saveRelatedDocuments($mainComponent, $request);
+
+        return redirect()->route('components.index')
+            ->with('success', 'Komponen Utama berjaya dikemaskini');
     }
 
     public function edit(MainComponent $mainComponent)
@@ -163,62 +182,21 @@ class MainComponentController extends Controller
         $sistems = Sistem::orderBy('kod')->get();
         $subsistems = Subsistem::orderBy('kod')->get();
         
-        // Data akan auto-decode oleh Model cast
-        // Jika perlu nilai individu untuk form editing
-        if (is_array($mainComponent->saiz) && !empty($mainComponent->saiz)) {
-            $mainComponent->saiz_nilai = $mainComponent->saiz[0] ?? '';
-        } else {
-            $mainComponent->saiz_nilai = $mainComponent->saiz ?? '';
-        }
+        // Decode JSON fields untuk display
+        $saizData = $this->decodeJsonField($mainComponent->saiz);
+        $kadaranData = $this->decodeJsonField($mainComponent->kadaran);
+        $kapasitiData = $this->decodeJsonField($mainComponent->kapasiti);
         
-        if (is_array($mainComponent->saiz_unit) && !empty($mainComponent->saiz_unit)) {
-            $mainComponent->saiz_unit_value = $mainComponent->saiz_unit[0] ?? '';
-        } else {
-            $mainComponent->saiz_unit_value = $mainComponent->saiz_unit ?? '';
-        }
-        
-        // Repeat for kadaran and kapasiti
-        if (is_array($mainComponent->kadaran) && !empty($mainComponent->kadaran)) {
-            $mainComponent->kadaran_nilai = $mainComponent->kadaran[0] ?? '';
-        } else {
-            $mainComponent->kadaran_nilai = $mainComponent->kadaran ?? '';
-        }
-        
-        if (is_array($mainComponent->kadaran_unit) && !empty($mainComponent->kadaran_unit)) {
-            $mainComponent->kadaran_unit_value = $mainComponent->kadaran_unit[0] ?? '';
-        } else {
-            $mainComponent->kadaran_unit_value = $mainComponent->kadaran_unit ?? '';
-        }
-        
-        if (is_array($mainComponent->kapasiti) && !empty($mainComponent->kapasiti)) {
-            $mainComponent->kapasiti_nilai = $mainComponent->kapasiti[0] ?? '';
-        } else {
-            $mainComponent->kapasiti_nilai = $mainComponent->kapasiti ?? '';
-        }
-        
-        if (is_array($mainComponent->kapasiti_unit) && !empty($mainComponent->kapasiti_unit)) {
-            $mainComponent->kapasiti_unit_value = $mainComponent->kapasiti_unit[0] ?? '';
-        } else {
-            $mainComponent->kapasiti_unit_value = $mainComponent->kapasiti_unit ?? '';
-        }
+        $mainComponent->saiz_nilai = $saizData['nilai'];
+        $mainComponent->saiz_unit_value = $saizData['unit'];
+        $mainComponent->kadaran_nilai = $kadaranData['nilai'];
+        $mainComponent->kadaran_unit_value = $kadaranData['unit'];
+        $mainComponent->kapasiti_nilai = $kapasitiData['nilai'];
+        $mainComponent->kapasiti_unit_value = $kapasitiData['unit'];
         
         return view('components.edit-main-component', compact(
             'mainComponent', 'components', 'sistems', 'subsistems'
         ));
-    }
-
-    public function show(MainComponent $mainComponent)
-    {
-        $mainComponent->load([
-            'component', 
-            'subComponents', 
-            'relatedComponents', 
-            'relatedDocuments'
-        ]);
-        
-        // Data JSON akan auto-decode oleh Model cast
-        
-        return view('components.view-main-component', compact('mainComponent'));
     }
 
     private function validationRules(): array
@@ -380,6 +358,18 @@ class MainComponentController extends Controller
         return view('components.create-main-component', compact(
             'components', 'sistems', 'subsistems'
         ));
+    }
+
+    public function show(MainComponent $mainComponent)
+    {
+        $mainComponent->load([
+            'component', 
+            'subComponents', 
+            'relatedComponents', 
+            'relatedDocuments'
+        ]);
+        
+        return view('components.view-main-component', compact('mainComponent'));
     }
 
     public function destroy(MainComponent $mainComponent)
