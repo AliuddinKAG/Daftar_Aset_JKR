@@ -123,22 +123,19 @@ class SubComponentController extends Controller
     }
 
     /**
-     * Display the specified sub component
-     */
-    public function show(SubComponent $subComponent)
-    {
-        $subComponent->load(['mainComponent.component']);
-        return view('components.view-sub-component', compact('subComponent'));
-    }
-
-    /**
-     * Show the form for editing the sub component
-     */
+    * Show the form for editing the sub component
+    */
     public function edit(SubComponent $subComponent)
     {
-        $mainComponents = MainComponent::with('component')->get();
-        return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
+    $mainComponents = MainComponent::with('component')->get();
+    
+    // Decode JSON specifications jika ada
+    if ($subComponent->specifications) {
+        $subComponent->specifications_decoded = json_decode($subComponent->specifications, true);
     }
+    
+    return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
+}
 
     /**
      * Update the specified sub component
