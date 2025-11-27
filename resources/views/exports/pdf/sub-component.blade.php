@@ -137,7 +137,9 @@
         <div style="margin-bottom: 2px; font-size: 7.4pt;">
             <span>Nama Komponen Utama</span>
             <span style="margin: 0 5px;">:</span>
-            <span style="border-bottom: 1px solid #000; display: inline-block; width: calc(100% - 95px); min-height: 12px; padding-left: 5px;">{{ $subComponent->mainComponent->nama_komponen_utama ?? '' }}</span>
+            <span style="border-bottom: 1px solid #000; display: block; width: calc(100% - 450px); min-height: 12px; padding-left: 5px;">
+            {{ $subComponent->mainComponent->nama_komponen_utama ?? '' }}
+            </span>
         </div>
 
         <!-- Id Komponen Utama + Kod Lokasi (SEBARIS) -->

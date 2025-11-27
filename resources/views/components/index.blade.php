@@ -234,6 +234,8 @@
             <div class="d-flex gap-2">
                 <a href="{{ route('components.edit', $component) }}" class="btn btn-light btn-icon">
                     <i class="bi bi-pencil"></i>
+                        <a href="{{ route('components.show', $component) }}" class="btn btn-info btn-sm btn-icon">
+                            <i class="bi bi-eye"></i>                
                 </a>
                 <form action="{{ route('components.delete', $component) }}" method="POST" 
                       onsubmit="return confirm('Padam komponen ini?')">
@@ -301,8 +303,11 @@
                             @endif
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('main-components.edit', $mainComponent) }}" class="btn btn-success btn-sm btn-icon">
+                            <a href="{{ route('main-components.edit', $mainComponent) }}" class="btn btn-light btn-icon">
                                 <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ route('main-components.show', $mainComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
+                            <i class="bi bi-eye"></i>
                             </a>
                             <form action="{{ route('main-components.delete', $mainComponent) }}" method="POST"
                                   onsubmit="return confirm('Padam komponen utama ini?')">
@@ -341,8 +346,11 @@
                                             @endif
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <a href="{{ route('sub-components.edit', $subComponent) }}" class="btn btn-info btn-sm btn-icon">
+                                            <a href="{{ route('sub-components.edit', $subComponent) }}" class="btn btn-light btn-icon">
                                                 <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{{ route('main-components.show', $mainComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
+                                            <i class="bi bi-eye"></i>
                                             </a>
                                             <form action="{{ route('sub-components.delete', $subComponent) }}" method="POST"
                                                   onsubmit="return confirm('Padam sub komponen ini?')">
