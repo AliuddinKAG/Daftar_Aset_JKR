@@ -40,10 +40,13 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Nama Komponen</label>
+                                    <label class="form-label">Id Komponen Utama</label>
                                     <input type="text" class="form-control" id="displayKomponen" readonly
                                            value="{{ $subComponent->mainComponent->component->nama_premis }}">
-                                    <small class="form-text text-muted">Nama komponen akan dipaparkan automatik</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Kod Lokasi</label>
+                                    <input type="text" class="form-control" id="displayKodLokasi" readonly>
                                 </div>
                             </div>
 
@@ -77,7 +80,7 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">No. Siri</label>
+                                            <label class="form-label">No. Siri <span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="no_siri" value="{{ old('no_siri', $subComponent->no_siri) }}">
                                         </div>
                                     </div>
@@ -99,7 +102,7 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">Kuantiti (Sama Jenis)</label>
+                                        <label class="form-label">Kuantiti (Sama Jenis) <span class="text-danger">*</span></label>
                                         <input type="number" class="form-control" name="kuantiti" 
                                                value="{{ old('kuantiti', $subComponent->kuantiti) }}" min="1">
                                     </div>
@@ -113,14 +116,21 @@
                         </div>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-info text-white">
-                            <i class="bi bi-save"></i> Kemaskini Sub Komponen
-                        </button>
+                    <!-- Button untuk next section -->
+                    <div class="d-flex justify-content-between">
                         <a href="{{ route('components.index') }}" class="btn btn-secondary">
-                            <i class="bi bi-x-circle"></i> Batal
+                            <i class="bi bi-arrow-left"></i> Kembali
                         </a>
+                        <button type="button" class="btn btn-info text-white" onclick="showSpecificationSection()">
+                            Seterusnya: Atribut Spesifikasi <i class="bi bi-arrow-right"></i>
+                        </button>
                     </div>
+
+                    <!-- Hidden section for specifications -->
+                    <div id="specificationSection" style="display: {{ $subComponent->specifications && $subComponent->specifications->count() > 0 ? 'block' : 'none' }};">
+                        @include('components.partials.sub-component-specifications', ['subComponent' => $subComponent])
+                    </div>
+
                 </form>
             </div>
         </div>
@@ -135,6 +145,22 @@ document.getElementById('mainComponentSelect').addEventListener('change', functi
     const selected = this.options[this.selectedIndex];
     const komponenName = selected.getAttribute('data-komponen');
     document.getElementById('displayKomponen').value = komponenName || '';
+});
+
+function showSpecificationSection() {
+    document.getElementById('specificationSection').style.display = 'block';
+    document.querySelector('button[onclick="showSpecificationSection()"]').style.display = 'none';
+    document.getElementById('specificationSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Auto hide button if specifications already exist
+document.addEventListener('DOMContentLoaded', function() {
+    const specSection = document.getElementById('specificationSection');
+    const nextButton = document.querySelector('button[onclick="showSpecificationSection()"]');
+    
+    if (specSection && specSection.style.display === 'block' && nextButton) {
+        nextButton.style.display = 'none';
+    }
 });
 </script>
 @endsection
