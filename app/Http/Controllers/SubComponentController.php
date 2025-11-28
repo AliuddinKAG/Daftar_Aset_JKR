@@ -123,19 +123,53 @@ class SubComponentController extends Controller
     }
 
     /**
-    * Show the form for editing the sub component
-    */
+     * Display the specified sub component
+     */
+    public function show(SubComponent $subComponent)
+    {
+        // Load relationships
+        $subComponent->load(['mainComponent.component']);
+        
+        // Decode JSON fields for display
+        if ($subComponent->saiz) {
+            $subComponent->saiz_decoded = json_decode($subComponent->saiz, true);
+        }
+        if ($subComponent->saiz_unit) {
+            $subComponent->saiz_unit_decoded = json_decode($subComponent->saiz_unit, true);
+        }
+        if ($subComponent->kadaran) {
+            $subComponent->kadaran_decoded = json_decode($subComponent->kadaran, true);
+        }
+        if ($subComponent->kadaran_unit) {
+            $subComponent->kadaran_unit_decoded = json_decode($subComponent->kadaran_unit, true);
+        }
+        if ($subComponent->kapasiti) {
+            $subComponent->kapasiti_decoded = json_decode($subComponent->kapasiti, true);
+        }
+        if ($subComponent->kapasiti_unit) {
+            $subComponent->kapasiti_unit_decoded = json_decode($subComponent->kapasiti_unit, true);
+        }
+        if ($subComponent->dokumen_berkaitan) {
+            $subComponent->dokumen_decoded = json_decode($subComponent->dokumen_berkaitan, true);
+        }
+        
+        return view('components.view-sub-component', compact('subComponent'));
+    }
+
+    /**
+     * Show the form for editing the sub component
+     */
     public function edit(SubComponent $subComponent)
     {
-    $mainComponents = MainComponent::with('component')->get();
-    
-    // Decode JSON specifications jika ada
-    if ($subComponent->specifications) {
-        $subComponent->specifications_decoded = json_decode($subComponent->specifications, true);
+        $mainComponents = MainComponent::with('component')->get();
+        
+        // Decode JSON specifications jika ada
+        if ($subComponent->specifications) {
+            $subComponent->specifications_decoded = json_decode($subComponent->specifications, true);
+        }
+        
+        return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
     }
-    
-    return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
-}
 
     /**
      * Update the specified sub component

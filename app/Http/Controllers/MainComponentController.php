@@ -68,23 +68,12 @@ class MainComponentController extends Controller
         $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
         // Handle array fields
-        $saizInput = $request->input('saiz');
-        $validated['saiz'] = is_array($saizInput) ? json_encode($saizInput) : $saizInput;
-        
-        $saizUnitInput = $request->input('saiz_unit');
-        $validated['saiz_unit'] = is_array($saizUnitInput) ? json_encode($saizUnitInput) : $saizUnitInput;
-        
-        $kadaranInput = $request->input('kadaran');
-        $validated['kadaran'] = is_array($kadaranInput) ? json_encode($kadaranInput) : $kadaranInput;
-        
-        $kadaranUnitInput = $request->input('kadaran_unit');
-        $validated['kadaran_unit'] = is_array($kadaranUnitInput) ? json_encode($kadaranUnitInput) : $kadaranUnitInput;
-        
-        $kapasitiInput = $request->input('kapasiti');
-        $validated['kapasiti'] = is_array($kapasitiInput) ? json_encode($kapasitiInput) : $kapasitiInput;
-        
-        $kapasitiUnitInput = $request->input('kapasiti_unit');
-        $validated['kapasiti_unit'] = is_array($kapasitiUnitInput) ? json_encode($kapasitiUnitInput) : $kapasitiUnitInput;
+        $validated['saiz'] = json_encode(array_filter($request->input('saiz', [])));
+        $validated['saiz_unit'] = json_encode(array_filter($request->input('saiz_unit', [])));
+        $validated['kadaran'] = json_encode(array_filter($request->input('kadaran', [])));
+        $validated['kadaran_unit'] = json_encode(array_filter($request->input('kadaran_unit', [])));
+        $validated['kapasiti'] = json_encode(array_filter($request->input('kapasiti', [])));
+        $validated['kapasiti_unit'] = json_encode(array_filter($request->input('kapasiti_unit', [])));
 
         // Atribut tambahan
         $validated['jenis'] = $request->input('jenis');
@@ -128,23 +117,12 @@ class MainComponentController extends Controller
         $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
         // Handle array fields
-        $validated['saiz'] = $this->processArrayFieldToJson(
-            $request->input('saiz'),
-            $request->input('saiz_unit')
-        );
-        $validated['saiz_unit'] = null;
-        
-        $validated['kadaran'] = $this->processArrayFieldToJson(
-            $request->input('kadaran'),
-            $request->input('kadaran_unit')
-        );
-        $validated['kadaran_unit'] = null;
-        
-        $validated['kapasiti'] = $this->processArrayFieldToJson(
-            $request->input('kapasiti'),
-            $request->input('kapasiti_unit')
-        );
-        $validated['kapasiti_unit'] = null;
+        $validated['saiz'] = json_encode(array_filter($request->input('saiz', [])));
+        $validated['saiz_unit'] = json_encode(array_filter($request->input('saiz_unit', [])));
+        $validated['kadaran'] = json_encode(array_filter($request->input('kadaran', [])));
+        $validated['kadaran_unit'] = json_encode(array_filter($request->input('kadaran_unit', [])));
+        $validated['kapasiti'] = json_encode(array_filter($request->input('kapasiti', [])));
+        $validated['kapasiti_unit'] = json_encode(array_filter($request->input('kapasiti_unit', [])));
 
         // Atribut tambahan
         $validated['jenis'] = $request->input('jenis');
@@ -181,22 +159,18 @@ class MainComponentController extends Controller
         $components = Component::where('status', 'aktif')->get();
         $sistems = Sistem::orderBy('kod')->get();
         $subsistems = Subsistem::orderBy('kod')->get();
-        
-        // Decode JSON fields untuk display
-        $saizData = $this->decodeJsonField($mainComponent->saiz);
-        $kadaranData = $this->decodeJsonField($mainComponent->kadaran);
-        $kapasitiData = $this->decodeJsonField($mainComponent->kapasiti);
-        
-        $mainComponent->saiz_nilai = $saizData['nilai'];
-        $mainComponent->saiz_unit_value = $saizData['unit'];
-        $mainComponent->kadaran_nilai = $kadaranData['nilai'];
-        $mainComponent->kadaran_unit_value = $kadaranData['unit'];
-        $mainComponent->kapasiti_nilai = $kapasitiData['nilai'];
-        $mainComponent->kapasiti_unit_value = $kapasitiData['unit'];
-        
-        return view('components.edit-main-component', compact(
-            'mainComponent', 'components', 'sistems', 'subsistems'
-        ));
+    
+        // Decode JSON arrays
+        $mainComponent->saiz_array = json_decode($mainComponent->saiz, true) ?? [];
+        $mainComponent->saiz_unit_array = json_decode($mainComponent->saiz_unit, true) ?? [];
+        $mainComponent->kadaran_array = json_decode($mainComponent->kadaran, true) ?? [];
+        $mainComponent->kadaran_unit_array = json_decode($mainComponent->kadaran_unit, true) ?? [];
+        $mainComponent->kapasiti_array = json_decode($mainComponent->kapasiti, true) ?? [];
+        $mainComponent->kapasiti_unit_array = json_decode($mainComponent->kapasiti_unit, true) ?? [];
+    
+    return view('components.edit-main-component', compact(
+        'mainComponent', 'components', 'sistems', 'subsistems'
+    ));
     }
 
     private function validationRules(): array

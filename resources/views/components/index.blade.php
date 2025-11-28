@@ -349,7 +349,7 @@
                                             <a href="{{ route('sub-components.edit', $subComponent) }}" class="btn btn-light btn-icon">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a href="{{ route('main-components.show', $mainComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
+                                            <a href="{{ route('sub-components.show', $subComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
                                             <i class="bi bi-eye"></i>
                                             </a>
                                             <form action="{{ route('sub-components.delete', $subComponent) }}" method="POST"
