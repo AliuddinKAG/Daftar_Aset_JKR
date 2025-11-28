@@ -370,7 +370,7 @@
         <td colspan="2" style="width: 20%; text-align: center;">No. Tag / Label</td>
     </tr>
     @if($mainComponent->relatedComponents && $mainComponent->relatedComponents->count() > 0)
-        @foreach($mainComponent->relatedComponents->take(3) as $related)
+        @foreach($mainComponent->relatedComponents->take(7) as $related)
         <tr>
             <td colspan="1" style="text-align: center;">{{ $related->bil ?? '' }}</td>
             <td colspan="2"style="text-align: center;">{{ $related->nama_komponen ?? '' }}</td>
@@ -403,7 +403,7 @@
         <td colspan="2" style="width: 30%; text-align: center;">Catatan</td>
     </tr>
     @if($mainComponent->relatedDocuments && $mainComponent->relatedDocuments->count() > 0)
-        @foreach($mainComponent->relatedDocuments->take(2) as $doc)
+        @foreach($mainComponent->relatedDocuments->take(3) as $doc)
         <tr>
             <td colspan="1" style="text-align: center;">{{ $doc->bil ?? '' }}</td>
             <td colspan="2" style="text-align: center;">{{ $doc->nama_dokumen ?? '' }}</td>

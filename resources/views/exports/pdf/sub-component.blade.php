@@ -380,7 +380,7 @@
             return !empty($doc['nama']) || !empty($doc['rujukan']);
         });
         
-        $minRows = 2;
+        $minRows = 4;
     @endphp
     
     @if($hasData)
