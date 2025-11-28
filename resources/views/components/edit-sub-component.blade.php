@@ -126,8 +126,14 @@
                         </button>
                     </div>
 
+                    @php
+                        $hasSpecifications = isset($subComponent->specifications_decoded) && 
+                                           is_array($subComponent->specifications_decoded) && 
+                                           count($subComponent->specifications_decoded) > 0;
+                    @endphp
+
                     <!-- Hidden section for specifications -->
-                    <div id="specificationSection" style="display: {{ $subComponent->specifications && $subComponent->specifications->count() > 0 ? 'block' : 'none' }};">
+                    <div id="specificationSection" style="display: {{ $hasSpecifications ? 'block' : 'none' }};">
                         @include('components.partials.sub-component-specifications', ['subComponent' => $subComponent])
                     </div>
 

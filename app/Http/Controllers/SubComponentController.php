@@ -163,7 +163,28 @@ class SubComponentController extends Controller
     {
         $mainComponents = MainComponent::with('component')->get();
         
-        // Decode JSON specifications jika ada
+        // Decode JSON fields for editing
+        if ($subComponent->saiz) {
+            $subComponent->saiz_decoded = json_decode($subComponent->saiz, true);
+        }
+        if ($subComponent->saiz_unit) {
+            $subComponent->saiz_unit_decoded = json_decode($subComponent->saiz_unit, true);
+        }
+        if ($subComponent->kadaran) {
+            $subComponent->kadaran_decoded = json_decode($subComponent->kadaran, true);
+        }
+        if ($subComponent->kadaran_unit) {
+            $subComponent->kadaran_unit_decoded = json_decode($subComponent->kadaran_unit, true);
+        }
+        if ($subComponent->kapasiti) {
+            $subComponent->kapasiti_decoded = json_decode($subComponent->kapasiti, true);
+        }
+        if ($subComponent->kapasiti_unit) {
+            $subComponent->kapasiti_unit_decoded = json_decode($subComponent->kapasiti_unit, true);
+        }
+        if ($subComponent->dokumen_berkaitan) {
+            $subComponent->dokumen_decoded = json_decode($subComponent->dokumen_berkaitan, true);
+        }
         if ($subComponent->specifications) {
             $subComponent->specifications_decoded = json_decode($subComponent->specifications, true);
         }
