@@ -26,17 +26,12 @@
                     <a href="{{ route('components.index') }}" class="btn btn-secondary">
                         <i class="bi bi-arrow-left"></i> Kembali
                     </a>
+                    <a href="{{ route('export.component.pdf', $component) }}" class="btn btn-danger">
+                        <i class="bi bi-file-pdf"></i> Download PDF
+                    </a>
                     <a href="{{ route('components.edit', $component) }}" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Edit
                     </a>
-                    <form action="{{ route('components.delete', $component) }}" method="POST" class="d-inline"
-                          onsubmit="return confirm('Adakah anda pasti ingin memadam komponen ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Padam
-                        </button>
-                    </form>
                 </div>
 
                 <!-- MAKLUMAT LOKASI KOMPONEN -->

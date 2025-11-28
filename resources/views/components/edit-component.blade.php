@@ -12,7 +12,7 @@
                         <h5 class="mb-0">EDIT BORANG PENGUMPULAN DATA DAFTAR ASET KHUSUS</h5>
                         <small class="text-white">Peringkat Komponen</small>
                     </div>
-                    <!-- Quick Export Dropdown -->
+                    <!-- Quick Export Dropdown
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="bi bi-download"></i> Export
@@ -20,7 +20,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ route('export.component.pdf', $component) }}" target="_blank">
                                 <i class="bi bi-file-pdf text-danger"></i> PDF
-                            </a></li>
+                            </a></li> -->
                             <!--<li><a class="dropdown-item" href="{{ route('export.component.excel', $component) }}">
                                 <i class="bi bi-file-excel text-success"></i> Excel
                             </a></li> -->
