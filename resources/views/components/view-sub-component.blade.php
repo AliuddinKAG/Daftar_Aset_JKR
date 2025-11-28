@@ -5,19 +5,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <!-- Export Buttons -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h6 class="mb-0"><i class="bi bi-download"></i> EXPORT LAPORAN</h6>
-            </div>
-            <div class="card-body">
-                <div class="d-flex gap-2">
-                    <a href="{{ route('export.sub-component.pdf', $subComponent) }}" class="btn btn-danger">
-                        <i class="bi bi-file-pdf"></i> Download PDF
-                    </a>
-                </div>
-            </div>
-        </div>
+
 
         <div class="card">
             <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
@@ -28,6 +16,9 @@
                 <div>
                     <a href="{{ route('sub-components.edit', $subComponent) }}" class="btn btn-warning btn-sm">
                         <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <a href="{{ route('export.sub-component.pdf', $subComponent) }}" class="btn btn-danger">
+                        <i class="bi bi-file-pdf"></i> Download PDF
                     </a>
                     <a href="{{ route('components.index') }}" class="btn btn-secondary btn-sm">
                         <i class="bi bi-arrow-left"></i> Kembali
