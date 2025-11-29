@@ -68,10 +68,10 @@
                     @foreach($saizArray as $index => $saiz)
                     <div class="row mb-2 saiz-row">
                         <div class="col-md-5">
-                            <input type="text" class="form-control form-control-sm" name="saiz[]" value="{{ $saiz }}" placeholder="Contoh: 1200x400x500 atau 1200">
+                            <input type="text" class="form-control form-control-sm" name="saiz" value="{{ $saiz }}" placeholder="Contoh: 1200x400x500 atau 1200">
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-sm" name="saiz_unit[]" value="{{ $saizUnitArray[$index] ?? '' }}" placeholder="Unit (mm/cm/m)">
+                            <input type="text" class="form-control form-control-sm" name="saiz_unit" value="{{ $saizUnitArray[$index] ?? '' }}" placeholder="Unit (mm/cm/m)">
                         </div>
                         <div class="col-md-3">
                             <button type="button" class="btn btn-sm btn-danger btn-remove-row" onclick="this.closest('.saiz-row').remove()" style="display:{{ $index > 0 ? 'inline-block' : 'none' }};">
@@ -102,10 +102,10 @@
                     @foreach($kadaranArray as $index => $kadaran)
                     <div class="row mb-2 kadaran-row">
                         <div class="col-md-5">
-                            <input type="text" class="form-control form-control-sm" name="kadaran[]" value="{{ $kadaran }}" placeholder="Nilai">
+                            <input type="text" class="form-control form-control-sm" name="kadaran" value="{{ $kadaran }}" placeholder="Nilai">
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-sm" name="kadaran_unit[]" value="{{ $kadaranUnitArray[$index] ?? '' }}" placeholder="Unit (kW/HP/A)">
+                            <input type="text" class="form-control form-control-sm" name="kadaran_unit" value="{{ $kadaranUnitArray[$index] ?? '' }}" placeholder="Unit (kW/HP/A)">
                         </div>
                         <div class="col-md-3">
                             <button type="button" class="btn btn-sm btn-danger btn-remove-row" onclick="this.closest('.kadaran-row').remove()" style="display:{{ $index > 0 ? 'inline-block' : 'none' }};">
@@ -136,10 +136,10 @@
                     @foreach($kapasitiArray as $index => $kapasiti)
                     <div class="row mb-2 kapasiti-row">
                         <div class="col-md-5">
-                            <input type="text" class="form-control form-control-sm" name="kapasiti[]" value="{{ $kapasiti }}" placeholder="Nilai">
+                            <input type="text" class="form-control form-control-sm" name="kapasiti" value="{{ $kapasiti }}" placeholder="Nilai">
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control form-control-sm" name="kapasiti_unit[]" value="{{ $kapasitiUnitArray[$index] ?? '' }}" placeholder="Unit (L/kg/ton)">
+                            <input type="text" class="form-control form-control-sm" name="kapasiti_unit" value="{{ $kapasitiUnitArray[$index] ?? '' }}" placeholder="Unit (L/kg/ton)">
                         </div>
                         <div class="col-md-3">
                             <button type="button" class="btn btn-sm btn-danger btn-remove-row" onclick="this.closest('.kapasiti-row').remove()" style="display:{{ $index > 0 ? 'inline-block' : 'none' }};">
@@ -182,10 +182,10 @@
                 @if(count($relatedComps) > 0)
                     @foreach($relatedComps as $index => $related)
                     <tr class="related-component-row">
-                        <td><input type="number" class="form-control form-control-sm" name="related_bil[]" value="{{ $related['bil'] ?? ($index + 1) }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="related_nama[]" value="{{ $related['nama_komponen'] ?? '' }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="related_dpa[]" value="{{ $related['no_dpa_kod_ruang'] ?? '' }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="related_tag[]" value="{{ $related['no_tag_label'] ?? '' }}"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="related_bil" value="{{ $related['bil'] ?? ($index + 1) }}"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="related_nama" value="{{ $related['nama_komponen'] ?? '' }}"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="related_dpa" value="{{ $related['no_dpa_kod_ruang'] ?? '' }}"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="related_tag" value="{{ $related['no_tag_label'] ?? '' }}"></td>
                         <td>
                             @if($index > 0)
                             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
@@ -197,10 +197,10 @@
                     @endforeach
                 @else
                 <tr class="related-component-row">
-                    <td><input type="number" class="form-control form-control-sm" name="related_bil[]" value="1"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="related_nama[]" placeholder="Nama Komponen"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="related_dpa[]" placeholder="No. DPA / Kod Ruang"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="related_tag[]" placeholder="No. Tag / Label"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="related_bil" value="1"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="related_nama" placeholder="Nama Komponen"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="related_dpa" placeholder="No. DPA / Kod Ruang"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="related_tag" placeholder="No. Tag / Label"></td>
                     <td></td>
                 </tr>
                 @endif
@@ -237,10 +237,10 @@
                 @if(count($relatedDocs) > 0)
                     @foreach($relatedDocs as $index => $doc)
                     <tr class="document-row">
-                        <td><input type="number" class="form-control form-control-sm" name="doc_bil[]" value="{{ $doc['bil'] ?? ($index + 1) }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="doc_nama[]" value="{{ $doc['nama_dokumen'] ?? '' }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[]" value="{{ $doc['no_rujukan_berkaitan'] ?? '' }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[]" value="{{ $doc['catatan'] ?? '' }}"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="doc_bil" value="{{ $doc['bil'] ?? ($index + 1) }}"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_nama" value="{{ $doc['nama_dokumen'] ?? '' }}"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan" value="{{ $doc['no_rujukan_berkaitan'] ?? '' }}"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_catatan" value="{{ $doc['catatan'] ?? '' }}"></td>
                         <td>
                             @if($index > 0)
                             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
@@ -252,10 +252,10 @@
                     @endforeach
                 @else
                 <tr class="document-row">
-                    <td><input type="number" class="form-control form-control-sm" name="doc_bil[]" value="1"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="doc_nama[]" placeholder="Nama Dokumen"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[]" placeholder="No Rujukan"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="doc_catatan[]" placeholder="Catatan"></td>
+                    <td><input type="number" class="form-control form-control-sm" name="doc_bil" value="1"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="doc_nama" placeholder="Nama Dokumen"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="doc_rujukan" placeholder="No Rujukan"></td>
+                    <td><input type="text" class="form-control form-control-sm" name="doc_catatan" placeholder="Catatan"></td>
                     <td></td>
                 </tr>
                 @endif
@@ -314,10 +314,10 @@ function addSaizRow() {
     newRow.className = 'row mb-2 saiz-row';
     newRow.innerHTML = `
         <div class="col-md-5">
-            <input type="text" class="form-control form-control-sm" name="saiz[]" placeholder="Contoh: 1200x400x500">
+            <input type="text" class="form-control form-control-sm" name="saiz" placeholder="Contoh: 1200x400x500">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control form-control-sm" name="saiz_unit[]" placeholder="Unit">
+            <input type="text" class="form-control form-control-sm" name="saiz_unit" placeholder="Unit">
         </div>
         <div class="col-md-3">
             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.saiz-row').remove()">
@@ -335,10 +335,10 @@ function addKadaranRow() {
     newRow.className = 'row mb-2 kadaran-row';
     newRow.innerHTML = `
         <div class="col-md-5">
-            <input type="text" class="form-control form-control-sm" name="kadaran[]" placeholder="Nilai">
+            <input type="text" class="form-control form-control-sm" name="kadaran" placeholder="Nilai">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control form-control-sm" name="kadaran_unit[]" placeholder="Unit">
+            <input type="text" class="form-control form-control-sm" name="kadaran_unit" placeholder="Unit">
         </div>
         <div class="col-md-3">
             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.kadaran-row').remove()">
@@ -356,10 +356,10 @@ function addKapasitiRow() {
     newRow.className = 'row mb-2 kapasiti-row';
     newRow.innerHTML = `
         <div class="col-md-5">
-            <input type="text" class="form-control form-control-sm" name="kapasiti[]" placeholder="Nilai">
+            <input type="text" class="form-control form-control-sm" name="kapasiti" placeholder="Nilai">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control form-control-sm" name="kapasiti_unit[]" placeholder="Unit">
+            <input type="text" class="form-control form-control-sm" name="kapasiti_unit" placeholder="Unit">
         </div>
         <div class="col-md-3">
             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('.kapasiti-row').remove()">
@@ -377,10 +377,10 @@ function addRelatedComponent() {
     const newRow = document.createElement('tr');
     newRow.className = 'related-component-row';
     newRow.innerHTML = `
-        <td><input type="number" class="form-control form-control-sm" name="related_bil[]" value="${relatedCounter}"></td>
-        <td><input type="text" class="form-control form-control-sm" name="related_nama[]" placeholder="Nama Komponen"></td>
-        <td><input type="text" class="form-control form-control-sm" name="related_dpa[]" placeholder="No. DPA / Kod Ruang"></td>
-        <td><input type="text" class="form-control form-control-sm" name="related_tag[]" placeholder="No. Tag / Label"></td>
+        <td><input type="number" class="form-control form-control-sm" name="related_bil" value="${relatedCounter}"></td>
+        <td><input type="text" class="form-control form-control-sm" name="related_nama" placeholder="Nama Komponen"></td>
+        <td><input type="text" class="form-control form-control-sm" name="related_dpa" placeholder="No. DPA / Kod Ruang"></td>
+        <td><input type="text" class="form-control form-control-sm" name="related_tag" placeholder="No. Tag / Label"></td>
         <td>
             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
                 <i class="bi bi-x"></i>
@@ -397,10 +397,10 @@ function addDocument() {
     const newRow = document.createElement('tr');
     newRow.className = 'document-row';
     newRow.innerHTML = `
-        <td><input type="number" class="form-control form-control-sm" name="doc_bil[]" value="${docCounter}"></td>
-        <td><input type="text" class="form-control form-control-sm" name="doc_nama[]" placeholder="Nama Dokumen"></td>
-        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[]" placeholder="No Rujukan"></td>
-        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[]" placeholder="Catatan"></td>
+        <td><input type="number" class="form-control form-control-sm" name="doc_bil" value="${docCounter}"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_nama" placeholder="Nama Dokumen"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan" placeholder="No Rujukan"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_catatan" placeholder="Catatan"></td>
         <td>
             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
                 <i class="bi bi-x"></i>

@@ -67,13 +67,17 @@ class MainComponentController extends Controller
         $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
         $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-        // Handle array fields
-        $validated['saiz'] = json_encode(array_filter($request->input('saiz', [])));
-        $validated['saiz_unit'] = json_encode(array_filter($request->input('saiz_unit', [])));
-        $validated['kadaran'] = json_encode(array_filter($request->input('kadaran', [])));
-        $validated['kadaran_unit'] = json_encode(array_filter($request->input('kadaran_unit', [])));
-        $validated['kapasiti'] = json_encode(array_filter($request->input('kapasiti', [])));
-        $validated['kapasiti_unit'] = json_encode(array_filter($request->input('kapasiti_unit', [])));
+        // Handle Saiz - simpan sebagai string sahaja
+        $validated['saiz'] = $request->input('saiz'); // contoh: "1200*400*200"
+        $validated['saiz_unit'] = $request->input('saiz_unit'); // contoh: "MM"
+    
+        // Handle Kadaran - simpan sebagai string sahaja
+        $validated['kadaran'] = $request->input('kadaran'); // contoh: "240"
+        $validated['kadaran_unit'] = $request->input('kadaran_unit'); // contoh: "V"
+    
+        // Handle Kapasiti - simpan sebagai string sahaja
+        $validated['kapasiti'] = $request->input('kapasiti'); // contoh: "5000"
+        $validated['kapasiti_unit'] = $request->input('kapasiti_unit'); // contoh: "BTU"
 
         // Atribut tambahan
         $validated['jenis'] = $request->input('jenis');
@@ -116,13 +120,17 @@ class MainComponentController extends Controller
         $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
         $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-        // Handle array fields
-        $validated['saiz'] = json_encode(array_filter($request->input('saiz', [])));
-        $validated['saiz_unit'] = json_encode(array_filter($request->input('saiz_unit', [])));
-        $validated['kadaran'] = json_encode(array_filter($request->input('kadaran', [])));
-        $validated['kadaran_unit'] = json_encode(array_filter($request->input('kadaran_unit', [])));
-        $validated['kapasiti'] = json_encode(array_filter($request->input('kapasiti', [])));
-        $validated['kapasiti_unit'] = json_encode(array_filter($request->input('kapasiti_unit', [])));
+        // Handle Saiz - simpan sebagai string sahaja
+        $validated['saiz'] = $request->input('saiz');
+        $validated['saiz_unit'] = $request->input('saiz_unit');
+    
+        // Handle Kadaran - simpan sebagai string sahaja
+        $validated['kadaran'] = $request->input('kadaran');
+        $validated['kadaran_unit'] = $request->input('kadaran_unit');
+    
+        // Handle Kapasiti - simpan sebagai string sahaja
+        $validated['kapasiti'] = $request->input('kapasiti');
+        $validated['kapasiti_unit'] = $request->input('kapasiti_unit');
 
         // Atribut tambahan
         $validated['jenis'] = $request->input('jenis');
@@ -159,15 +167,7 @@ class MainComponentController extends Controller
         $components = Component::where('status', 'aktif')->get();
         $sistems = Sistem::orderBy('kod')->get();
         $subsistems = Subsistem::orderBy('kod')->get();
-    
-        // Decode JSON arrays
-        $mainComponent->saiz_array = json_decode($mainComponent->saiz, true) ?? [];
-        $mainComponent->saiz_unit_array = json_decode($mainComponent->saiz_unit, true) ?? [];
-        $mainComponent->kadaran_array = json_decode($mainComponent->kadaran, true) ?? [];
-        $mainComponent->kadaran_unit_array = json_decode($mainComponent->kadaran_unit, true) ?? [];
-        $mainComponent->kapasiti_array = json_decode($mainComponent->kapasiti, true) ?? [];
-        $mainComponent->kapasiti_unit_array = json_decode($mainComponent->kapasiti_unit, true) ?? [];
-    
+
     return view('components.edit-main-component', compact(
         'mainComponent', 'components', 'sistems', 'subsistems'
     ));

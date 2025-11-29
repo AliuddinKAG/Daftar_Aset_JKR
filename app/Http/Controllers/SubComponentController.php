@@ -77,26 +77,6 @@ class SubComponentController extends Controller
             'status' => 'required|string|in:aktif,tidak_aktif',
         ]);
 
-        // Convert arrays to JSON for storage
-        if (isset($validated['saiz']) && is_array($validated['saiz'])) {
-            $validated['saiz'] = json_encode($validated['saiz']);
-        }
-        if (isset($validated['saiz_unit']) && is_array($validated['saiz_unit'])) {
-            $validated['saiz_unit'] = json_encode($validated['saiz_unit']);
-        }
-        if (isset($validated['kadaran']) && is_array($validated['kadaran'])) {
-            $validated['kadaran'] = json_encode($validated['kadaran']);
-        }
-        if (isset($validated['kadaran_unit']) && is_array($validated['kadaran_unit'])) {
-            $validated['kadaran_unit'] = json_encode($validated['kadaran_unit']);
-        }
-        if (isset($validated['kapasiti']) && is_array($validated['kapasiti'])) {
-            $validated['kapasiti'] = json_encode($validated['kapasiti']);
-        }
-        if (isset($validated['kapasiti_unit']) && is_array($validated['kapasiti_unit'])) {
-            $validated['kapasiti_unit'] = json_encode($validated['kapasiti_unit']);
-        }
-        
         // Store documents as JSON
         if (isset($validated['doc_bil']) && is_array($validated['doc_bil'])) {
             $documents = [];
@@ -130,29 +110,6 @@ class SubComponentController extends Controller
         // Load relationships
         $subComponent->load(['mainComponent.component']);
         
-        // Decode JSON fields for display
-        if ($subComponent->saiz) {
-            $subComponent->saiz_decoded = json_decode($subComponent->saiz, true);
-        }
-        if ($subComponent->saiz_unit) {
-            $subComponent->saiz_unit_decoded = json_decode($subComponent->saiz_unit, true);
-        }
-        if ($subComponent->kadaran) {
-            $subComponent->kadaran_decoded = json_decode($subComponent->kadaran, true);
-        }
-        if ($subComponent->kadaran_unit) {
-            $subComponent->kadaran_unit_decoded = json_decode($subComponent->kadaran_unit, true);
-        }
-        if ($subComponent->kapasiti) {
-            $subComponent->kapasiti_decoded = json_decode($subComponent->kapasiti, true);
-        }
-        if ($subComponent->kapasiti_unit) {
-            $subComponent->kapasiti_unit_decoded = json_decode($subComponent->kapasiti_unit, true);
-        }
-        if ($subComponent->dokumen_berkaitan) {
-            $subComponent->dokumen_decoded = json_decode($subComponent->dokumen_berkaitan, true);
-        }
-        
         return view('components.view-sub-component', compact('subComponent'));
     }
 
@@ -162,32 +119,6 @@ class SubComponentController extends Controller
     public function edit(SubComponent $subComponent)
     {
         $mainComponents = MainComponent::with('component')->get();
-        
-        // Decode JSON fields for editing
-        if ($subComponent->saiz) {
-            $subComponent->saiz_decoded = json_decode($subComponent->saiz, true);
-        }
-        if ($subComponent->saiz_unit) {
-            $subComponent->saiz_unit_decoded = json_decode($subComponent->saiz_unit, true);
-        }
-        if ($subComponent->kadaran) {
-            $subComponent->kadaran_decoded = json_decode($subComponent->kadaran, true);
-        }
-        if ($subComponent->kadaran_unit) {
-            $subComponent->kadaran_unit_decoded = json_decode($subComponent->kadaran_unit, true);
-        }
-        if ($subComponent->kapasiti) {
-            $subComponent->kapasiti_decoded = json_decode($subComponent->kapasiti, true);
-        }
-        if ($subComponent->kapasiti_unit) {
-            $subComponent->kapasiti_unit_decoded = json_decode($subComponent->kapasiti_unit, true);
-        }
-        if ($subComponent->dokumen_berkaitan) {
-            $subComponent->dokumen_decoded = json_decode($subComponent->dokumen_berkaitan, true);
-        }
-        if ($subComponent->specifications) {
-            $subComponent->specifications_decoded = json_decode($subComponent->specifications, true);
-        }
         
         return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
     }
@@ -252,26 +183,6 @@ class SubComponentController extends Controller
             'status' => 'required|string|in:aktif,tidak_aktif',
         ]);
 
-        // Convert arrays to JSON for storage
-        if (isset($validated['saiz']) && is_array($validated['saiz'])) {
-            $validated['saiz'] = json_encode($validated['saiz']);
-        }
-        if (isset($validated['saiz_unit']) && is_array($validated['saiz_unit'])) {
-            $validated['saiz_unit'] = json_encode($validated['saiz_unit']);
-        }
-        if (isset($validated['kadaran']) && is_array($validated['kadaran'])) {
-            $validated['kadaran'] = json_encode($validated['kadaran']);
-        }
-        if (isset($validated['kadaran_unit']) && is_array($validated['kadaran_unit'])) {
-            $validated['kadaran_unit'] = json_encode($validated['kadaran_unit']);
-        }
-        if (isset($validated['kapasiti']) && is_array($validated['kapasiti'])) {
-            $validated['kapasiti'] = json_encode($validated['kapasiti']);
-        }
-        if (isset($validated['kapasiti_unit']) && is_array($validated['kapasiti_unit'])) {
-            $validated['kapasiti_unit'] = json_encode($validated['kapasiti_unit']);
-        }
-        
         // Store documents as JSON
         if (isset($validated['doc_bil']) && is_array($validated['doc_bil'])) {
             $documents = [];

@@ -45,10 +45,10 @@
             @foreach($saizArray as $index => $saiz)
             <div class="row mb-2 related-component-row">
                 <div class="col-md-5">
-                    <input type="text" class="form-control form-control-sm" name="saiz[]" placeholder="Saiz Fizikal" value="{{ $saiz }}">
+                    <input type="text" class="form-control form-control-sm" name="saiz" placeholder="Saiz Fizikal" value="{{ $saiz }}">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" name="saiz_unit[]" placeholder="Unit" value="{{ $saizUnitArray[$index] ?? '' }}">
+                    <input type="text" class="form-control form-control-sm" name="saiz_unit" placeholder="Unit" value="{{ $saizUnitArray[$index] ?? '' }}">
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeRelatedRow(this)" style="display:{{ $index > 0 ? 'block' : 'none' }};">
@@ -76,10 +76,10 @@
             @foreach($kapasitiArray as $index => $kapasiti)
             <div class="row mb-2 related-component-row">
                 <div class="col-md-5">
-                    <input type="text" class="form-control form-control-sm" name="kapasiti[]" placeholder="Kapasiti" value="{{ $kapasiti }}">
+                    <input type="text" class="form-control form-control-sm" name="kapasiti" placeholder="Kapasiti" value="{{ $kapasiti }}">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" name="kapasiti_unit[]" placeholder="Unit" value="{{ $kapasitiUnitArray[$index] ?? '' }}">
+                    <input type="text" class="form-control form-control-sm" name="kapasiti_unit" placeholder="Unit" value="{{ $kapasitiUnitArray[$index] ?? '' }}">
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeRelatedRow(this)" style="display:{{ $index > 0 ? 'block' : 'none' }};">
@@ -107,10 +107,10 @@
             @foreach($kadaranArray as $index => $kadaran)
             <div class="row mb-2 related-component-row">
                 <div class="col-md-5">
-                    <input type="text" class="form-control form-control-sm" name="kadaran[]" placeholder="Kadaran" value="{{ $kadaran }}">
+                    <input type="text" class="form-control form-control-sm" name="kadaran" placeholder="Kadaran" value="{{ $kadaran }}">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" name="kadaran_unit[]" placeholder="Unit" value="{{ $kadaranUnitArray[$index] ?? '' }}">
+                    <input type="text" class="form-control form-control-sm" name="kadaran_unit" placeholder="Unit" value="{{ $kadaranUnitArray[$index] ?? '' }}">
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeRelatedRow(this)" style="display:{{ $index > 0 ? 'block' : 'none' }};">
@@ -260,16 +260,16 @@
             @foreach($docBilArray as $index => $bil)
             <div class="row mb-2 document-row">
                 <div class="col-md-1">
-                    <input type="number" class="form-control form-control-sm" name="doc_bil[]" placeholder="Bil" value="{{ $bil }}">
+                    <input type="number" class="form-control form-control-sm" name="doc_bil" placeholder="Bil" value="{{ $bil }}">
                 </div>
                 <div class="col-md-4">
-                    <input type="text" class="form-control form-control-sm" name="doc_nama[]" placeholder="Nama Dokumen" value="{{ $docNamaArray[$index] ?? '' }}">
+                    <input type="text" class="form-control form-control-sm" name="doc_nama" placeholder="Nama Dokumen" value="{{ $docNamaArray[$index] ?? '' }}">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" name="doc_rujukan[]" placeholder="No Rujukan Berkaitan" value="{{ $docRujukanArray[$index] ?? '' }}">
+                    <input type="text" class="form-control form-control-sm" name="doc_rujukan" placeholder="No Rujukan Berkaitan" value="{{ $docRujukanArray[$index] ?? '' }}">
                 </div>
                 <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" name="doc_catatan[]" placeholder="Catatan" value="{{ $docCatatanArray[$index] ?? '' }}">
+                    <input type="text" class="form-control form-control-sm" name="doc_catatan" placeholder="Catatan" value="{{ $docCatatanArray[$index] ?? '' }}">
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeDocRow(this)" style="display:{{ $index > 0 ? 'block' : 'none' }};">
@@ -330,10 +330,10 @@ function addSaizFizikal() {
     newRow.className = 'row mb-2 related-component-row';
     newRow.innerHTML = `
         <div class="col-md-5">
-            <input type="text" class="form-control form-control-sm" name="saiz[]" placeholder="Saiz Fizikal">
+            <input type="text" class="form-control form-control-sm" name="saiz" placeholder="Saiz Fizikal">
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control form-control-sm" name="saiz_unit[]" placeholder="Unit">
+            <input type="text" class="form-control form-control-sm" name="saiz_unit" placeholder="Unit">
         </div>
         <div class="col-md-1">
             <button type="button" class="btn btn-sm btn-danger" onclick="removeRelatedRow(this)">
@@ -350,10 +350,10 @@ function addKapasiti() {
     newRow.className = 'row mb-2 related-component-row';
     newRow.innerHTML = `
         <div class="col-md-5">
-            <input type="text" class="form-control form-control-sm" name="kapasiti[]" placeholder="Kapasiti">
+            <input type="text" class="form-control form-control-sm" name="kapasiti" placeholder="Kapasiti">
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control form-control-sm" name="kapasiti_unit[]" placeholder="Unit">
+            <input type="text" class="form-control form-control-sm" name="kapasiti_unit" placeholder="Unit">
         </div>
         <div class="col-md-1">
             <button type="button" class="btn btn-sm btn-danger" onclick="removeRelatedRow(this)">
@@ -370,10 +370,10 @@ function addKadaran() {
     newRow.className = 'row mb-2 related-component-row';
     newRow.innerHTML = `
         <div class="col-md-5">
-            <input type="text" class="form-control form-control-sm" name="kadaran[]" placeholder="Kadaran">
+            <input type="text" class="form-control form-control-sm" name="kadaran" placeholder="Kadaran">
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control form-control-sm" name="kadaran_unit[]" placeholder="Unit">
+            <input type="text" class="form-control form-control-sm" name="kadaran_unit" placeholder="Unit">
         </div>
         <div class="col-md-1">
             <button type="button" class="btn btn-sm btn-danger" onclick="removeRelatedRow(this)">
@@ -395,16 +395,16 @@ function addDocument() {
     newRow.className = 'row mb-2 document-row';
     newRow.innerHTML = `
         <div class="col-md-1">
-            <input type="number" class="form-control form-control-sm" name="doc_bil[]" placeholder="Bil" value="${docCounter}">
+            <input type="number" class="form-control form-control-sm" name="doc_bil" placeholder="Bil" value="${docCounter}">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control form-control-sm" name="doc_nama[]" placeholder="Nama Dokumen">
+            <input type="text" class="form-control form-control-sm" name="doc_nama" placeholder="Nama Dokumen">
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control form-control-sm" name="doc_rujukan[]" placeholder="No Rujukan Berkaitan">
+            <input type="text" class="form-control form-control-sm" name="doc_rujukan" placeholder="No Rujukan Berkaitan">
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control form-control-sm" name="doc_catatan[]" placeholder="Catatan">
+            <input type="text" class="form-control form-control-sm" name="doc_catatan" placeholder="Catatan">
         </div>
         <div class="col-md-1">
             <button type="button" class="btn btn-sm btn-danger" onclick="removeDocRow(this)">
