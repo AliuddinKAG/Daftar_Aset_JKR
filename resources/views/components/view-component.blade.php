@@ -29,6 +29,9 @@
                     <a href="{{ route('export.component.pdf', $component) }}" class="btn btn-danger">
                         <i class="bi bi-file-pdf"></i> Download PDF
                     </a>
+                    <a href="{{ route('export.complete-report.pdf', $component) }}" class="btn btn-primary">
+                        <i class="bi bi-file-earmark-pdf"></i> Download Complete Report
+                    </a>
                     <a href="{{ route('components.edit', $component) }}" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Edit
                     </a>

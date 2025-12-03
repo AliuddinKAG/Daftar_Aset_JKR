@@ -20,8 +20,8 @@
                     <a href="{{ route('export.sub-component.pdf', $subComponent) }}" class="btn btn-danger">
                         <i class="bi bi-file-pdf"></i> Download PDF
                     </a>
-                    <a href="{{ route('components.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="bi bi-arrow-left"></i> Kembali
+                    <a href="{{ route('export.complete-report.pdf', $subComponent) }}" class="btn btn-primary">
+                        <i class="bi bi-file-earmark-pdf"></i> Download Complete Report
                     </a>
                 </div>
             </div>
