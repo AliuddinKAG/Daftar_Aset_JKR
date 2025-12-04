@@ -21,7 +21,7 @@
     <td colspan="4" class="value-cell" rowspan="2">{{ $mainComponent->gambar_komponen ?? '' }}<span>Sila Lampirkan gambar jika perlu dan pastikan dimuat naik ke dalam Sistem mySPATA</span></td>
 </tr>
 <tr>
-    <td colspan="2" class="label-cell">No Perolehan (Gemas)</td>
+    <td colspan="2" class="label-cell">No Perolehan (1GFMAS)</td>
 </tr>
 
 <!-- Bidang Kejuruteraan -->
