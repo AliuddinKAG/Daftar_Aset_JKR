@@ -62,7 +62,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="2" class="label-cell">No Perolehan (Gemas)</td>
+            <td colspan="2" class="label-cell">No Perolehan (1GFMAS)</td>
         </tr>
 
         <!-- Bidang Kejuruteraan -->
