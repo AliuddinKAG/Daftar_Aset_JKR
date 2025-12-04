@@ -34,8 +34,6 @@ class ExportController extends Controller
         $filename = 'Borang-1-Komponen-' . $component->id . '-' . date('YmdHis') . '.pdf';
         
         return $pdf->stream($filename);
-
-        // return $pdf->download($filename);
     }
 
     /**
@@ -85,7 +83,10 @@ class ExportController extends Controller
     {
         $component->load(['mainComponents.subComponents']);
         
-        $pdf = PDF::loadView('exports.pdf.complete-report', compact('component'));
+        // KIRA JUMLAH MUKA SURAT
+        $totalPages = $this->calculateTotalPages($component);
+        
+        $pdf = PDF::loadView('exports.pdf.complete-report', compact('component', 'totalPages'));
         
         $pdf->setPaper('a4', 'portrait');
         $pdf->setOption('isHtml5ParserEnabled', true);
@@ -95,6 +96,28 @@ class ExportController extends Controller
         $filename = 'Laporan-Lengkap-Komponen-' . $component->id . '-' . date('YmdHis') . '.pdf';
         
         return $pdf->stream($filename);
+    }
+
+    /**
+     * HELPER: Calculate total pages for complete report
+     */
+    private function calculateTotalPages(Component $component)
+    {
+        $pages = 0;
+        
+        // 1 page untuk Component (Borang 1)
+        $pages += 1;
+        
+        // Setiap Main Component = 1 page
+        $mainComponentsCount = $component->mainComponents->count();
+        $pages += $mainComponentsCount;
+        
+        // Setiap Sub Component = 1 page
+        foreach ($component->mainComponents as $mainComponent) {
+            $pages += $mainComponent->subComponents->count();
+        }
+        
+        return $pages;
     }
 
     /**
