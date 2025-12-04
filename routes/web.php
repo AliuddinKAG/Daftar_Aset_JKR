@@ -5,6 +5,7 @@ use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\MainComponentController;
 use App\Http\Controllers\SubComponentController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\KodBinaanLuarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +72,27 @@ Route::prefix('sub-components')->name('sub-components.')->group(function () {
     Route::get('/{subComponent}/edit', [SubComponentController::class, 'edit'])->name('edit');
     Route::put('/{subComponent}', [SubComponentController::class, 'update'])->name('update');
     Route::delete('/{subComponent}', [SubComponentController::class, 'destroy'])->name('delete');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Kod Binaan Luar Routes (Master Data)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('kod-binaan-luar')->name('kod-binaan-luar.')->group(function () {
+    // API endpoints - MESTI di atas untuk elak conflict dengan {kodBinaanLuar}
+    Route::get('/api/aktif', [KodBinaanLuarController::class, 'getAktif'])->name('api.aktif');
+    Route::get('/api/search', [KodBinaanLuarController::class, 'search'])->name('api.search');
+    
+    // Standard CRUD routes
+    Route::get('/', [KodBinaanLuarController::class, 'index'])->name('index');
+    Route::get('/create', [KodBinaanLuarController::class, 'create'])->name('create');
+    Route::post('/', [KodBinaanLuarController::class, 'store'])->name('store');
+    Route::get('/{kodBinaanLuar}', [KodBinaanLuarController::class, 'show'])->name('show');
+    Route::get('/{kodBinaanLuar}/edit', [KodBinaanLuarController::class, 'edit'])->name('edit');
+    Route::put('/{kodBinaanLuar}', [KodBinaanLuarController::class, 'update'])->name('update');
+    Route::delete('/{kodBinaanLuar}', [KodBinaanLuarController::class, 'destroy'])->name('destroy');
 });
 
 /*

@@ -174,12 +174,26 @@
                                     <tr>
                                         <td width="30%">Nama Binaan Luar</td>
                                         <td><input type="text" class="form-control" name="nama_binaan_luar" 
-                                                   value="{{ old('nama_binaan_luar') }}"></td>
+                                                   value="{{ old('nama_binaan_luar') }}" 
+                                                   placeholder="Contoh: Kolam Renang A"></td>
                                     </tr>
                                     <tr>
                                         <td>Kod Binaan Luar</td>
-                                        <td><input type="text" class="form-control" name="kod_binaan_luar" 
-                                                   value="{{ old('kod_binaan_luar') }}"></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-binaan-luar" name="kod_binaan_luar" id="kod_binaan_luar">
+                                                    <option value="">-- Pilih atau Taip Kod Binaan Luar --</option>
+                                                    @if(isset($kodBinaanLuar))
+                                                        @foreach($kodBinaanLuar as $binaan)
+                                                            <option value="{{ $binaan->kod }}" {{ old('kod_binaan_luar') == $binaan->kod ? 'selected' : '' }}>
+                                                                {{ $binaan->kod }} - {{ $binaan->nama }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>Koordinat GPS (WGS 84)</td>
@@ -201,18 +215,51 @@
                                     </tr>
                                     <tr>
                                         <td>Kod Aras</td>
-                                        <td><input type="text" class="form-control" name="kod_aras_binaan" 
-                                                   value="{{ old('kod_aras_binaan') }}"></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-aras-binaan" name="kod_aras_binaan" id="kod_aras_binaan">
+                                                    <option value="">-- Pilih atau Taip Kod Aras --</option>
+                                                    @foreach($kodAras as $aras)
+                                                        <option value="{{ $aras->kod }}" {{ old('kod_aras_binaan') == $aras->kod ? 'selected' : '' }}>
+                                                            {{ $aras->kod }} - {{ $aras->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>Kod Ruang</td>
-                                        <td><input type="text" class="form-control" name="kod_ruang_binaan" 
-                                                   value="{{ old('kod_ruang_binaan') }}"></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-ruang-binaan" name="kod_ruang_binaan" id="kod_ruang_binaan">
+                                                    <option value="">-- Pilih atau Taip Kod Ruang --</option>
+                                                    @foreach($kodRuangs as $ruang)
+                                                        <option value="{{ $ruang->kod }}" {{ old('kod_ruang_binaan') == $ruang->kod ? 'selected' : '' }}>
+                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>Nama Ruang</td>
-                                        <td><input type="text" class="form-control" name="nama_ruang_binaan" 
-                                                   value="{{ old('nama_ruang_binaan') }}"></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-nama-ruang-binaan" name="nama_ruang_binaan" id="nama_ruang_binaan">
+                                                    <option value="">-- Pilih atau Taip Nama Ruang --</option>
+                                                    @foreach($namaRuangs as $nama)
+                                                        <option value="{{ $nama->nama }}" {{ old('nama_ruang_binaan') == $nama->nama ? 'selected' : '' }}>
+                                                            {{ $nama->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>Catatan: <br></td>
@@ -254,7 +301,7 @@
 <script>
 $(document).ready(function() {
     // Initialize Select2 untuk semua dropdown dengan tags support
-    $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang').select2({
+    $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
         theme: 'bootstrap-5',
         tags: true,
         placeholder: 'Cari atau taip nilai baru',
