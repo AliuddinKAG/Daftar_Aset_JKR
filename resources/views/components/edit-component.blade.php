@@ -14,6 +14,10 @@
 .input-group-text {
     background-color: #e9ecef;
 }
+/* Highlight untuk tag baru */
+.select2-results__option .badge {
+    font-size: 0.875rem;
+}
 </style>
 @endsection
 
@@ -308,12 +312,12 @@
 
 <script>
 $(document).ready(function() {
-    // Initialize Select2 dengan tags support untuk semua dropdown
+    // Initialize Select2 dengan clear button dan delete capability
     $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
         theme: 'bootstrap-5',
         tags: true,
         placeholder: 'Cari atau taip nilai baru',
-        allowClear: true,
+        allowClear: true,  // Enable butang X untuk clear selection
         createTag: function (params) {
             var term = $.trim(params.term);
             if (term === '') {
@@ -321,20 +325,76 @@ $(document).ready(function() {
             }
             return {
                 id: term,
-                text: term + ' (Baru)',
+                text: term + ' ✓ (Baru)',
                 newTag: true
             }
+        },
+        // Highlight tag baru dengan warna berbeza
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span class="badge bg-success">' + data.text + '</span>');
+            }
+            return data.text;
+        }
+    });
+
+    // Event untuk buang option yang salah taip
+    $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').on('select2:unselecting', function(e) {
+        var data = e.params.args.data;
+        
+        // Jika option adalah tag baru yang user taip sendiri
+        if (data.newTag) {
+            // Optional: uncomment jika nak confirmation dialog
+            // if (!confirm('Buang "' + data.text + '"?')) {
+            //     e.preventDefault();
+            //     return;
+            // }
+            
+            // Auto remove option dari dropdown
+            var $select = $(this);
+            setTimeout(function() {
+                $select.find('option[value="' + data.id + '"]').remove();
+            }, 100);
+        }
+    });
+
+    // Event bila clear semua (klik X button)
+    $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').on('select2:clear', function() {
+        var $select = $(this);
+        // Optional: Buang semua tag baru bila clear
+        $select.find('option').each(function() {
+            var $option = $(this);
+            // Check jika option ni bukan dari database (tag baru)
+            if ($option.val() && !$option.data('original')) {
+                // Uncomment line ini jika nak buang tag baru bila clear
+                // $option.remove();
+            }
+        });
+    });
+
+    // Mark original options (dari database)
+    $('.select2-blok option, .select2-aras option, .select2-ruang option, .select2-nama-ruang option, .select2-binaan-luar option, .select2-aras-binaan option, .select2-ruang-binaan option, .select2-nama-ruang-binaan option').each(function() {
+        if ($(this).val()) {
+            $(this).data('original', true);
         }
     });
 
     // Toggle Blok Section
     $('#ada_blok').on('change', function() {
-        $('#blok_section').slideToggle(300);
+        if ($(this).is(':checked')) {
+            $('#blok_section').slideDown(300);
+        } else {
+            $('#blok_section').slideUp(300);
+        }
     });
 
     // Toggle Binaan Luar Section
     $('#ada_binaan_luar').on('change', function() {
-        $('#binaan_section').slideToggle(300);
+        if ($(this).is(':checked')) {
+            $('#binaan_section').slideDown(300);
+        } else {
+            $('#binaan_section').slideUp(300);
+        }
     });
 
     // Check on page load
@@ -344,6 +404,11 @@ $(document).ready(function() {
     if ($('#ada_binaan_luar').is(':checked')) {
         $('#binaan_section').show();
     }
+
+    // Tambah CSS untuk highlight new tags
+    $('<style>')
+        .text('.select2-results__option--highlighted .badge { background-color: #198754 !important; color: white !important; }')
+        .appendTo('head');
 });
 </script>
 @endsection
