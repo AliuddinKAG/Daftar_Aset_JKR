@@ -4,24 +4,42 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// OPTION A: If you have deleted_at column, use SoftDeletes
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SubComponentDocument extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes; // Remove SoftDeletes if no deleted_at column
 
+    /**
+     * IMPORTANT: Specify exact table name
+     */
+    protected $table = 'sub_component_documents';
+
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
-        'sub_component_id',   // ID hubungan ke jadual sub_component
-        'nama_fail',          // Nama fail asal
-        'path',               // Lokasi fail disimpan (contoh: storage/app/public/documents)
-        'jenis_fail',         // Contoh: pdf, jpg, docx
-        'catatan',            // Catatan tambahan
+        'sub_component_id',
+        'bil',
+        'nama_dokumen',
+        'no_rujukan_berkaitan',
+        'catatan',
+        'file_path',
     ];
 
     /**
-     * Hubungan ke model SubComponent
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'deleted_at' => 'datetime', // Remove this if not using SoftDeletes
+    ];
+
+    /**
+     * Relationship: Belongs to SubComponent
      */
     public function subComponent()
     {
-        return $this->belongsTo(SubComponent::class);
+        return $this->belongsTo(SubComponent::class, 'sub_component_id', 'id');
     }
 }

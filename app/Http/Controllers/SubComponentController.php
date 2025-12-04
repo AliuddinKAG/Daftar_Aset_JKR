@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SubComponent;
 use App\Models\MainComponent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SubComponentController extends Controller
 {
@@ -22,84 +23,39 @@ class SubComponentController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            // Maklumat Utama
-            'main_component_id' => 'required|exists:main_components,id',
-            'nama_sub_komponen' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'status_komponen' => 'nullable|string',
-            'no_siri' => 'nullable|string|max:255',
-            'no_sijil_pendaftaran' => 'nullable|string|max:255',
-            'jenama' => 'nullable|string|max:255',
-            'model' => 'nullable|string|max:255',
-            'kuantiti' => 'nullable|integer|min:1',
-            'catatan' => 'nullable|string',
-            
-            // Atribut Spesifikasi
-            'jenis' => 'nullable|string|max:255',
-            'bahan' => 'nullable|string|max:255',
-            'saiz' => 'nullable|array',
-            'saiz_unit' => 'nullable|array',
-            'kadaran' => 'nullable|array',
-            'kadaran_unit' => 'nullable|array',
-            'kapasiti' => 'nullable|array',
-            'kapasiti_unit' => 'nullable|array',
-            'catatan_atribut' => 'nullable|string',
-            
-            // Maklumat Pembelian
-            'tarikh_pembelian' => 'nullable|date',
-            'kos_perolehan' => 'nullable|numeric',
-            'no_pesanan_rasmi_kontrak' => 'nullable|string|max:255',
-            'kod_ptj' => 'nullable|string|max:255',
-            'tarikh_dipasang' => 'nullable|date',
-            'tarikh_waranti_tamat' => 'nullable|date',
-            'jangka_hayat' => 'nullable|string|max:255',
-            
-            // Pengilang, Pembekal, Kontraktor
-            'nama_pengilang' => 'nullable|string|max:255',
-            'nama_pembekal' => 'nullable|string|max:255',
-            'alamat_pembekal' => 'nullable|string',
-            'no_telefon_pembekal' => 'nullable|string|max:50',
-            'nama_kontraktor' => 'nullable|string|max:255',
-            'alamat_kontraktor' => 'nullable|string',
-            'no_telefon_kontraktor' => 'nullable|string|max:50',
-            'catatan_pembelian' => 'nullable|string',
-            
-            // Dokumen Berkaitan
-            'doc_bil' => 'nullable|array',
-            'doc_nama' => 'nullable|array',
-            'doc_rujukan' => 'nullable|array',
-            'doc_catatan' => 'nullable|array',
-            'catatan_dokumen' => 'nullable|string',
-            
-            // Status & Nota
-            'nota' => 'nullable|string',
-            'status' => 'required|string|in:aktif,tidak_aktif',
-        ]);
+        try {
+            $validated = $request->validate($this->validationRules());
 
-        // Store documents as JSON
-        if (isset($validated['doc_bil']) && is_array($validated['doc_bil'])) {
-            $documents = [];
-            foreach ($validated['doc_bil'] as $index => $bil) {
-                if (!empty($bil) || !empty($validated['doc_nama'][$index] ?? '')) {
-                    $documents[] = [
-                        'bil' => $bil,
-                        'nama' => $validated['doc_nama'][$index] ?? '',
-                        'rujukan' => $validated['doc_rujukan'][$index] ?? '',
-                        'catatan' => $validated['doc_catatan'][$index] ?? '',
-                    ];
-                }
-            }
-            $validated['dokumen_berkaitan'] = json_encode($documents);
+            DB::beginTransaction();
+
+            // Handle Saiz, Kadaran, Kapasiti - convert to JSON if array
+            $validated['saiz'] = $this->convertToJson($request->input('saiz'));
+            $validated['saiz_unit'] = $this->convertToJson($request->input('saiz_unit'));
+            $validated['kadaran'] = $this->convertToJson($request->input('kadaran'));
+            $validated['kadaran_unit'] = $this->convertToJson($request->input('kadaran_unit'));
+            $validated['kapasiti'] = $this->convertToJson($request->input('kapasiti'));
+            $validated['kapasiti_unit'] = $this->convertToJson($request->input('kapasiti_unit'));
+
+            // Handle dokumen berkaitan - save as JSON
+            $validated['dokumen_berkaitan'] = $this->processDokumenBerkaitan($request);
+
+            $validated['status'] = $request->input('status', 'aktif');
             
-            // Remove array fields
-            unset($validated['doc_bil'], $validated['doc_nama'], $validated['doc_rujukan'], $validated['doc_catatan']);
+            SubComponent::create($validated);
+
+            DB::commit();
+
+            return redirect()->route('components.index')
+                ->with('success', 'Sub Komponen berjaya ditambah');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error creating sub component: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->with('error', 'Gagal menyimpan Sub Komponen: ' . $e->getMessage())
+                ->withInput();
         }
-        
-        SubComponent::create($validated);
-
-        return redirect()->route('components.index')
-            ->with('success', 'Sub Komponen berjaya ditambah');
     }
 
     /**
@@ -107,7 +63,7 @@ class SubComponentController extends Controller
      */
     public function show(SubComponent $subComponent)
     {
-        // Load relationships
+        // Load hanya relationships yang wujud - BUANG relatedDocuments
         $subComponent->load(['mainComponent.component']);
         
         return view('components.view-sub-component', compact('subComponent'));
@@ -128,84 +84,37 @@ class SubComponentController extends Controller
      */
     public function update(Request $request, SubComponent $subComponent)
     {
-        $validated = $request->validate([
-            // Maklumat Utama
-            'main_component_id' => 'required|exists:main_components,id',
-            'nama_sub_komponen' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'status_komponen' => 'nullable|string',
-            'no_siri' => 'nullable|string|max:255',
-            'no_sijil_pendaftaran' => 'nullable|string|max:255',
-            'jenama' => 'nullable|string|max:255',
-            'model' => 'nullable|string|max:255',
-            'kuantiti' => 'nullable|integer|min:1',
-            'catatan' => 'nullable|string',
-            
-            // Atribut Spesifikasi
-            'jenis' => 'nullable|string|max:255',
-            'bahan' => 'nullable|string|max:255',
-            'saiz' => 'nullable|array',
-            'saiz_unit' => 'nullable|array',
-            'kadaran' => 'nullable|array',
-            'kadaran_unit' => 'nullable|array',
-            'kapasiti' => 'nullable|array',
-            'kapasiti_unit' => 'nullable|array',
-            'catatan_atribut' => 'nullable|string',
-            
-            // Maklumat Pembelian
-            'tarikh_pembelian' => 'nullable|date',
-            'kos_perolehan' => 'nullable|numeric',
-            'no_pesanan_rasmi_kontrak' => 'nullable|string|max:255',
-            'kod_ptj' => 'nullable|string|max:255',
-            'tarikh_dipasang' => 'nullable|date',
-            'tarikh_waranti_tamat' => 'nullable|date',
-            'jangka_hayat' => 'nullable|string|max:255',
-            
-            // Pengilang, Pembekal, Kontraktor
-            'nama_pengilang' => 'nullable|string|max:255',
-            'nama_pembekal' => 'nullable|string|max:255',
-            'alamat_pembekal' => 'nullable|string',
-            'no_telefon_pembekal' => 'nullable|string|max:50',
-            'nama_kontraktor' => 'nullable|string|max:255',
-            'alamat_kontraktor' => 'nullable|string',
-            'no_telefon_kontraktor' => 'nullable|string|max:50',
-            'catatan_pembelian' => 'nullable|string',
-            
-            // Dokumen Berkaitan
-            'doc_bil' => 'nullable|array',
-            'doc_nama' => 'nullable|array',
-            'doc_rujukan' => 'nullable|array',
-            'doc_catatan' => 'nullable|array',
-            'catatan_dokumen' => 'nullable|string',
-            
-            // Status & Nota
-            'nota' => 'nullable|string',
-            'status' => 'required|string|in:aktif,tidak_aktif',
-        ]);
+        try {
+            $validated = $request->validate($this->validationRules());
 
-        // Store documents as JSON
-        if (isset($validated['doc_bil']) && is_array($validated['doc_bil'])) {
-            $documents = [];
-            foreach ($validated['doc_bil'] as $index => $bil) {
-                if (!empty($bil) || !empty($validated['doc_nama'][$index] ?? '')) {
-                    $documents[] = [
-                        'bil' => $bil,
-                        'nama' => $validated['doc_nama'][$index] ?? '',
-                        'rujukan' => $validated['doc_rujukan'][$index] ?? '',
-                        'catatan' => $validated['doc_catatan'][$index] ?? '',
-                    ];
-                }
-            }
-            $validated['dokumen_berkaitan'] = json_encode($documents);
+            DB::beginTransaction();
+
+            // Handle Saiz, Kadaran, Kapasiti - convert to JSON if array
+            $validated['saiz'] = $this->convertToJson($request->input('saiz'));
+            $validated['saiz_unit'] = $this->convertToJson($request->input('saiz_unit'));
+            $validated['kadaran'] = $this->convertToJson($request->input('kadaran'));
+            $validated['kadaran_unit'] = $this->convertToJson($request->input('kadaran_unit'));
+            $validated['kapasiti'] = $this->convertToJson($request->input('kapasiti'));
+            $validated['kapasiti_unit'] = $this->convertToJson($request->input('kapasiti_unit'));
+
+            // Handle dokumen berkaitan - save as JSON
+            $validated['dokumen_berkaitan'] = $this->processDokumenBerkaitan($request);
+
+            $subComponent->update($validated);
+
+            DB::commit();
+
+            return redirect()->route('components.index')
+                ->with('success', 'Sub Komponen berjaya dikemaskini');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error updating sub component: ' . $e->getMessage());
             
-            // Remove array fields
-            unset($validated['doc_bil'], $validated['doc_nama'], $validated['doc_rujukan'], $validated['doc_catatan']);
+            return redirect()->back()
+                ->with('error', 'Gagal mengemaskini Sub Komponen: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $subComponent->update($validated);
-
-        return redirect()->route('components.index')
-            ->with('success', 'Sub Komponen berjaya dikemaskini');
     }
 
     /**
@@ -213,7 +122,7 @@ class SubComponentController extends Controller
      */
     public function destroy(SubComponent $subComponent)
     {
-        $subComponent->delete(); // Soft delete
+        $subComponent->delete();
         
         return redirect()->route('components.index')
             ->with('success', 'Sub Komponen berjaya dipadam');
@@ -250,9 +159,109 @@ class SubComponentController extends Controller
     public function forceDestroy($id)
     {
         $subComponent = SubComponent::onlyTrashed()->findOrFail($id);
-        $subComponent->forceDelete(); // Permanent delete
+        $subComponent->forceDelete();
         
         return redirect()->route('sub-components.trashed')
             ->with('success', 'Sub Komponen berjaya dipadam secara kekal');
+    }
+
+    /**
+     * Helper: Convert to JSON if array
+     */
+    private function convertToJson($input)
+    {
+        if (empty($input)) {
+            return null;
+        }
+        
+        return is_array($input) ? json_encode($input) : $input;
+    }
+
+    /**
+     * Helper: Process dokumen berkaitan as JSON
+     */
+    private function processDokumenBerkaitan(Request $request)
+    {
+        $bils = $request->input('doc_bil', []);
+        $namas = $request->input('doc_nama', []);
+        $rujukans = $request->input('doc_rujukan', []);
+        $catatans = $request->input('doc_catatan', []);
+
+        $documents = [];
+
+        if (is_array($namas)) {
+            foreach ($namas as $index => $nama) {
+                if (!empty(trim($nama ?? ''))) {
+                    $documents[] = [
+                        'bil' => $bils[$index] ?? ($index + 1),
+                        'nama' => $nama,
+                        'rujukan' => $rujukans[$index] ?? null,
+                        'catatan' => $catatans[$index] ?? null,
+                    ];
+                }
+            }
+        }
+
+        return !empty($documents) ? json_encode($documents) : null;
+    }
+
+    /**
+     * Validation rules
+     */
+    private function validationRules(): array
+    {
+        return [
+            'main_component_id' => 'required|exists:main_components,id',
+            'nama_sub_komponen' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'status_komponen' => 'nullable|string',
+            'no_siri' => 'nullable|string|max:255',
+            'no_sijil_pendaftaran' => 'nullable|string|max:255',
+            'jenama' => 'nullable|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'kuantiti' => 'nullable|integer|min:1',
+            'catatan' => 'nullable|string',
+            
+            // Atribut Spesifikasi
+            'jenis' => 'nullable|string|max:255',
+            'bahan' => 'nullable|string|max:255',
+            'saiz' => 'nullable',
+            'saiz_unit' => 'nullable',
+            'kadaran' => 'nullable',
+            'kadaran_unit' => 'nullable',
+            'kapasiti' => 'nullable',
+            'kapasiti_unit' => 'nullable',
+            'catatan_atribut' => 'nullable|string',
+            
+            // Maklumat Pembelian
+            'tarikh_pembelian' => 'nullable|date',
+            'kos_perolehan' => 'nullable|numeric',
+            'no_pesanan_rasmi_kontrak' => 'nullable|string|max:255',
+            'kod_ptj' => 'nullable|string|max:255',
+            'tarikh_dipasang' => 'nullable|date',
+            'tarikh_waranti_tamat' => 'nullable|date',
+            'jangka_hayat' => 'nullable|string|max:255',
+            
+            // Pengilang, Pembekal, Kontraktor
+            'nama_pengilang' => 'nullable|string|max:255',
+            'nama_pembekal' => 'nullable|string|max:255',
+            'alamat_pembekal' => 'nullable|string',
+            'no_telefon_pembekal' => 'nullable|string|max:50',
+            'nama_kontraktor' => 'nullable|string|max:255',
+            'alamat_kontraktor' => 'nullable|string',
+            'no_telefon_kontraktor' => 'nullable|string|max:50',
+            'catatan_pembelian' => 'nullable|string',
+            
+            // Dokumen - array inputs
+            'doc_bil' => 'nullable|array',
+            'doc_nama' => 'nullable|array',
+            'doc_rujukan' => 'nullable|array',
+            'doc_catatan' => 'nullable|array',
+            'catatan_dokumen' => 'nullable|string',
+            
+            // Status & Nota
+            'nota' => 'nullable|string',
+            'status' => 'required|string|in:aktif,tidak_aktif',
+        ];
     }
 }

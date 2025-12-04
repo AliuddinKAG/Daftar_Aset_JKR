@@ -5,8 +5,6 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-
-
         <div class="card">
             <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                 <div>
@@ -20,8 +18,8 @@
                     <a href="{{ route('export.sub-component.pdf', $subComponent) }}" class="btn btn-danger">
                         <i class="bi bi-file-pdf"></i> Download PDF
                     </a>
-                    <a href="{{ route('export.complete-report.pdf', $subComponent) }}" class="btn btn-primary">
-                        <i class="bi bi-file-earmark-pdf"></i> Download Complete Report
+                    <a href="{{ route('main-components.show', $subComponent->mainComponent) }}" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Kembali
                     </a>
                 </div>
             </div>
@@ -156,42 +154,15 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <strong>Saiz Fizikal:</strong>
-                                @if(isset($subComponent->saiz_decoded) && is_array($subComponent->saiz_decoded))
-                                    @foreach($subComponent->saiz_decoded as $index => $saiz)
-                                        <p class="mb-0">
-                                            {{ $saiz ?? '-' }} 
-                                            {{ $subComponent->saiz_unit_decoded[$index] ?? '' }}
-                                        </p>
-                                    @endforeach
-                                @else
-                                    <p class="mb-0">-</p>
-                                @endif
+                                <p class="mb-0">{{ $subComponent->saiz ?? '-' }} {{ $subComponent->saiz_unit }}</p>
                             </div>
                             <div class="col-md-4">
                                 <strong>Kadaran:</strong>
-                                @if(isset($subComponent->kadaran_decoded) && is_array($subComponent->kadaran_decoded))
-                                    @foreach($subComponent->kadaran_decoded as $index => $kadaran)
-                                        <p class="mb-0">
-                                            {{ $kadaran ?? '-' }} 
-                                            {{ $subComponent->kadaran_unit_decoded[$index] ?? '' }}
-                                        </p>
-                                    @endforeach
-                                @else
-                                    <p class="mb-0">-</p>
-                                @endif
+                                <p class="mb-0">{{ $subComponent->kadaran ?? '-' }} {{ $subComponent->kadaran_unit }}</p>
                             </div>
                             <div class="col-md-4">
                                 <strong>Kapasiti:</strong>
-                                @if(isset($subComponent->kapasiti_decoded) && is_array($subComponent->kapasiti_decoded))
-                                    @foreach($subComponent->kapasiti_decoded as $index => $kapasiti)
-                                        <p class="mb-0">
-                                            {{ $kapasiti ?? '-' }} 
-                                            {{ $subComponent->kapasiti_unit_decoded[$index] ?? '' }}
-                                        </p>
-                                    @endforeach
-                                @else
-                                    <p class="mb-0">-</p>
-                                @endif
+                                <p class="mb-0">{{ $subComponent->kapasiti ?? '-' }} {{ $subComponent->kapasiti_unit }}</p>
                             </div>
                         </div>
 
@@ -215,7 +186,7 @@
                                 <table class="table table-bordered table-sm">
                                     <tr>
                                         <td width="50%"><strong>Tarikh Pembelian</strong></td>
-                                        <td>{{ $subComponent->tarikh_pembelian ? \Carbon\Carbon::parse($subComponent->tarikh_pembelian)->format('d/m/Y') : '-' }}</td>
+                                        <td>{{ $subComponent->tarikh_pembelian?->format('d/m/Y') ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Kos Perolehan</strong></td>
@@ -235,13 +206,13 @@
                                 <table class="table table-bordered table-sm">
                                     <tr>
                                         <td width="50%"><strong>Tarikh Dipasang</strong></td>
-                                        <td>{{ $subComponent->tarikh_dipasang ? \Carbon\Carbon::parse($subComponent->tarikh_dipasang)->format('d/m/Y') : '-' }}</td>
+                                        <td>{{ $subComponent->tarikh_dipasang?->format('d/m/Y') ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Tarikh Waranti Tamat</strong></td>
                                         <td>
-                                            {{ $subComponent->tarikh_waranti_tamat ? \Carbon\Carbon::parse($subComponent->tarikh_waranti_tamat)->format('d/m/Y') : '-' }}
-                                            @if($subComponent->tarikh_waranti_tamat && \Carbon\Carbon::parse($subComponent->tarikh_waranti_tamat)->isPast())
+                                            {{ $subComponent->tarikh_waranti_tamat?->format('d/m/Y') ?? '-' }}
+                                            @if($subComponent->is_warranty_expired)
                                                 <span class="badge bg-danger">Tamat</span>
                                             @endif
                                         </td>
@@ -296,7 +267,11 @@
                 </div>
 
                 <!-- DOKUMEN BERKAITAN -->
-                @if(isset($subComponent->dokumen_decoded) && is_array($subComponent->dokumen_decoded) && count($subComponent->dokumen_decoded) > 0)
+                @php
+                    $dokumenList = $subComponent->getDokumenBerkaitanFormatted();
+                @endphp
+                
+                @if(!empty($dokumenList))
                 <div class="card mb-4">
                     <div class="card-header bg-dark text-white">
                         DOKUMEN BERKAITAN
@@ -312,7 +287,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($subComponent->dokumen_decoded as $doc)
+                                @foreach($dokumenList as $doc)
                                 <tr>
                                     <td>{{ $doc['bil'] ?? '-' }}</td>
                                     <td>{{ $doc['nama'] ?? '-' }}</td>
