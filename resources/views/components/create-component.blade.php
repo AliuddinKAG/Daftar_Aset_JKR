@@ -1,483 +1,341 @@
 @extends('layouts.app')
 
-@section('title', 'Borang 2: Komponen Utama')
+@section('title', 'Borang Pengumpulan Data - Peringkat Komponen')
+
+@section('styles')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<style>
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px;
+}
+.input-group-text {
+    background-color: #e9ecef;
+}
+</style>
+@endsection
 
 @section('content')
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-10 offset-md-1">
         <div class="card">
-            <div class="card-header bg-success text-white">
+            <div class="card-header">
                 <h5 class="mb-0">BORANG PENGUMPULAN DATA DAFTAR ASET KHUSUS</h5>
-                <small>Peringkat Komponen Utama</small>
+                <small class="text-white">Peringkat Komponen</small>
             </div>
             <div class="card-body">
-                <form action="{{ route('main-components.store') }}" method="POST" enctype="multipart/form-data" id="mainComponentForm">
+                <form action="{{ route('components.store') }}" method="POST">
                     @csrf
 
-                    <!-- MAKLUMAT KOMPONEN UTAMA -->
+                    <!-- Maklumat Lokasi Komponen -->
                     <div class="card mb-4">
                         <div class="card-header bg-secondary text-white">
-                            MAKLUMAT KOMPONEN UTAMA
+                            <h6 class="mb-0">MAKLUMAT LOKASI KOMPONEN</h6>
                         </div>
                         <div class="card-body">
                             <div class="row mb-3">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label class="form-label">Nama Premis <span class="text-danger">*</span></label>
-                                    <select class="form-select @error('component_id') is-invalid @enderror" name="component_id" id="component_id" required>
-                                        <option value="">-- Pilih Komponen --</option>
-                                        @foreach($components as $component)
-                                            <option value="{{ $component->id }}" 
-                                                data-dpa="{{ $component->nombor_dpa }}"
-                                                data-nama="{{ $component->nama_premis }}"
-                                                {{ old('component_id') == $component->id ? 'selected' : '' }}>
-                                                {{ $component->nama_premis }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('component_id')
+                                    <input type="text" class="form-control @error('nama_premis') is-invalid @enderror" 
+                                           name="nama_premis" value="{{ old('nama_premis') }}" 
+                                           placeholder="Contoh: PARLIMEN MALAYSIA" required>
+                                    @error('nama_premis')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Nombor DPA</label>
-                                    <input type="text" class="form-control bg-light" id="display_dpa" readonly placeholder="Auto-fill dari komponen">
-                                    <small class="text-muted">Auto-fill berdasarkan komponen dipilih</small>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Kod Lokasi <span class="text-danger">*</span></label>
-                                    <input type="text" 
-                                        class="form-control bg-light @error('kod_lokasi') is-invalid @enderror" 
-                                        name="kod_lokasi" 
-                                        id="kod_lokasi"
-                                        value="{{ old('kod_lokasi') }}" 
-                                        placeholder="Auto-generated"
-                                        readonly
-                                        required>
-                                    @error('kod_lokasi')
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombor DPA <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('nombor_dpa') is-invalid @enderror" 
+                                           name="nombor_dpa" value="{{ old('nombor_dpa') }}" 
+                                           placeholder="Contoh: 1610MYS.140144.BD0001" required>
+                                    @error('nombor_dpa')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Format: KU-[ID]-[NO]</small>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="card mb-3" style="background: #f8f9fa;">
-                                <div class="card-header bg-dark text-white">
-                                    <strong>Maklumat Utama</strong>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Nama Komponen Utama <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control @error('nama_komponen_utama') is-invalid @enderror" 
-                                               name="nama_komponen_utama" value="{{ old('nama_komponen_utama') }}" required>
-                                        @error('nama_komponen_utama')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>                   
-
-                                    <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <label class="form-label">Sistem</label>
+                    <!-- Blok Section -->
+                    <div class="card mb-4">
+                        <div class="card-header" style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ada_blok" 
+                                       id="ada_blok" value="1" {{ old('ada_blok') ? 'checked' : '' }}
+                                       style="width: 20px; height: 20px; border: 2px solid #64748b; cursor: pointer;">
+                                <label class="form-check-label fw-bold ms-2" for="ada_blok" style="cursor: pointer; font-size: 1rem;">
+                                    Blok (Tandakan '√' jika berkenaan)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="card-body" id="blok_section" style="display: none;">
+                            <table class="table table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Maklumat Lokasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td width="30%">Kod Blok</td>
+                                        <td>
                                             <div class="input-group">
-                                                <select class="form-select select2-sistem" name="sistem" id="sistem">
-                                                    <option value="">-- Pilih atau Taip Sistem --</option>
-                                                    @foreach($sistems as $sistem)
-                                                        <option value="{{ $sistem->kod }}" 
-                                                            data-id="{{ $sistem->id }}"
-                                                            {{ old('sistem') == $sistem->kod ? 'selected' : '' }}>
-                                                            {{ $sistem->kod }} - {{ $sistem->nama }}
+                                                <select class="form-select select2-blok" name="kod_blok" id="kod_blok">
+                                                    <option value="">-- Pilih atau Taip Kod Blok --</option>
+                                                    @foreach($kodBloks as $blok)
+                                                        <option value="{{ $blok->kod }}" {{ old('kod_blok') == $blok->kod ? 'selected' : '' }}>
+                                                            {{ $blok->kod }} - {{ $blok->nama }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">SubSistem</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kod Aras</td>
+                                        <td>
                                             <div class="input-group">
-                                                <select class="form-select select2-subsistem" name="subsistem" id="subsistem">
-                                                    <option value="">-- Pilih atau Taip SubSistem --</option>
-                                                    @foreach($subsistems as $subsistem)
-                                                        <option value="{{ $subsistem->kod }}" 
-                                                            data-sistem-id="{{ $subsistem->sistem_id }}"
-                                                            {{ old('subsistem') == $subsistem->kod ? 'selected' : '' }}>
-                                                            {{ $subsistem->kod }} - {{ $subsistem->nama }}
+                                                <select class="form-select select2-aras" name="kod_aras" id="kod_aras">
+                                                    <option value="">-- Pilih atau Taip Kod Aras --</option>
+                                                    @foreach($kodAras as $aras)
+                                                        <option value="{{ $aras->kod }}" {{ old('kod_aras') == $aras->kod ? 'selected' : '' }}>
+                                                            {{ $aras->kod }} - {{ $aras->nama }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Kuantiti</label>
-                                            <input type="number" class="form-control" name="kuantiti" value="{{ old('kuantiti', 1) }}" min="1">
-                                            <small class="form-text text-muted">(Komponen yang sama jenis)</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Bidang Kejuruteraan -->
-                            <div class="card mb-3">
-                                <div class="card-header bg-light">
-                                    <strong>Bidang Kejuruteraan Komponen:</strong>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="awam_arkitek" id="awam" value="1" {{ old('awam_arkitek') ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="awam">Awam/Arkitek</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kod Ruang</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-ruang" name="kod_ruang" id="kod_ruang">
+                                                    <option value="">-- Pilih atau Taip Kod Ruang --</option>
+                                                    @foreach($kodRuangs as $ruang)
+                                                        <option value="{{ $ruang->kod }}" {{ old('kod_ruang') == $ruang->kod ? 'selected' : '' }}>
+                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="elektrikal" id="elektrikal" value="1" {{ old('elektrikal') ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="elektrikal">Elektrikal</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nama Ruang</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-nama-ruang" name="nama_ruang" id="nama_ruang">
+                                                    <option value="">-- Pilih atau Taip Nama Ruang --</option>
+                                                    @foreach($namaRuangs as $nama)
+                                                        <option value="{{ $nama->nama }}" {{ old('nama_ruang') == $nama->nama ? 'selected' : '' }}>
+                                                            {{ $nama->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="elv_ict" id="elv" value="1" {{ old('elv_ict') ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="elv">ELV/ICT</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-2">
-                                        <div class="col-md-4">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="mekanikal" id="mekanikal" value="1" {{ old('mekanikal') ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="mekanikal">Mekanikal</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="bio_perubatan" id="bio" value="1" {{ old('bio_perubatan') ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="bio">Bio Perubatan</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" name="lain_lain" placeholder="Lain-lain:" value="{{ old('lain_lain') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Catatan:</label>
-                                <textarea class="form-control" name="catatan" rows="2">{{ old('catatan') }}</textarea>
-                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Catatan:</td>
+                                        <td><textarea class="form-control" name="catatan_blok" rows="3">{{ old('catatan_blok') }}</textarea></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <!-- MAKLUMAT PEROLEHAN -->
+                    <!-- Binaan Luar Section -->
                     <div class="card mb-4">
-                        <div class="card-header bg-dark text-white">
-                            MAKLUMAT PEROLEHAN
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <td width="50%">Tarikh Perolehan</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_perolehan" value="{{ old('tarikh_perolehan') }}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Kos Perolehan/Kontrak</td>
-                                            <td><input type="text" class="form-control form-control-sm" name="kos_perolehan" value="{{ old('kos_perolehan') }}" placeholder="RM"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>No. Pesanan Rasmi Kerajaan/Kontrak</td>
-                                            <td><input type="text" class="form-control form-control-sm" name="no_pesanan_rasmi_kontrak" value="{{ old('no_pesanan_rasmi_kontrak') }}"></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="col-md-6">
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <td width="50%">Tarikh Dipasang</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_dipasang" value="{{ old('tarikh_dipasang') }}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Tarikh Waranti Tamat</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_waranti_tamat" value="{{ old('tarikh_waranti_tamat') }}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Tarikh Tamat DLP</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_tamat_dlp" value="{{ old('tarikh_tamat_dlp') }}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Jangka Hayat</td>
-                                            <td><input type="text" class="form-control form-control-sm" name="jangka_hayat" value="{{ old('jangka_hayat') }}" placeholder="Tahun"></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Pengilang, Pembekal, Kontraktor -->
-                            <div class="row mt-3">
-                                <div class="col-md-4">
-                                    <h6 class="fw-bold">Pengilang</h6>
-                                    <div class="mb-2">
-                                        <label class="form-label small">Nama:</label>
-                                        <input type="text" class="form-control form-control-sm" name="nama_pengilang" value="{{ old('nama_pengilang') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <h6 class="fw-bold">Pembekal</h6>
-                                    <div class="mb-2">
-                                        <label class="form-label small">Nama:</label>
-                                        <input type="text" class="form-control form-control-sm" name="nama_pembekal" value="{{ old('nama_pembekal') }}">
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label small">Alamat:</label>
-                                        <textarea class="form-control form-control-sm" name="alamat_pembekal" rows="2">{{ old('alamat_pembekal') }}</textarea>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label small">No. Telefon:</label>
-                                        <input type="text" class="form-control form-control-sm" name="no_telefon_pembekal" value="{{ old('no_telefon_pembekal') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <h6 class="fw-bold">Kontraktor</h6>
-                                    <div class="mb-2">
-                                        <label class="form-label small">Nama:</label>
-                                        <input type="text" class="form-control form-control-sm" name="nama_kontraktor" value="{{ old('nama_kontraktor') }}">
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label small">Alamat:</label>
-                                        <textarea class="form-control form-control-sm" name="alamat_kontraktor" rows="2">{{ old('alamat_kontraktor') }}</textarea>
-                                    </div>
-                                    <div class="mb-2">
-                                        <label class="form-label small">No. Telefon:</label>
-                                        <input type="text" class="form-control form-control-sm" name="no_telefon_kontraktor" value="{{ old('no_telefon_kontraktor') }}">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <label class="form-label">Catatan:</label>
-                                <textarea class="form-control" name="catatan_maklumat" rows="2">{{ old('catatan_maklumat') }}</textarea>
+                        <div class="card-header bg-light">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="ada_binaan_luar" 
+                                       id="ada_binaan_luar" value="1" {{ old('ada_binaan_luar') ? 'checked' : '' }}
+                                       style="width: 20px; height: 20px; border: 2px solid #64748b; cursor: pointer;">
+                                <label class="form-check-label fw-bold" for="ada_binaan_luar">
+                                    Binaan Luar (Tandakan '√' jika berkenaan)
+                                </label>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- MAKLUMAT KOMPONEN -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-dark text-white">
-                            MAKLUMAT KOMPONEN
-                        </div>
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Deskripsi</label>
-                                    <textarea class="form-control" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-2">
-                                        <label class="form-label">Status Komponen</label>
-                                        <select class="form-select" name="status_komponen">
-                                            <option value="">-- Pilih Status --</option>
-                                            <option value="operational" {{ old('status_komponen') == 'operational' ? 'selected' : '' }}>Operational</option>
-                                            <option value="under_maintenance" {{ old('status_komponen') == 'under_maintenance' ? 'selected' : '' }}>Under Maintenance</option>
-                                            <option value="rosak" {{ old('status_komponen') == 'rosak' ? 'selected' : '' }}>Rosak</option>
-                                            <option value="retired" {{ old('status_komponen') == 'retired' ? 'selected' : '' }}>Retired</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label class="form-label">Jenama</label>
-                                    <input type="text" class="form-control" name="jenama" value="{{ old('jenama') }}">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Model</label>
-                                    <input type="text" class="form-control" name="model" value="{{ old('model') }}">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">No. Siri</label>
-                                    <input type="text" class="form-control" name="no_siri" value="{{ old('no_siri') }}">
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">No. Tag / Label (Jika berkenaan)</label>
-                                    <input type="text" class="form-control" name="no_tag_label" value="{{ old('no_tag_label') }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">No Sijil Pendaftaran (Jika ada)</label>
-                                    <input type="text" class="form-control" name="no_sijil_pendaftaran" value="{{ old('no_sijil_pendaftaran') }}">
-                                </div>
-                            </div>
+                        <div class="card-body" id="binaan_section" style="display: none;">
+                            <table class="table table-bordered">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th colspan="2" class="text-center">Maklumat Lokasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td width="30%">Nama Binaan Luar</td>
+                                        <td><input type="text" class="form-control" name="nama_binaan_luar" 
+                                                   value="{{ old('nama_binaan_luar') }}" 
+                                                   placeholder="Contoh: Kolam Renang A"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kod Binaan Luar</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-binaan-luar" name="kod_binaan_luar" id="kod_binaan_luar">
+                                                    <option value="">-- Pilih atau Taip Kod Binaan Luar --</option>
+                                                    @if(isset($kodBinaanLuar))
+                                                        @foreach($kodBinaanLuar as $binaan)
+                                                            <option value="{{ $binaan->kod }}" {{ old('kod_binaan_luar') == $binaan->kod ? 'selected' : '' }}>
+                                                                {{ $binaan->kod }} - {{ $binaan->nama }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Koordinat GPS (WGS 84)</td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" name="koordinat_x" 
+                                                           value="{{ old('koordinat_x') }}" placeholder="X: ( Cth 2.935905 )">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" name="koordinat_y" 
+                                                           value="{{ old('koordinat_y') }}" placeholder="Y: ( Cth 101.700286)">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="fw-bold">Diisi Jika Binaan Luar Mempunyai Aras dan Ruang</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kod Aras</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-aras-binaan" name="kod_aras_binaan" id="kod_aras_binaan">
+                                                    <option value="">-- Pilih atau Taip Kod Aras --</option>
+                                                    @foreach($kodAras as $aras)
+                                                        <option value="{{ $aras->kod }}" {{ old('kod_aras_binaan') == $aras->kod ? 'selected' : '' }}>
+                                                            {{ $aras->kod }} - {{ $aras->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kod Ruang</td>
+                                    <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-ruang-binaan" name="kod_ruang_binaan" id="kod_ruang_binaan">
+                                                    <option value="">-- Pilih atau Taip Kod Ruang --</option>
+                                                    @foreach($kodRuangs as $ruang)
+                                                        <option value="{{ $ruang->kod }}" {{ old('kod_ruang_binaan') == $ruang->kod ? 'selected' : '' }}>
+                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nama Ruang</td>
+                                    <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-nama-ruang-binaan" name="nama_ruang_binaan" id="nama_ruang_binaan">
+                                                    <option value="">-- Pilih atau Taip Nama Ruang --</option>
+                                                    @foreach($namaRuangs as $nama)
+                                                        <option value="{{ $nama->nama }}" {{ old('nama_ruang_binaan') == $nama->nama ? 'selected' : '' }}>
+                                                            {{ $nama->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Catatan: <br></td>
+                                        <td><textarea class="form-control" name="catatan_binaan" rows="3">{{ old('catatan_binaan') }}</textarea></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <!-- Button to show attributes section -->
-                    <div class="d-flex justify-content-between" id="mainButtons">
-                        <a href="{{ route('components.index') }}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Kembali
-                        </a>
-                        <button type="button" class="btn btn-info text-white" onclick="showAttributesSection()">
-                            Seterusnya: Atribut Spesifikasi <i class="bi bi-arrow-right"></i>
+                    <!-- Status -->
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                        <select class="form-select" name="status" required>
+                            <option value="aktif" {{ old('status', 'aktif') == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                            <option value="tidak_aktif" {{ old('status') == 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Simpan Komponen
                         </button>
+                        <a href="{{ route('components.index') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </a>
                     </div>
-
-                    <!-- Hidden section for attributes -->
-                    <div id="attributesSection" style="display: none; margin-top: 20px;">
-                        @include('components.partials.main-component-attributes')
-                    </div>
-
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-{{-- Inline script untuk show attributes --}}
-<script>
-function showAttributesSection() {
-    document.getElementById('attributesSection').style.display = 'block';
-    document.getElementById('mainButtons').style.display = 'none';
-    document.getElementById('attributesSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-</script>
 @endsection
 
 @section('scripts')
+<!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
 $(document).ready(function() {
-    // Initialize Select2 untuk Sistem dengan delete capability
-    $('.select2-sistem').select2({
+    // Initialize Select2 untuk semua dropdown dengan tags support
+     $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
         theme: 'bootstrap-5',
         tags: true,
-        placeholder: 'Cari atau taip sistem baru',
+        placeholder: 'Cari atau taip nilai baru',
         allowClear: true,
-        createTag: function(params) {
+        createTag: function (params) {
             var term = $.trim(params.term);
-            if (term === '') return null;
-            return { 
-                id: term, 
-                text: term + ' ✓ (Baru)', 
-                newTag: true 
-            };
-        },
-        templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span class="badge bg-success">' + data.text + '</span>');
+            if (term === '') {
+                return null;
             }
-            return data.text;
-        }
-    });
-
-    // Initialize Select2 untuk SubSistem dengan delete capability
-    $('.select2-subsistem').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Cari atau taip subsistem baru',
-        allowClear: true,
-        createTag: function(params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            return { 
-                id: term, 
-                text: term + ' ✓ (Baru)', 
-                newTag: true 
-            };
-        },
-        templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span class="badge bg-success">' + data.text + '</span>');
+            return {
+                id: term,
+                text: term + ' (Baru)',
+                newTag: true
             }
-            return data.text;
         }
     });
 
-    // Event untuk buang option yang salah taip - SISTEM
-    $('.select2-sistem').on('select2:unselecting', function(e) {
-        var data = e.params.args.data;
-        if (data.newTag) {
-            var $select = $(this);
-            setTimeout(function() {
-                $select.find('option[value="' + data.id + '"]').remove();
-            }, 100);
-        }
+    // Toggle Blok Section
+    $('#ada_blok').on('change', function() {
+        $('#blok_section').slideToggle(300);
     });
 
-    // Event untuk buang option yang salah taip - SUBSISTEM
-    $('.select2-subsistem').on('select2:unselecting', function(e) {
-        var data = e.params.args.data;
-        if (data.newTag) {
-            var $select = $(this);
-            setTimeout(function() {
-                $select.find('option[value="' + data.id + '"]').remove();
-            }, 100);
-        }
+    // Toggle Binaan Luar Section
+    $('#ada_binaan_luar').on('change', function() {
+        $('#binaan_section').slideToggle(300);
     });
 
-    // Mark original options dari database
-    $('.select2-sistem option, .select2-subsistem option').each(function() {
-        if ($(this).val()) {
-            $(this).data('original', true);
-        }
-    });
-
-    // Filter SubSistem berdasarkan Sistem yang dipilih
-    $('#sistem').on('change', function() {
-        var sistemId = $(this).find(':selected').data('id');
-        var $subsistem = $('#subsistem');
-        
-        if (sistemId) {
-            $subsistem.find('option').each(function() {
-                var optionSistemId = $(this).data('sistem-id');
-                $(this).toggle(!optionSistemId || optionSistemId == sistemId);
-            });
-        } else {
-            $subsistem.find('option').show();
-        }
-        $subsistem.val('').trigger('change');
-    });
-
-    // Auto-fill DPA dan generate Kod Lokasi
-    $('#component_id').on('change', function() {
-        var $selected = $(this).find(':selected');
-        var componentId = $(this).val();
-        
-        // Auto-fill DPA
-        $('#display_dpa').val($selected.data('dpa') || '');
-        
-        // Generate Kod Lokasi automatically via AJAX
-        if (componentId) {
-            $.ajax({
-                url: '/main-components/generate-kod-lokasi',
-                type: 'GET',
-                data: { component_id: componentId },
-                success: function(response) {
-                    $('#kod_lokasi').val(response.kod_lokasi);
-                },
-                error: function() {
-                    // Fallback: generate simple kod lokasi
-                    var timestamp = Date.now().toString().slice(-6);
-                    $('#kod_lokasi').val('KU-' + componentId + '-' + timestamp);
-                }
-            });
-        } else {
-            $('#kod_lokasi').val('');
-        }
-    });
-    
-    // Trigger on page load if component already selected
-    if ($('#component_id').val()) {
-        $('#component_id').trigger('change');
+    // Check on page load
+    if ($('#ada_blok').is(':checked')) {
+        $('#blok_section').show();
     }
-
-    // Tambah CSS untuk highlight new tags
-    $('<style>')
-        .text('.select2-results__option--highlighted .badge { background-color: #198754 !important; color: white !important; }')
-        .appendTo('head');
+    if ($('#ada_binaan_luar').is(':checked')) {
+        $('#binaan_section').show();
+    }
 });
 </script>
 @endsection
