@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class KodAras extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -26,6 +28,7 @@ class KodAras extends Model
         'nama',
         'tingkat',
         'is_active',
+        'status',
     ];
 
     /**
@@ -42,14 +45,31 @@ class KodAras extends Model
 
     /**
      * Scope a query to only include active kod aras.
+     * Support both 'status' and 'is_active' columns for flexibility.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)
-                     ->orderBy('tingkat');
+        if (Schema::hasColumn($this->getTable(), 'status')) {
+            return $query->where('status', 'aktif')->orderBy('tingkat');
+        }
+        return $query->where('is_active', true)->orderBy('tingkat');
+    }
+
+    /**
+     * Scope a query to only include inactive kod aras.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeInactive($query)
+    {
+        if (Schema::hasColumn($this->getTable(), 'status')) {
+            return $query->where('status', 'tidak_aktif')->orderBy('tingkat');
+        }
+        return $query->where('is_active', false)->orderBy('tingkat');
     }
 
     /**
@@ -81,6 +101,28 @@ class KodAras extends Model
     }
 
     /**
+     * Scope to get only ground floor and above.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeGroundAndAbove($query)
+    {
+        return $query->where('tingkat', '>=', 0)->orderBy('tingkat');
+    }
+
+    /**
+     * Scope to get only basement floors.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeBasement($query)
+    {
+        return $query->where('tingkat', '<', 0)->orderBy('tingkat');
+    }
+
+    /**
      * Get the full display name (kod + nama).
      *
      * @return string
@@ -88,6 +130,22 @@ class KodAras extends Model
     public function getFullNameAttribute()
     {
         return $this->kod . ' - ' . $this->nama;
+    }
+
+    /**
+     * Get the tingkat display with proper formatting.
+     *
+     * @return string
+     */
+    public function getTingkatDisplayAttribute()
+    {
+        if ($this->tingkat < 0) {
+            return 'B' . abs($this->tingkat); // Basement
+        } elseif ($this->tingkat == 0) {
+            return 'Ground Floor';
+        } else {
+            return 'Floor ' . $this->tingkat;
+        }
     }
 
     /**
@@ -108,5 +166,59 @@ class KodAras extends Model
     public function isBasement()
     {
         return $this->tingkat < 0;
+    }
+
+    /**
+     * Check if this is ground floor.
+     *
+     * @return bool
+     */
+    public function isGroundFloor()
+    {
+        return $this->tingkat == 0;
+    }
+
+    /**
+     * Check if a kod already exists.
+     *
+     * @param  string  $kod
+     * @param  int|null  $excludeId
+     * @return bool
+     */
+    public static function kodExists($kod, $excludeId = null)
+    {
+        $query = self::where('kod', $kod);
+        
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+        
+        return $query->exists();
+    }
+
+    /**
+     * Get status badge color.
+     *
+     * @return string
+     */
+    public function getStatusBadgeAttribute()
+    {
+        if (Schema::hasColumn($this->getTable(), 'status')) {
+            return $this->status === 'aktif' ? 'success' : 'secondary';
+        }
+        return $this->is_active ? 'success' : 'secondary';
+    }
+
+    /**
+     * Get status display text.
+     *
+     * @return string
+     */
+    public function getStatusDisplayAttribute()
+    {
+        if (Schema::hasColumn($this->getTable(), 'status')) {
+            return $this->status === 'aktif' ? 'Aktif' : 'Tidak Aktif';
+        }
+        return $this->is_active ? 'Aktif' : 'Tidak Aktif';
     }
 }

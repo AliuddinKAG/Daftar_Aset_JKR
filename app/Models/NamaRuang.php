@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class NamaRuang extends Model
 {
@@ -25,6 +26,7 @@ class NamaRuang extends Model
         'nama',
         'jenis',
         'is_active',
+        'status',
     ];
 
     /**
@@ -40,14 +42,17 @@ class NamaRuang extends Model
 
     /**
      * Scope a query to only include active nama ruang.
+     * Supports both 'status' and 'is_active' columns for backward compatibility.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)
-                     ->orderBy('nama');
+        if (Schema::hasColumn($this->getTable(), 'status')) {
+            return $query->where('status', 'aktif')->orderBy('nama');
+        }
+        return $query->where('is_active', true)->orderBy('nama');
     }
 
     /**
@@ -72,34 +77,6 @@ class NamaRuang extends Model
     public function scopeByJenis($query, $jenis)
     {
         return $query->where('jenis', $jenis);
-    }
-
-    /**
-     * Get all unique jenis (types).
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public static function getJenis()
-    {
-        return self::where('is_active', true)
-                   ->distinct()
-                   ->pluck('jenis')
-                   ->filter()
-                   ->sort()
-                   ->values();
-    }
-
-    /**
-     * Get nama ruangs grouped by jenis.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public static function groupedByJenis()
-    {
-        return self::active()
-                   ->get()
-                   ->groupBy('jenis')
-                   ->sortKeys();
     }
 
     /**
@@ -133,5 +110,44 @@ class NamaRuang extends Model
     public function scopeFacilities($query)
     {
         return $query->where('jenis', 'Facilities');
+    }
+
+    /**
+     * Check if a nama already exists.
+     *
+     * @param  string  $nama
+     * @return bool
+     */
+    public static function namaExists($nama)
+    {
+        return self::where('nama', $nama)->exists();
+    }
+
+    /**
+     * Get all unique jenis (types).
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getJenis()
+    {
+        return self::where('is_active', true)
+                   ->distinct()
+                   ->pluck('jenis')
+                   ->filter()
+                   ->sort()
+                   ->values();
+    }
+
+    /**
+     * Get nama ruangs grouped by jenis.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function groupedByJenis()
+    {
+        return self::active()
+                   ->get()
+                   ->groupBy('jenis')
+                   ->sortKeys();
     }
 }

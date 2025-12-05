@@ -53,6 +53,7 @@ class ComponentController extends Controller
             'nombor_dpa' => 'required|string|max:255',
             'ada_blok' => 'nullable|boolean',
             'kod_blok' => 'nullable|string|max:100',
+            'nama_blok' => 'nullable|string|max:255', // Accept nama from form
             'kod_aras' => 'nullable|string|max:50',
             'kod_ruang' => 'nullable|string|max:50',
             'nama_ruang' => 'nullable|string|max:255',
@@ -71,11 +72,14 @@ class ComponentController extends Controller
 
         DB::beginTransaction();
         try {
-            // Auto-create master records if new values provided
+            // Auto-create master records with nama support
             $this->autoCreateMasterRecords($request);
 
+            // Remove nama_blok from validated data before creating component
+            $componentData = collect($validated)->except('nama_blok')->toArray();
+
             // Create component
-            Component::create($validated);
+            Component::create($componentData);
 
             DB::commit();
 
@@ -129,6 +133,7 @@ class ComponentController extends Controller
             'nombor_dpa' => 'required|string|max:255',
             'ada_blok' => 'nullable|boolean',
             'kod_blok' => 'nullable|string|max:100',
+            'nama_blok' => 'nullable|string|max:255', // Accept nama from form
             'kod_aras' => 'nullable|string|max:50',
             'kod_ruang' => 'nullable|string|max:50',
             'nama_ruang' => 'nullable|string|max:255',
@@ -147,11 +152,14 @@ class ComponentController extends Controller
 
         DB::beginTransaction();
         try {
-            // Auto-create master records if new values provided
+            // Auto-create master records
             $this->autoCreateMasterRecords($request);
 
+            // Remove nama_blok before update
+            $componentData = collect($validated)->except('nama_blok')->toArray();
+
             // Update component
-            $component->update($validated);
+            $component->update($componentData);
 
             DB::commit();
 
@@ -216,27 +224,36 @@ class ComponentController extends Controller
     }
 
     /**
-     * Auto-create master records if they don't exist
+     * Auto-create master records with proper nama handling
      * This method checks if user typed new values and creates them in master tables
      */
     private function autoCreateMasterRecords(Request $request)
     {
-        // Auto-create Kod Blok jika tidak wujud
+        // ========================================
+        // Kod Blok - with nama support
+        // ========================================
         if ($request->filled('kod_blok')) {
             $kodBlok = trim($request->kod_blok);
+            
+            // Use provided nama_blok or fallback to kod
+            $namaBlok = $request->filled('nama_blok') 
+                ? trim($request->nama_blok) 
+                : $kodBlok;
             
             KodBlok::firstOrCreate(
                 ['kod' => $kodBlok],
                 [
-                    'nama' => $kodBlok, // Guna kod sebagai nama sementara
-                    'status' => 'aktif',
+                    'nama' => $namaBlok,
+                    'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]
             );
         }
 
-        // Auto-create Kod Aras jika tidak wujud
+        // ========================================
+        // Kod Aras - simple auto-create
+        // ========================================
         if ($request->filled('kod_aras')) {
             $kodAras = trim($request->kod_aras);
             
@@ -244,14 +261,17 @@ class ComponentController extends Controller
                 ['kod' => $kodAras],
                 [
                     'nama' => $kodAras,
-                    'status' => 'aktif',
+                    'tingkat' => 0, // Default tingkat
+                    'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]
             );
         }
 
-        // Auto-create Kod Ruang jika tidak wujud
+        // ========================================
+        // Kod Ruang - simple auto-create
+        // ========================================
         if ($request->filled('kod_ruang')) {
             $kodRuang = trim($request->kod_ruang);
             
@@ -259,28 +279,34 @@ class ComponentController extends Controller
                 ['kod' => $kodRuang],
                 [
                     'nama' => $kodRuang,
-                    'status' => 'aktif',
+                    'kategori' => null,
+                    'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]
             );
         }
 
-        // Auto-create Nama Ruang jika tidak wujud
+        // ========================================
+        // Nama Ruang
+        // ========================================
         if ($request->filled('nama_ruang')) {
             $namaRuang = trim($request->nama_ruang);
             
             NamaRuang::firstOrCreate(
                 ['nama' => $namaRuang],
                 [
-                    'status' => 'aktif',
+                    'jenis' => null,
+                    'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]
             );
         }
 
-        // Auto-create Kod Binaan Luar jika tidak wujud
+        // ========================================
+        // Kod Binaan Luar
+        // ========================================
         if ($request->filled('kod_binaan_luar')) {
             $kodBinaanLuar = trim($request->kod_binaan_luar);
             
@@ -295,7 +321,9 @@ class ComponentController extends Controller
             );
         }
 
-        // Auto-create untuk Kod Aras Binaan jika ada
+        // ========================================
+        // Binaan: Kod Aras
+        // ========================================
         if ($request->filled('kod_aras_binaan')) {
             $kodArasBinaan = trim($request->kod_aras_binaan);
             
@@ -303,14 +331,17 @@ class ComponentController extends Controller
                 ['kod' => $kodArasBinaan],
                 [
                     'nama' => $kodArasBinaan,
-                    'status' => 'aktif',
+                    'tingkat' => 0,
+                    'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]
             );
         }
 
-        // Auto-create untuk Kod Ruang Binaan jika ada
+        // ========================================
+        // Binaan: Kod Ruang
+        // ========================================
         if ($request->filled('kod_ruang_binaan')) {
             $kodRuangBinaan = trim($request->kod_ruang_binaan);
             
@@ -318,21 +349,25 @@ class ComponentController extends Controller
                 ['kod' => $kodRuangBinaan],
                 [
                     'nama' => $kodRuangBinaan,
-                    'status' => 'aktif',
+                    'kategori' => null,
+                    'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]
             );
         }
 
-        // Auto-create untuk Nama Ruang Binaan jika ada
+        // ========================================
+        // Binaan: Nama Ruang
+        // ========================================
         if ($request->filled('nama_ruang_binaan')) {
             $namaRuangBinaan = trim($request->nama_ruang_binaan);
             
             NamaRuang::firstOrCreate(
                 ['nama' => $namaRuangBinaan],
                 [
-                    'status' => 'aktif',
+                    'jenis' => null,
+                    'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]

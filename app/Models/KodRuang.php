@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class KodRuang extends Model
 {
@@ -26,6 +27,7 @@ class KodRuang extends Model
         'nama',
         'kategori',
         'is_active',
+        'status',
     ];
 
     /**
@@ -41,14 +43,17 @@ class KodRuang extends Model
 
     /**
      * Scope a query to only include active kod ruang.
+     * Supports both 'status' and 'is_active' columns.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)
-                     ->orderBy('kod');
+        if (Schema::hasColumn($this->getTable(), 'status')) {
+            return $query->where('status', 'aktif')->orderBy('kod');
+        }
+        return $query->where('is_active', true)->orderBy('kod');
     }
 
     /**
@@ -86,6 +91,17 @@ class KodRuang extends Model
     public function getFullNameAttribute()
     {
         return $this->kod . ' - ' . $this->nama;
+    }
+
+    /**
+     * Check if a kod already exists.
+     *
+     * @param  string  $kod
+     * @return bool
+     */
+    public static function kodExists($kod)
+    {
+        return self::where('kod', $kod)->exists();
     }
 
     /**
