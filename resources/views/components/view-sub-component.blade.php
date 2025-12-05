@@ -34,17 +34,17 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <strong>Nama Premis:</strong>
-                                <p class="mb-0">{{ $subComponent->mainComponent->component->nama_premis ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->mainComponent->component->nama_premis ?: '-' }}</p>
                             </div>
                             <div class="col-md-4">
                                 <strong>Nombor DPA:</strong>
-                                <p class="mb-0">{{ $subComponent->mainComponent->component->nombor_dpa ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->mainComponent->component->nombor_dpa ?: '-' }}</p>
                             </div>
                             <div class="col-md-4">
                                 <strong>Komponen Utama:</strong>
                                 <p class="mb-0">
                                     <a href="{{ route('main-components.show', $subComponent->mainComponent) }}" class="text-decoration-none">
-                                        {{ $subComponent->mainComponent->nama_komponen_utama ?? '-' }}
+                                        {{ $subComponent->mainComponent->nama_komponen_utama ?: '-' }}
                                     </a>
                                 </p>
                             </div>
@@ -66,17 +66,17 @@
                                 <div class="row mb-3">
                                     <div class="col-md-12">
                                         <strong>Nama Sub Komponen:</strong>
-                                        <p class="mb-0 text-info fw-bold">{{ $subComponent->nama_sub_komponen }}</p>
+                                        <p class="mb-0 text-info fw-bold">{{ $subComponent->nama_sub_komponen ?: '-' }}</p>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <strong>Deskripsi:</strong>
-                                        <p class="mb-0">{{ $subComponent->deskripsi ?? '-' }}</p>
+                                        <p class="mb-0">{{ $subComponent->deskripsi ?: '-' }}</p>
                                     </div>
                                     <div class="col-md-3">
                                         <strong>Kuantiti:</strong>
-                                        <p class="mb-0">{{ $subComponent->kuantiti ?? 1 }}</p>
+                                        <p class="mb-0">{{ $subComponent->kuantiti ?: 1 }}</p>
                                     </div>
                                     <div class="col-md-3">
                                         <strong>Status Komponen:</strong>
@@ -106,22 +106,22 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <strong>Jenama:</strong>
-                                <p class="mb-0">{{ $subComponent->jenama ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->jenama ?: '-' }}</p>
                             </div>
                             <div class="col-md-4">
                                 <strong>Model:</strong>
-                                <p class="mb-0">{{ $subComponent->model ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->model ?: '-' }}</p>
                             </div>
                             <div class="col-md-4">
                                 <strong>No. Siri:</strong>
-                                <p class="mb-0">{{ $subComponent->no_siri ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->no_siri ?: '-' }}</p>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
                                 <strong>No. Sijil Pendaftaran:</strong>
-                                <p class="mb-0">{{ $subComponent->no_sijil_pendaftaran ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->no_sijil_pendaftaran ?: '-' }}</p>
                             </div>
                         </div>
 
@@ -143,26 +143,101 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <strong>Jenis:</strong>
-                                <p class="mb-0">{{ $subComponent->jenis ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->jenis ?: '-' }}</p>
                             </div>
                             <div class="col-md-6">
                                 <strong>Bahan:</strong>
-                                <p class="mb-0">{{ $subComponent->bahan ?? '-' }}</p>
+                                <p class="mb-0">{{ $subComponent->bahan ?: '-' }}</p>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <strong>Saiz Fizikal:</strong>
-                                <p class="mb-0">{{ $subComponent->saiz ?? '-' }} {{ $subComponent->saiz_unit }}</p>
+                                <p class="mb-0">
+                                    @php
+                                        $saiz = $subComponent->saiz;
+                                        $saizUnit = $subComponent->saiz_unit;
+                                        
+                                        // Clean up saiz - remove brackets and quotes
+                                        if (is_string($saiz)) {
+                                            $saiz = trim($saiz, '[]"');
+                                        }
+                                        
+                                        // Clean up unit - remove brackets and quotes
+                                        if (is_string($saizUnit)) {
+                                            $saizUnit = trim($saizUnit, '[]"');
+                                        }
+                                        
+                                        // Display
+                                        if (!empty($saiz)) {
+                                            echo $saiz;
+                                            if (!empty($saizUnit)) {
+                                                echo ' ' . $saizUnit;
+                                            }
+                                        } else {
+                                            echo '-';
+                                        }
+                                    @endphp
+                                </p>
                             </div>
                             <div class="col-md-4">
                                 <strong>Kadaran:</strong>
-                                <p class="mb-0">{{ $subComponent->kadaran ?? '-' }} {{ $subComponent->kadaran_unit }}</p>
+                                <p class="mb-0">
+                                    @php
+                                        $kadaran = $subComponent->kadaran;
+                                        $kadaranUnit = $subComponent->kadaran_unit;
+                                        
+                                        // Clean up kadaran
+                                        if (is_string($kadaran)) {
+                                            $kadaran = trim($kadaran, '[]"');
+                                        }
+                                        
+                                        // Clean up unit
+                                        if (is_string($kadaranUnit)) {
+                                            $kadaranUnit = trim($kadaranUnit, '[]"');
+                                        }
+                                        
+                                        // Display
+                                        if (!empty($kadaran)) {
+                                            echo $kadaran;
+                                            if (!empty($kadaranUnit)) {
+                                                echo ' ' . $kadaranUnit;
+                                            }
+                                        } else {
+                                            echo '-';
+                                        }
+                                    @endphp
+                                </p>
                             </div>
                             <div class="col-md-4">
                                 <strong>Kapasiti:</strong>
-                                <p class="mb-0">{{ $subComponent->kapasiti ?? '-' }} {{ $subComponent->kapasiti_unit }}</p>
+                                <p class="mb-0">
+                                    @php
+                                        $kapasiti = $subComponent->kapasiti;
+                                        $kapasiti_unit = $subComponent->kapasiti_unit;
+                                        
+                                        // Clean up kapasiti
+                                        if (is_string($kapasiti)) {
+                                            $kapasiti = trim($kapasiti, '[]"');
+                                        }
+                                        
+                                        // Clean up unit
+                                        if (is_string($kapasiti_unit)) {
+                                            $kapasiti_unit = trim($kapasiti_unit, '[]"');
+                                        }
+                                        
+                                        // Display
+                                        if (!empty($kapasiti)) {
+                                            echo $kapasiti;
+                                            if (!empty($kapasiti_unit)) {
+                                                echo ' ' . $kapasiti_unit;
+                                            }
+                                        } else {
+                                            echo '-';
+                                        }
+                                    @endphp
+                                </p>
                             </div>
                         </div>
 
@@ -186,7 +261,7 @@
                                 <table class="table table-bordered table-sm">
                                     <tr>
                                         <td width="50%"><strong>Tarikh Pembelian</strong></td>
-                                        <td>{{ $subComponent->tarikh_pembelian?->format('d/m/Y') ?? '-' }}</td>
+                                        <td>{{ $subComponent->tarikh_pembelian ? $subComponent->tarikh_pembelian->format('d/m/Y') : '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Kos Perolehan</strong></td>
@@ -194,11 +269,11 @@
                                     </tr>
                                     <tr>
                                         <td><strong>No. Pesanan Rasmi/Kontrak</strong></td>
-                                        <td>{{ $subComponent->no_pesanan_rasmi_kontrak ?? '-' }}</td>
+                                        <td>{{ $subComponent->no_pesanan_rasmi_kontrak ?: '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Kod PTJ</strong></td>
-                                        <td>{{ $subComponent->kod_ptj ?? '-' }}</td>
+                                        <td>{{ $subComponent->kod_ptj ?: '-' }}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -206,12 +281,12 @@
                                 <table class="table table-bordered table-sm">
                                     <tr>
                                         <td width="50%"><strong>Tarikh Dipasang</strong></td>
-                                        <td>{{ $subComponent->tarikh_dipasang?->format('d/m/Y') ?? '-' }}</td>
+                                        <td>{{ $subComponent->tarikh_dipasang ? $subComponent->tarikh_dipasang->format('d/m/Y') : '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Tarikh Waranti Tamat</strong></td>
                                         <td>
-                                            {{ $subComponent->tarikh_waranti_tamat?->format('d/m/Y') ?? '-' }}
+                                            {{ $subComponent->tarikh_waranti_tamat ? $subComponent->tarikh_waranti_tamat->format('d/m/Y') : '-' }}
                                             @if($subComponent->is_warranty_expired)
                                                 <span class="badge bg-danger">Tamat</span>
                                             @endif
@@ -231,7 +306,7 @@
                                 <div class="card">
                                     <div class="card-header bg-light"><strong>Pengilang</strong></div>
                                     <div class="card-body">
-                                        <p class="mb-0">{{ $subComponent->nama_pengilang ?? '-' }}</p>
+                                        <p class="mb-0">{{ $subComponent->nama_pengilang ?: '-' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -239,9 +314,9 @@
                                 <div class="card">
                                     <div class="card-header bg-light"><strong>Pembekal</strong></div>
                                     <div class="card-body">
-                                        <p class="mb-1"><strong>Nama:</strong> {{ $subComponent->nama_pembekal ?? '-' }}</p>
-                                        <p class="mb-1"><strong>Alamat:</strong> {{ $subComponent->alamat_pembekal ?? '-' }}</p>
-                                        <p class="mb-0"><strong>Tel:</strong> {{ $subComponent->no_telefon_pembekal ?? '-' }}</p>
+                                        <p class="mb-1"><strong>Nama:</strong> {{ $subComponent->nama_pembekal ?: '-' }}</p>
+                                        <p class="mb-1"><strong>Alamat:</strong> {{ $subComponent->alamat_pembekal ?: '-' }}</p>
+                                        <p class="mb-0"><strong>Tel:</strong> {{ $subComponent->no_telefon_pembekal ?: '-' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -249,9 +324,9 @@
                                 <div class="card">
                                     <div class="card-header bg-light"><strong>Kontraktor</strong></div>
                                     <div class="card-body">
-                                        <p class="mb-1"><strong>Nama:</strong> {{ $subComponent->nama_kontraktor ?? '-' }}</p>
-                                        <p class="mb-1"><strong>Alamat:</strong> {{ $subComponent->alamat_kontraktor ?? '-' }}</p>
-                                        <p class="mb-0"><strong>Tel:</strong> {{ $subComponent->no_telefon_kontraktor ?? '-' }}</p>
+                                        <p class="mb-1"><strong>Nama:</strong> {{ $subComponent->nama_kontraktor ?: '-' }}</p>
+                                        <p class="mb-1"><strong>Alamat:</strong> {{ $subComponent->alamat_kontraktor ?: '-' }}</p>
+                                        <p class="mb-0"><strong>Tel:</strong> {{ $subComponent->no_telefon_kontraktor ?: '-' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -289,10 +364,10 @@
                             <tbody>
                                 @foreach($dokumenList as $doc)
                                 <tr>
-                                    <td>{{ $doc['bil'] ?? '-' }}</td>
-                                    <td>{{ $doc['nama'] ?? '-' }}</td>
-                                    <td>{{ $doc['rujukan'] ?? '-' }}</td>
-                                    <td>{{ $doc['catatan'] ?? '-' }}</td>
+                                    <td>{{ $doc['bil'] ?: '-' }}</td>
+                                    <td>{{ $doc['nama'] ?: '-' }}</td>
+                                    <td>{{ $doc['rujukan'] ?: '-' }}</td>
+                                    <td>{{ $doc['catatan'] ?: '-' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

@@ -28,15 +28,15 @@ class SubComponentController extends Controller
 
             DB::beginTransaction();
 
-            // Handle Saiz, Kadaran, Kapasiti - convert to JSON if array
-            $validated['saiz'] = $this->convertToJson($request->input('saiz'));
-            $validated['saiz_unit'] = $this->convertToJson($request->input('saiz_unit'));
-            $validated['kadaran'] = $this->convertToJson($request->input('kadaran'));
-            $validated['kadaran_unit'] = $this->convertToJson($request->input('kadaran_unit'));
-            $validated['kapasiti'] = $this->convertToJson($request->input('kapasiti'));
-            $validated['kapasiti_unit'] = $this->convertToJson($request->input('kapasiti_unit'));
+            // SIMPLE STRING - NO JSON ENCODING untuk saiz, kadaran, kapasiti
+            $validated['saiz'] = $request->input('saiz') ?: null;
+            $validated['saiz_unit'] = $request->input('saiz_unit') ?: null;
+            $validated['kadaran'] = $request->input('kadaran') ?: null;
+            $validated['kadaran_unit'] = $request->input('kadaran_unit') ?: null;
+            $validated['kapasiti'] = $request->input('kapasiti') ?: null;
+            $validated['kapasiti_unit'] = $request->input('kapasiti_unit') ?: null;
 
-            // Handle dokumen berkaitan - save as JSON
+            // Handle dokumen berkaitan - HANYA ini yang JSON array
             $validated['dokumen_berkaitan'] = $this->processDokumenBerkaitan($request);
 
             $validated['status'] = $request->input('status', 'aktif');
@@ -63,7 +63,7 @@ class SubComponentController extends Controller
      */
     public function show(SubComponent $subComponent)
     {
-        // Load hanya relationships yang wujud - BUANG relatedDocuments
+        // Load hanya relationships yang wujud
         $subComponent->load(['mainComponent.component']);
         
         return view('components.view-sub-component', compact('subComponent'));
@@ -89,15 +89,15 @@ class SubComponentController extends Controller
 
             DB::beginTransaction();
 
-            // Handle Saiz, Kadaran, Kapasiti - convert to JSON if array
-            $validated['saiz'] = $this->convertToJson($request->input('saiz'));
-            $validated['saiz_unit'] = $this->convertToJson($request->input('saiz_unit'));
-            $validated['kadaran'] = $this->convertToJson($request->input('kadaran'));
-            $validated['kadaran_unit'] = $this->convertToJson($request->input('kadaran_unit'));
-            $validated['kapasiti'] = $this->convertToJson($request->input('kapasiti'));
-            $validated['kapasiti_unit'] = $this->convertToJson($request->input('kapasiti_unit'));
+            // SIMPLE STRING - NO JSON ENCODING untuk saiz, kadaran, kapasiti
+            $validated['saiz'] = $request->input('saiz') ?: null;
+            $validated['saiz_unit'] = $request->input('saiz_unit') ?: null;
+            $validated['kadaran'] = $request->input('kadaran') ?: null;
+            $validated['kadaran_unit'] = $request->input('kadaran_unit') ?: null;
+            $validated['kapasiti'] = $request->input('kapasiti') ?: null;
+            $validated['kapasiti_unit'] = $request->input('kapasiti_unit') ?: null;
 
-            // Handle dokumen berkaitan - save as JSON
+            // Handle dokumen berkaitan - HANYA ini yang JSON array
             $validated['dokumen_berkaitan'] = $this->processDokumenBerkaitan($request);
 
             $subComponent->update($validated);
@@ -166,19 +166,7 @@ class SubComponentController extends Controller
     }
 
     /**
-     * Helper: Convert to JSON if array
-     */
-    private function convertToJson($input)
-    {
-        if (empty($input)) {
-            return null;
-        }
-        
-        return is_array($input) ? json_encode($input) : $input;
-    }
-
-    /**
-     * Helper: Process dokumen berkaitan as JSON
+     * Helper: Process dokumen berkaitan as array (will be auto JSON by cast)
      */
     private function processDokumenBerkaitan(Request $request)
     {
@@ -202,7 +190,8 @@ class SubComponentController extends Controller
             }
         }
 
-        return !empty($documents) ? json_encode($documents) : null;
+        // Return array - akan auto convert ke JSON oleh cast dalam model
+        return !empty($documents) ? $documents : null;
     }
 
     /**
@@ -222,15 +211,15 @@ class SubComponentController extends Controller
             'kuantiti' => 'nullable|integer|min:1',
             'catatan' => 'nullable|string',
             
-            // Atribut Spesifikasi
+            // Atribut Spesifikasi - SIMPLE STRING
             'jenis' => 'nullable|string|max:255',
             'bahan' => 'nullable|string|max:255',
-            'saiz' => 'nullable',
-            'saiz_unit' => 'nullable',
-            'kadaran' => 'nullable',
-            'kadaran_unit' => 'nullable',
-            'kapasiti' => 'nullable',
-            'kapasiti_unit' => 'nullable',
+            'saiz' => 'nullable|string|max:255',
+            'saiz_unit' => 'nullable|string|max:255',
+            'kadaran' => 'nullable|string|max:255',
+            'kadaran_unit' => 'nullable|string|max:255',
+            'kapasiti' => 'nullable|string|max:255',
+            'kapasiti_unit' => 'nullable|string|max:255',
             'catatan_atribut' => 'nullable|string',
             
             // Maklumat Pembelian
@@ -240,7 +229,7 @@ class SubComponentController extends Controller
             'kod_ptj' => 'nullable|string|max:255',
             'tarikh_dipasang' => 'nullable|date',
             'tarikh_waranti_tamat' => 'nullable|date',
-            'jangka_hayat' => 'nullable|string|max:255',
+            'jangka_hayat' => 'nullable|integer',
             
             // Pengilang, Pembekal, Kontraktor
             'nama_pengilang' => 'nullable|string|max:255',

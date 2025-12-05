@@ -69,7 +69,7 @@
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Status Komponen</label>
+                                            <label class="form-label">Status Komponen <span class="text-danger">*</span></label>
                                             <select class="form-select" name="status_komponen">
                                                 <option value="">-- Pilih Status --</option>
                                                 <option value="operational" {{ old('status_komponen') == 'operational' ? 'selected' : '' }}>Operational</option>
