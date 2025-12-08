@@ -125,7 +125,6 @@
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                            <small class="text-muted">Taip kod baru untuk tambah (contoh: B01, UTARA, ADMIN)</small>
                                         </td>
                                     </tr>
                                     <tr id="nama-blok-row" style="display: none;">
