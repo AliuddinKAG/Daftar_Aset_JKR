@@ -243,12 +243,80 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    {{-- Rest of binaan luar fields... --}}
-                                </tbody>
+                                    <tr>
+                                        <td>Koordinat GPS (WGS 84)</td>
+                                        <td>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" name="koordinat_x" 
+                                                           value="{{ old('koordinat_x') }}" placeholder="X: ( Cth 2.935905 )">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" name="koordinat_y" 
+                                                           value="{{ old('koordinat_y') }}" placeholder="Y: ( Cth 101.700286)">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="fw-bold">Diisi Jika Binaan Luar Mempunyai Aras dan Ruang</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kod Aras</td>
+                                        <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-aras-binaan" name="kod_aras_binaan" id="kod_aras_binaan">
+                                                    <option value="">-- Pilih atau Taip Kod Aras --</option>
+                                                    @foreach($kodAras as $aras)
+                                                        <option value="{{ $aras->kod }}" {{ old('kod_aras_binaan') == $aras->kod ? 'selected' : '' }}>
+                                                            {{ $aras->kod }} - {{ $aras->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Kod Ruang</td>
+                                    <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-ruang-binaan" name="kod_ruang_binaan" id="kod_ruang_binaan">
+                                                    <option value="">-- Pilih atau Taip Kod Ruang --</option>
+                                                    @foreach($kodRuangs as $ruang)
+                                                        <option value="{{ $ruang->kod }}" {{ old('kod_ruang_binaan') == $ruang->kod ? 'selected' : '' }}>
+                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nama Ruang</td>
+                                    <td>
+                                            <div class="input-group">
+                                                <select class="form-select select2-nama-ruang-binaan" name="nama_ruang_binaan" id="nama_ruang_binaan">
+                                                    <option value="">-- Pilih atau Taip Nama Ruang --</option>
+                                                    @foreach($namaRuangs as $nama)
+                                                        <option value="{{ $nama->nama }}" {{ old('nama_ruang_binaan') == $nama->nama ? 'selected' : '' }}>
+                                                            {{ $nama->nama }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Catatan: <br></td>
+                                        <td><textarea class="form-control" name="catatan_binaan" rows="3">{{ old('catatan_binaan') }}</textarea></td>
+                                    </tr>
+                                    </tbody>
                             </table>
                         </div>
                     </div>
-
                     <!-- Status -->
                     <div class="mb-3">
                         <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
