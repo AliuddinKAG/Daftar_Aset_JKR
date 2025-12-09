@@ -44,7 +44,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Kod Lokasi</label>
-                                    <input type="text" class="form-control" id="displayKomponen" readonly>
+                                    <input type="text" class="form-control" id="displayKodLokasi" readonly>
                                 </div>
                             </div>
 
@@ -134,13 +134,39 @@
 </div>
 @endsection
 
+
 @section('scripts')
 <script>
-// Auto-fill komponen name
-document.getElementById('mainComponentSelect').addEventListener('change', function() {
-    const selected = this.options[this.selectedIndex];
-    const komponenName = selected.getAttribute('data-komponen');
-    document.getElementById('displayKomponen').value = komponenName || '';
+$(document).ready(function() {
+    // ===========================
+    // Auto-fill komponen name dan kod lokasi
+    // ===========================
+    $('#mainComponentSelect').on('change', function() {
+        const selected = this.options[this.selectedIndex];
+        const komponenName = selected.getAttribute('data-komponen');
+        const kodLokasi = selected.getAttribute('data-kod-lokasi');
+        
+        // Set nama komponen
+        $('#displayKomponen').val(komponenName || '');
+        
+        // Set kod lokasi
+        if (kodLokasi) {
+            $('#displayKodLokasi').val(kodLokasi);
+        } else {
+            // Generate kod lokasi jika tidak ada
+            const mainCompId = $(this).val();
+            if (mainCompId) {
+                $('#displayKodLokasi').val('LOK-' + mainCompId.padStart(4, '0'));
+            } else {
+                $('#displayKodLokasi').val('');
+            }
+        }
+    });
+
+    // Trigger on page load jika ada value (untuk validation error)
+    if ($('#mainComponentSelect').val()) {
+        $('#mainComponentSelect').trigger('change');
+    }
 });
 
 function showSpecificationSection() {

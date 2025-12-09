@@ -144,23 +144,51 @@
 </div>
 @endsection
 
+
 @section('scripts')
 <script>
-// Auto-fill komponen name when main component changes
-document.getElementById('mainComponentSelect').addEventListener('change', function() {
-    const selected = this.options[this.selectedIndex];
-    const komponenName = selected.getAttribute('data-komponen');
-    document.getElementById('displayKomponen').value = komponenName || '';
-});
+$(document).ready(function() {
+    // ===========================
+    // Auto-fill komponen name dan kod lokasi
+    // ===========================
+    $('#mainComponentSelect').on('change', function() {
+        const selected = this.options[this.selectedIndex];
+        const komponenName = selected.getAttribute('data-komponen');
+        const kodLokasi = selected.getAttribute('data-kod-lokasi');
+        
+        // Set nama komponen
+        $('#displayKomponen').val(komponenName || '');
+        
+        // Set kod lokasi
+        if (kodLokasi) {
+            $('#displayKodLokasi').val(kodLokasi);
+        } else {
+            // Generate kod lokasi jika tidak ada
+            const mainCompId = $(this).val();
+            if (mainCompId) {
+                $('#displayKodLokasi').val('LOK-' + mainCompId.padStart(4, '0'));
+            } else {
+                $('#displayKodLokasi').val('');
+            }
+        }
+    });
 
-function showSpecificationSection() {
-    document.getElementById('specificationSection').style.display = 'block';
-    document.querySelector('button[onclick="showSpecificationSection()"]').style.display = 'none';
-    document.getElementById('specificationSection').scrollIntoView({ behavior: 'smooth' });
-}
+    // Trigger on page load untuk set initial values
+    if ($('#mainComponentSelect').val()) {
+        $('#mainComponentSelect').trigger('change');
+    }
 
-// Auto hide button if specifications already exist
-document.addEventListener('DOMContentLoaded', function() {
+    // ===========================
+    // Show specification section
+    // ===========================
+    window.showSpecificationSection = function() {
+        document.getElementById('specificationSection').style.display = 'block';
+        const btn = document.querySelector('button[onclick="showSpecificationSection()"]');
+        if (btn) btn.style.display = 'none';
+        document.getElementById('specificationSection').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // Auto hide button if specifications already exist
     const specSection = document.getElementById('specificationSection');
     const nextButton = document.querySelector('button[onclick="showSpecificationSection()"]');
     
