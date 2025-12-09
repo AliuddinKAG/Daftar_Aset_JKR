@@ -183,7 +183,9 @@
                                     <table class="table table-bordered">
                                         <tr>
                                             <td width="50%">Tarikh Perolehan</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_perolehan" value="{{ old('tarikh_perolehan', $mainComponent->tarikh_perolehan?->format('Y-m-d')) }}"></td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_perolehan" 
+                                                value="{{ old('tarikh_perolehan', $mainComponent->tarikh_perolehan ? \Carbon\Carbon::parse($mainComponent->tarikh_perolehan)->format('Y-m-d') : '') }}">
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Kos Perolehan/Kontrak</td>
@@ -198,16 +200,22 @@
                                 <div class="col-md-6">
                                     <table class="table table-bordered">
                                         <tr>
-                                            <td width="50%">Tarikh Dipasang</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_dipasang" value="{{ old('tarikh_dipasang', $mainComponent->tarikh_dipasang?->format('Y-m-d')) }}"></td>
+                                            <td>Tarikh Dipasang</td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_dipasang" 
+                                                value="{{ old('tarikh_dipasang', $mainComponent->tarikh_dipasang ? \Carbon\Carbon::parse($mainComponent->tarikh_dipasang)->format('Y-m-d') : '') }}">
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Tarikh Waranti Tamat</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_waranti_tamat" value="{{ old('tarikh_waranti_tamat', $mainComponent->tarikh_waranti_tamat?->format('Y-m-d')) }}"></td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_waranti_tamat" 
+                                                value="{{ old('tarikh_waranti_tamat', $mainComponent->tarikh_waranti_tamat ? \Carbon\Carbon::parse($mainComponent->tarikh_waranti_tamat)->format('Y-m-d') : '') }}">
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Tarikh Tamat DLP</td>
-                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_tamat_dlp" value="{{ old('tarikh_tamat_dlp', $mainComponent->tarikh_tamat_dlp?->format('Y-m-d')) }}"></td>
+                                            <td><input type="date" class="form-control form-control-sm" name="tarikh_tamat_dlp" 
+                                                value="{{ old('tarikh_tamat_dlp', $mainComponent->tarikh_tamat_dlp ? \Carbon\Carbon::parse($mainComponent->tarikh_tamat_dlp)->format('Y-m-d') : '') }}">
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>Jangka Hayat</td>

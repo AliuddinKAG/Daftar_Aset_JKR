@@ -59,13 +59,32 @@
     }
     $kadaranUnit = trim($kadaranUnit, '[]"');
     
-    // Purchase info
-    $tarikhPembelian = old('tarikh_pembelian', $subComponent->tarikh_pembelian ?? '');
+    // Purchase info - TARIKH DIPERBAIKI
+    // Format tarikh untuk input type="date" (Y-m-d)
+    $tarikhPembelian = old('tarikh_pembelian');
+    if (!$tarikhPembelian && isset($subComponent->tarikh_pembelian)) {
+        $tarikhPembelian = $subComponent->tarikh_pembelian instanceof \Carbon\Carbon 
+            ? $subComponent->tarikh_pembelian->format('Y-m-d')
+            : (\Carbon\Carbon::parse($subComponent->tarikh_pembelian)->format('Y-m-d') ?? '');
+    }
+    
+    $tarikhDipasang = old('tarikh_dipasang');
+    if (!$tarikhDipasang && isset($subComponent->tarikh_dipasang)) {
+        $tarikhDipasang = $subComponent->tarikh_dipasang instanceof \Carbon\Carbon 
+            ? $subComponent->tarikh_dipasang->format('Y-m-d')
+            : (\Carbon\Carbon::parse($subComponent->tarikh_dipasang)->format('Y-m-d') ?? '');
+    }
+    
+    $tarikhWaranti = old('tarikh_waranti_tamat');
+    if (!$tarikhWaranti && isset($subComponent->tarikh_waranti_tamat)) {
+        $tarikhWaranti = $subComponent->tarikh_waranti_tamat instanceof \Carbon\Carbon 
+            ? $subComponent->tarikh_waranti_tamat->format('Y-m-d')
+            : (\Carbon\Carbon::parse($subComponent->tarikh_waranti_tamat)->format('Y-m-d') ?? '');
+    }
+    
     $kosPerolehan = old('kos_perolehan', $subComponent->kos_perolehan ?? '');
     $noPesananRasmi = old('no_pesanan_rasmi_kontrak', $subComponent->no_pesanan_rasmi_kontrak ?? '');
     $kodPtj = old('kod_ptj', $subComponent->kod_ptj ?? '');
-    $tarikhDipasang = old('tarikh_dipasang', $subComponent->tarikh_dipasang ?? '');
-    $tarikhWaranti = old('tarikh_waranti_tamat', $subComponent->tarikh_waranti_tamat ?? '');
     $jangkaHayat = old('jangka_hayat', $subComponent->jangka_hayat ?? '');
     
     // Supplier info
@@ -88,7 +107,6 @@
     $catatanDokumen = old('catatan_dokumen', $subComponent->catatan_dokumen ?? '');
     $nota = old('nota', $subComponent->nota ?? '');
 @endphp
-
 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
 <div class="card mb-4 mt-4">
     <div class="card-header bg-dark text-white">
@@ -187,7 +205,7 @@
                         </tr>
                         <tr>
                             <td>Kos Perolehan/Kontrak</td>
-                            <td><input type="text" class="form-control form-control-sm" name="kos_perolehan" value="{{ $kosPerolehan }}" placeholder="RM"></td>
+                            <td><input type="text" class="form-control form-control-sm" name="kos_perolehan" value="{{ $kosPerolehan }}" placeholder="Contoh: 20000.00"></td>
                         </tr>
                         <tr>
                             <td>No. Pesanan Rasmi Kerajaan / Kontrak</td>
