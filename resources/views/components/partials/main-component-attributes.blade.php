@@ -51,11 +51,11 @@
     <div class="card-body">
         <div class="row mb-3">
             <div class="col-md-6">
-                <label for="jenis" class="form-label">Jenis</label>
+                <label for="jenis" class="form-label">Jenis<span class="text-danger">*</span></label>
                 <input id="jenis" type="text" class="form-control" name="jenis" value="{{ $jenis }}">
             </div>
             <div class="col-md-6">
-                <label for="bahan" class="form-label">Bahan</label>
+                <label for="bahan" class="form-label">Bahan<span class="text-danger">*</span></label>
                 <input id="bahan" type="text" class="form-control" name="bahan" value="{{ $bahan }}">
             </div>
         </div>

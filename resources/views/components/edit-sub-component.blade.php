@@ -65,13 +65,13 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">Deskripsi</label>
+                                        <label class="form-label">Deskripsi<span class="text-danger">*</span></label>
                                         <textarea class="form-control" name="deskripsi" rows="3">{{ old('deskripsi', $subComponent->deskripsi) }}</textarea>
                                     </div>
 
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <label class="form-label">Status Komponen</label>
+                                            <label class="form-label">Status Komponen<span class="text-danger">*</span></label>
                                             <select class="form-select" name="status_komponen">
                                                 <option value="">-- Pilih Status --</option>
                                                 <option value="operational" {{ old('status_komponen', $subComponent->status_komponen) == 'operational' ? 'selected' : '' }}>Operational</option>
@@ -92,11 +92,11 @@
                                                    value="{{ old('no_sijil_pendaftaran', $subComponent->no_sijil_pendaftaran) }}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Jenama</label>
+                                            <label class="form-label">Jenama<span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="jenama" value="{{ old('jenama', $subComponent->jenama) }}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Model</label>
+                                            <label class="form-label">Model<span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="model" value="{{ old('model', $subComponent->model) }}">
                                         </div>
                                     </div>

@@ -63,7 +63,7 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">Deskripsi</label>
+                                        <label class="form-label">Deskripsi<span class="text-danger">*</span></label>
                                         <textarea class="form-control" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
                                     </div>
 
@@ -89,11 +89,11 @@
                                             <input type="text" class="form-control" name="no_sijil_pendaftaran" value="{{ old('no_sijil_pendaftaran') }}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Jenama</label>
+                                            <label class="form-label">Jenama<span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="jenama" value="{{ old('jenama') }}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Model</label>
+                                            <label class="form-label">Model<span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="model" value="{{ old('model') }}">
                                         </div>
                                     </div>

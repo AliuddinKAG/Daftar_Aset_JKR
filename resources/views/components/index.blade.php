@@ -148,7 +148,7 @@
                 <i class="bi bi-box-seam"></i>
             </div>
             <div class="stats-number">{{ $components->count() }}</div>
-            <div class="stats-label">Total Komponen</div>
+            <div class="stats-label">Komponen</div>
         </div>
     </div>
     <div class="col-md-4 mb-3">
@@ -181,7 +181,7 @@
                 </div>
                 <div>
                     <h6 class="mb-0">Borang 1</h6>
-                    <small class="text-muted">Tambah Komponen</small>
+                    <small class="text-muted">Peringkat Komponen</small>
                 </div>
             </div>
         </a>
@@ -194,7 +194,7 @@
                 </div>
                 <div>
                     <h6 class="mb-0">Borang 2</h6>
-                    <small class="text-muted">Tambah Komponen Utama</small>
+                    <small class="text-muted">Peringkat Komponen Utama</small>
                 </div>
             </div>
         </a>
@@ -207,7 +207,7 @@
                 </div>
                 <div>
                     <h6 class="mb-0">Borang 3</h6>
-                    <small class="text-muted">Tambah Sub Komponen</small>
+                    <small class="text-muted">Peringkat Sub Komponen</small>
                 </div>
             </div>
         </a>

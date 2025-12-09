@@ -76,7 +76,7 @@
 
                                     <div class="row mb-3">
                                         <div class="col-md-4">
-                                            <label class="form-label">Sistem</label>
+                                            <label class="form-label">Sistem<span class="text-danger">*</span></label>
                                             <div class="input-group">
                                                 <select class="form-select select2-sistem" name="sistem" id="sistem">
                                                     <option value="">-- Pilih atau Taip Sistem --</option>
@@ -92,7 +92,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">SubSistem</label>
+                                            <label class="form-label">SubSistem<span class="text-danger">*</span></label>
                                             <div class="input-group">
                                                 <select class="form-select select2-subsistem" name="subsistem" id="subsistem">
                                                     <option value="">-- Pilih atau Taip SubSistem --</option>
@@ -108,7 +108,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">Kuantiti</label>
+                                            <label class="form-label">Kuantiti<span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="kuantiti" value="{{ old('kuantiti', 1) }}" min="1">
                                             <small class="form-text text-muted">(Komponen yang sama jenis)</small>
                                         </div>
@@ -219,37 +219,37 @@
                                 <div class="col-md-4">
                                     <h6 class="fw-bold">Pengilang</h6>
                                     <div class="mb-2">
-                                        <label class="form-label small">Nama:</label>
+                                        <label class="form-label small">Nama: <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-sm" name="nama_pengilang" value="{{ old('nama_pengilang') }}">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <h6 class="fw-bold">Pembekal</h6>
                                     <div class="mb-2">
-                                        <label class="form-label small">Nama:</label>
+                                        <label class="form-label small">Nama:<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-sm" name="nama_pembekal" value="{{ old('nama_pembekal') }}">
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label small">Alamat:</label>
+                                        <label class="form-label small">Alamat:<span class="text-danger">*</span></label>
                                         <textarea class="form-control form-control-sm" name="alamat_pembekal" rows="2">{{ old('alamat_pembekal') }}</textarea>
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label small">No. Telefon:</label>
+                                        <label class="form-label small">No. Telefon:<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-sm" name="no_telefon_pembekal" value="{{ old('no_telefon_pembekal') }}">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <h6 class="fw-bold">Kontraktor</h6>
                                     <div class="mb-2">
-                                        <label class="form-label small">Nama:</label>
+                                        <label class="form-label small">Nama:<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-sm" name="nama_kontraktor" value="{{ old('nama_kontraktor') }}">
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label small">Alamat:</label>
+                                        <label class="form-label small">Alamat:<span class="text-danger">*</span></label>
                                         <textarea class="form-control form-control-sm" name="alamat_kontraktor" rows="2">{{ old('alamat_kontraktor') }}</textarea>
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label small">No. Telefon:</label>
+                                        <label class="form-label small">No. Telefon:<span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-sm" name="no_telefon_kontraktor" value="{{ old('no_telefon_kontraktor') }}">
                                     </div>
                                 </div>
@@ -270,7 +270,7 @@
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Deskripsi</label>
+                                    <label class="form-label">Deskripsi<span class="text-danger">*</span></label>
                                     <textarea class="form-control" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
                                 </div>
                                 <div class="col-md-6">
@@ -289,15 +289,15 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <label class="form-label">Jenama</label>
+                                    <label class="form-label">Jenama<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="jenama" value="{{ old('jenama') }}">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">Model</label>
+                                    <label class="form-label">Model<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="model" value="{{ old('model') }}">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">No. Siri</label>
+                                    <label class="form-label">No. Siri<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="no_siri" value="{{ old('no_siri') }}">
                                 </div>
                             </div>
