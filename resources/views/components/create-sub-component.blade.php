@@ -72,8 +72,8 @@
                                             <label class="form-label">Status Komponen <span class="text-danger">*</span></label>
                                             <select class="form-select" name="status_komponen">
                                                 <option value="">-- Pilih Status --</option>
-                                                <option value="operational" {{ old('status_komponen') == 'operational' ? 'selected' : '' }}>Operational</option>
-                                                <option value="under_maintenance" {{ old('status_komponen') == 'under_maintenance' ? 'selected' : '' }}>Under Maintenance</option>
+                                                <option value="operational" {{ old('status_komponen') == 'operational' ? 'selected' : '' }}>Beroperasi</option>
+                                                <option value="under_maintenance" {{ old('status_komponen') == 'under_maintenance' ? 'selected' : '' }}>Sedang Diselenggara</option>
                                                 <option value="rosak" {{ old('status_komponen') == 'rosak' ? 'selected' : '' }}>Rosak</option>
                                             </select>
                                         </div>
