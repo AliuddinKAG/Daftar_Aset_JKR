@@ -250,7 +250,12 @@
     <!-- BINAAN LUAR Section -->
     <div class="checkbox-section">
         <div class="checkbox-header">
-            <span class="checkbox-box {{ $component->ada_binaan_luar ? '✓' : '' }}"></span>
+         {{--  <span class="checkbox-box ">{{ $component->ada_binaan_luar ? 'checked' : '' }}</span> --}}
+            <span class="checkbox-box">
+                @if($component->ada_binaan_luar)
+                    ✓
+                @endif
+            </span>
             <span class="checkbox-label">Binaan Luar (Tandakan '✓' jika berkenaan)</span>
             <span style="margin-left: 10px; font-size: 10pt;"></span>
         </div>
