@@ -350,7 +350,9 @@ function showAttributesSection() {
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
+    // ===========================
     // Initialize Select2 untuk Sistem
+    // ===========================
     $('.select2-sistem').select2({
         theme: 'bootstrap-5',
         tags: true,
@@ -363,7 +365,9 @@ $(document).ready(function() {
         }
     });
 
+    // ===========================
     // Initialize Select2 untuk SubSistem
+    // ===========================
     $('.select2-subsistem').select2({
         theme: 'bootstrap-5',
         tags: true,
@@ -376,7 +380,9 @@ $(document).ready(function() {
         }
     });
 
+    // ===========================
     // Filter SubSistem berdasarkan Sistem yang dipilih
+    // ===========================
     $('#sistem').on('change', function() {
         var sistemId = $(this).find(':selected').data('id');
         var $subsistem = $('#subsistem');
@@ -392,7 +398,9 @@ $(document).ready(function() {
         $subsistem.val('').trigger('change');
     });
 
+    // ===========================
     // Auto-fill DPA dan generate Kod Lokasi
+    // ===========================
     $('#component_id').on('change', function() {
         var $selected = $(this).find(':selected');
         var componentId = $(this).val();
@@ -424,6 +432,78 @@ $(document).ready(function() {
     if ($('#component_id').val()) {
         $('#component_id').trigger('change');
     }
+
+    // ===========================
+    // FORMAT KOS PEROLEHAN
+    // ===========================
+    
+    // Format input kos perolehan - hanya angka dan titik
+    $('input[name="kos_perolehan"]').on('input', function() {
+        let value = $(this).val();
+        
+        // Remove non-numeric characters except dots
+        value = value.replace(/[^0-9.]/g, '');
+        
+        // Remove multiple dots
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
+        $(this).val(value);
+    });
+
+    // Format dengan comma separator dan RM prefix ketika blur
+    $('input[name="kos_perolehan"]').on('blur', function() {
+        let value = $(this).val();
+        
+        if (value) {
+            // Remove any existing RM and spaces
+            value = value.replace(/RM\s*/g, '').trim();
+            
+            // Parse as number
+            let number = parseFloat(value);
+            
+            if (!isNaN(number)) {
+                // Format dengan 2 decimal places dan thousand separator
+                let formatted = number.toLocaleString('en-MY', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                $(this).val('RM ' + formatted);
+            }
+        }
+    });
+
+    // Remove formatting ketika focus untuk mudah edit
+    $('input[name="kos_perolehan"]').on('focus', function() {
+        let value = $(this).val();
+        if (value) {
+            // Remove RM prefix and commas
+            value = value.replace(/RM\s*/g, '').replace(/,/g, '');
+            $(this).val(value);
+        }
+    });
+
+    // ===========================
+    // FORM SUBMIT - Clean format untuk database
+    // ===========================
+    $('#mainComponentForm').on('submit', function(e) {
+        let kosInput = $('input[name="kos_perolehan"]');
+        let value = kosInput.val();
+        
+        if (value) {
+            // Clean value untuk database: RM20000.00
+            value = value.replace(/RM\s*/g, '').replace(/,/g, '');
+            let number = parseFloat(value);
+            
+            if (!isNaN(number)) {
+                // Format: RM20000.00 (no comma, with RM prefix)
+                kosInput.val('RM' + number.toFixed(2));
+            }
+        }
+    });
 });
 </script>
 @endsection
