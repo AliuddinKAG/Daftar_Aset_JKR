@@ -252,50 +252,86 @@
 
                 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
                 <div class="card mb-4">
-                    <div class="card-header bg-dark text-white">
-                        MAKLUMAT ATRIBUT SPESIFIKASI
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <strong>Jenis:</strong>
-                                <p class="mb-0">{{ $mainComponent->jenis ?? '-' }}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Bekalan Elektrik:</strong>
-                                <p class="mb-0">{{ $mainComponent->bekalan_elektrik ?? '-' }}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Bahan:</strong>
-                                <p class="mb-0">{{ $mainComponent->bahan ?? '-' }}</p>
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Kaedah Pemasangan:</strong>
-                                <p class="mb-0">{{ $mainComponent->kaedah_pemasangan ?? '-' }}</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <strong>Saiz Fizikal:</strong>
-                                <p class="mb-0">{{ $mainComponent->saiz ?? '-' }} {{ $mainComponent->saiz_unit }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Kadaran:</strong>
-                                <p class="mb-0">{{ $mainComponent->kadaran ?? '-' }} {{ $mainComponent->kadaran_unit }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Kapasiti:</strong>
-                                <p class="mb-0">{{ $mainComponent->kapasiti ?? '-' }} {{ $mainComponent->kapasiti_unit }}</p>
-                            </div>
-                        </div>
-                        @if($mainComponent->catatan_atribut)
-                        <div class="mt-3">
-                            <strong>Catatan:</strong>
-                            <p class="mb-0">{{ $mainComponent->catatan_atribut }}</p>
-                        </div>
-                        @endif
-                    </div>
+                <div class="card-header bg-dark text-white">
+                    MAKLUMAT ATRIBUT SPESIFIKASI
                 </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Jenis:</strong>
+                        <p class="mb-0">{{ $mainComponent->jenis ?? '-' }}</p>
+                        </div>
+                <div class="col-md-3">
+                    <strong>Bekalan Elektrik:</strong>
+                    <p class="mb-0">{{ $mainComponent->bekalan_elektrik ?? '-' }}</p>
+                        </div>
+                <div class="col-md-3">
+                    <strong>Bahan:</strong>
+                    <p class="mb-0">{{ $mainComponent->bahan ?? '-' }}</p>
+                </div>
+                <div class="col-md-3">
+                    <strong>Kaedah Pemasangan:</strong>
+                    <p class="mb-0">{{ $mainComponent->kaedah_pemasangan ?? '-' }}</p>
+                </div>
+            </div>
+
+                <!-- MEASUREMENTS - UPDATED TO USE NEW TABLE -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Saiz Fizikal:</strong>
+                        @php
+                            $saizMeasurements = $mainComponent->saizMeasurements ?? collect();
+                        @endphp
+                        @if($saizMeasurements->isNotEmpty())
+                            <ul class="mb-0 ps-3">
+                                @foreach($saizMeasurements as $measurement)
+                                    <li>{{ $measurement->value }} {{ $measurement->unit }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="mb-0">-</p>
+                        @endif
+            </div>
+            <div class="col-md-4">
+                <strong>Kadaran:</strong>
+                @php
+                    $kadaranMeasurements = $mainComponent->kadaranMeasurements ?? collect();
+                @endphp
+                @if($kadaranMeasurements->isNotEmpty())
+                    <ul class="mb-0 ps-3">
+                        @foreach($kadaranMeasurements as $measurement)
+                            <li>{{ $measurement->value }} {{ $measurement->unit }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="mb-0">-</p>
+                @endif
+            </div>
+            <div class="col-md-4">
+                <strong>Kapasiti:</strong>
+                @php
+                    $kapasitiMeasurements = $mainComponent->kapasitiMeasurements ?? collect();
+                @endphp
+                @if($kapasitiMeasurements->isNotEmpty())
+                    <ul class="mb-0 ps-3">
+                        @foreach($kapasitiMeasurements as $measurement)
+                            <li>{{ $measurement->value }} {{ $measurement->unit }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="mb-0">-</p>
+                @endif
+            </div>
+        </div>
+
+        @if($mainComponent->catatan_atribut)
+        <div class="mt-3">
+            <strong>Catatan:</strong>
+            <p class="mb-0">{{ $mainComponent->catatan_atribut }}</p>
+        </div>
+        @endif
+    </div>
+</div>
 
                 <!-- KOMPONEN YANG BERHUBUNGKAIT -->
                 @if($mainComponent->relatedComponents && $mainComponent->relatedComponents->count() > 0)

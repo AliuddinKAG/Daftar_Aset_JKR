@@ -136,120 +136,146 @@
 
                 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
                 <div class="card mb-4">
-                    <div class="card-header bg-dark text-white">
-                        MAKLUMAT ATRIBUT SPESIFIKASI
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Jenis:</strong>
-                                <p class="mb-0">{{ $subComponent->jenis ?: '-' }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Bahan:</strong>
-                                <p class="mb-0">{{ $subComponent->bahan ?: '-' }}</p>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Saiz Fizikal:</strong>
-                                <p class="mb-0">
-                                    @php
-                                        $saiz = $subComponent->saiz;
-                                        $saizUnit = $subComponent->saiz_unit;
-                                        
-                                        // Clean up saiz - remove brackets and quotes
-                                        if (is_string($saiz)) {
-                                            $saiz = trim($saiz, '[]"');
-                                        }
-                                        
-                                        // Clean up unit - remove brackets and quotes
-                                        if (is_string($saizUnit)) {
-                                            $saizUnit = trim($saizUnit, '[]"');
-                                        }
-                                        
-                                        // Display
-                                        if (!empty($saiz)) {
-                                            echo $saiz;
-                                            if (!empty($saizUnit)) {
-                                                echo ' ' . $saizUnit;
-                                            }
-                                        } else {
-                                            echo '-';
-                                        }
-                                    @endphp
-                                </p>
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Kadaran:</strong>
-                                <p class="mb-0">
-                                    @php
-                                        $kadaran = $subComponent->kadaran;
-                                        $kadaranUnit = $subComponent->kadaran_unit;
-                                        
-                                        // Clean up kadaran
-                                        if (is_string($kadaran)) {
-                                            $kadaran = trim($kadaran, '[]"');
-                                        }
-                                        
-                                        // Clean up unit
-                                        if (is_string($kadaranUnit)) {
-                                            $kadaranUnit = trim($kadaranUnit, '[]"');
-                                        }
-                                        
-                                        // Display
-                                        if (!empty($kadaran)) {
-                                            echo $kadaran;
-                                            if (!empty($kadaranUnit)) {
-                                                echo ' ' . $kadaranUnit;
-                                            }
-                                        } else {
-                                            echo '-';
-                                        }
-                                    @endphp
-                                </p>
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Kapasiti:</strong>
-                                <p class="mb-0">
-                                    @php
-                                        $kapasiti = $subComponent->kapasiti;
-                                        $kapasiti_unit = $subComponent->kapasiti_unit;
-                                        
-                                        // Clean up kapasiti
-                                        if (is_string($kapasiti)) {
-                                            $kapasiti = trim($kapasiti, '[]"');
-                                        }
-                                        
-                                        // Clean up unit
-                                        if (is_string($kapasiti_unit)) {
-                                            $kapasiti_unit = trim($kapasiti_unit, '[]"');
-                                        }
-                                        
-                                        // Display
-                                        if (!empty($kapasiti)) {
-                                            echo $kapasiti;
-                                            if (!empty($kapasiti_unit)) {
-                                                echo ' ' . $kapasiti_unit;
-                                            }
-                                        } else {
-                                            echo '-';
-                                        }
-                                    @endphp
-                                </p>
-                            </div>
-                        </div>
-
-                        @if($subComponent->catatan_atribut)
-                        <div class="mt-3">
-                            <strong>Catatan:</strong>
-                            <p class="mb-0">{{ $subComponent->catatan_atribut }}</p>
-                        </div>
-                        @endif
-                    </div>
+                <div class="card-header bg-dark text-white">
+                    MAKLUMAT ATRIBUT SPESIFIKASI
                 </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                        <strong>Jenis:</strong>
+                        <p class="mb-0">{{ $subComponent->jenis ?: '-' }}</p>
+                    </div>
+                <div class="col-md-6">
+                    <strong>Bahan:</strong>
+                    <p class="mb-0">{{ $subComponent->bahan ?: '-' }}</p>
+                </div>
+            </div>
 
+                <!-- MEASUREMENTS - UPDATED TO USE NEW TABLE -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Saiz Fizikal:</strong>
+                    @php
+                        $saizMeasurements = $subComponent->saizMeasurements ?? collect();
+                    @endphp
+                        @if($saizMeasurements->isNotEmpty())
+                            <ul class="mb-0 ps-3">
+                        @foreach($saizMeasurements as $measurement)
+                            <li>{{ $measurement->value }} {{ $measurement->unit }}</li>
+                        @endforeach
+                        </ul>
+                    @else
+                    {{-- Fallback to old single column for backward compatibility --}}
+                    @php
+                        $saiz = $subComponent->saiz;
+                        $saizUnit = $subComponent->saiz_unit;
+                        
+                        // Clean up saiz - remove brackets and quotes
+                        if (is_string($saiz)) {
+                            $saiz = trim($saiz, '[]"');
+                        }
+                        
+                        // Clean up unit - remove brackets and quotes
+                        if (is_string($saizUnit)) {
+                            $saizUnit = trim($saizUnit, '[]"');
+                        }
+                    @endphp
+                    <p class="mb-0">
+                        @if(!empty($saiz))
+                            {{ $saiz }}
+                            @if(!empty($saizUnit))
+                                {{ $saizUnit }}
+                            @endif
+                        @else
+                            -
+                        @endif
+                    </p>
+                @endif
+            </div>
+            <div class="col-md-4">
+                <strong>Kadaran:</strong>
+                @php
+                    $kadaranMeasurements = $subComponent->kadaranMeasurements ?? collect();
+                @endphp
+                @if($kadaranMeasurements->isNotEmpty())
+                    <ul class="mb-0 ps-3">
+                        @foreach($kadaranMeasurements as $measurement)
+                            <li>{{ $measurement->value }} {{ $measurement->unit }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    {{-- Fallback to old single column --}}
+                    @php
+                        $kadaran = $subComponent->kadaran;
+                        $kadaranUnit = $subComponent->kadaran_unit;
+                        
+                        if (is_string($kadaran)) {
+                            $kadaran = trim($kadaran, '[]"');
+                        }
+                        
+                        if (is_string($kadaranUnit)) {
+                            $kadaranUnit = trim($kadaranUnit, '[]"');
+                        }
+                    @endphp
+                    <p class="mb-0">
+                        @if(!empty($kadaran))
+                            {{ $kadaran }}
+                            @if(!empty($kadaranUnit))
+                                {{ $kadaranUnit }}
+                            @endif
+                        @else
+                            -
+                        @endif
+                    </p>
+                @endif
+            </div>
+            <div class="col-md-4">
+                <strong>Kapasiti:</strong>
+                @php
+                    $kapasitiMeasurements = $subComponent->kapasitiMeasurements ?? collect();
+                @endphp
+                @if($kapasitiMeasurements->isNotEmpty())
+                    <ul class="mb-0 ps-3">
+                        @foreach($kapasitiMeasurements as $measurement)
+                            <li>{{ $measurement->value }} {{ $measurement->unit }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    {{-- Fallback to old single column --}}
+                    @php
+                        $kapasiti = $subComponent->kapasiti;
+                        $kapasitiUnit = $subComponent->kapasiti_unit;
+                        
+                        if (is_string($kapasiti)) {
+                            $kapasiti = trim($kapasiti, '[]"');
+                        }
+                        
+                        if (is_string($kapasitiUnit)) {
+                            $kapasitiUnit = trim($kapasitiUnit, '[]"');
+                        }
+                    @endphp
+                    <p class="mb-0">
+                        @if(!empty($kapasiti))
+                            {{ $kapasiti }}
+                            @if(!empty($kapasitiUnit))
+                                {{ $kapasitiUnit }}
+                            @endif
+                        @else
+                            -
+                        @endif
+                    </p>
+                @endif
+            </div>
+        </div>
+
+        @if($subComponent->catatan_atribut)
+        <div class="mt-3">
+            <strong>Catatan:</strong>
+            <p class="mb-0">{{ $subComponent->catatan_atribut }}</p>
+        </div>
+        @endif
+    </div>
+</div>
                 <!-- MAKLUMAT PEMBELIAN -->
                 <div class="card mb-4">
                     <div class="card-header bg-dark text-white">
