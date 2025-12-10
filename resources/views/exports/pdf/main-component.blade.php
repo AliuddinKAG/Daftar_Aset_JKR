@@ -234,10 +234,19 @@
         <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_dipasang?->format('d/m/Y') ?? '' }}</td>
     </tr>
     <tr>
-        <td class="label-cell">Kos Perolehan/Kontrak</td>
-        <td class="value-cell">{{ $mainComponent->kos_perolehan ? 'RM ' . number_format($mainComponent->kos_perolehan, 2) : '' }}</td>
-        <td class="label-cell">Tarikh Waranti Tamat</td>
-        <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_waranti_tamat?->format('d/m/Y') ?? '' }}</td>
+    <td class="label-cell">Kos Perolehan/Kontrak</td>
+    <td class="value-cell">
+        @php
+            // Remove all non-numeric characters except decimal point
+            $kosBersih = preg_replace('/[^0-9.]/', '', $mainComponent->kos_perolehan ?? '');
+            // Convert to float
+            $kosFloat = (float) $kosBersih;
+            // Format and display
+            echo $kosFloat > 0 ? 'RM ' . number_format($kosFloat, 2) : '';
+        @endphp
+    </td>
+    <td class="label-cell">Tarikh Waranti Tamat</td>
+    <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_waranti_tamat?->format('d/m/Y') ?? '' }}</td>
     </tr>
     <tr>
         <td class="label-cell">No. Pesanan Rasmi Kerajaan/Kontrak</td>

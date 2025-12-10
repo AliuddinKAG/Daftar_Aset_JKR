@@ -687,10 +687,19 @@
                 <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_dipasang?->format('d/m/Y') ?? '' }}</td>
             </tr>
             <tr>
-                <td class="label-cell">Kos Perolehan/Kontrak</td>
-                <td class="value-cell">{{ $mainComponent->kos_perolehan ? 'RM ' . number_format($mainComponent->kos_perolehan, 2) : '' }}</td>
-                <td class="label-cell">Tarikh Waranti Tamat</td>
-                <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_waranti_tamat?->format('d/m/Y') ?? '' }}</td>
+            <td class="label-cell">Kos Perolehan/Kontrak</td>
+            <td class="value-cell">
+            @php
+            $kos = preg_replace('/[^0-9.]/', '', $mainComponent->kos_perolehan);
+            @endphp
+
+            {{ $kos ? 'RM ' . number_format((float)$kos, 2) : '' }}
+            </td>
+
+            <td class="label-cell">Tarikh Waranti Tamat</td>
+            <td colspan="4" class="value-cell">
+            {{ $mainComponent->tarikh_waranti_tamat?->format('d/m/Y') ?? '' }}
+            </td>
             </tr>
             <tr>
                 <td class="label-cell">No. Pesanan Rasmi Kerajaan/Kontrak</td>

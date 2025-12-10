@@ -116,7 +116,13 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Kos Perolehan/Kontrak</strong></td>
-                                        <td>{{ $mainComponent->kos_perolehan ? 'RM ' . number_format($mainComponent->kos_perolehan, 2) : '-' }}</td>
+                                        <td>
+                                        @php
+                                            $kos = preg_replace('/[^0-9.]/', '', $mainComponent->kos_perolehan); // buang RM, koma, apa2 huruf
+                                        @endphp
+
+                                            {{ $kos !== '' ? 'RM ' . number_format((float)$kos, 2) : '-' }}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td><strong>No. Pesanan Rasmi</strong></td>
