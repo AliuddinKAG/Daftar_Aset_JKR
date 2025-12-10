@@ -471,7 +471,8 @@ $(document).ready(function() {
                     maximumFractionDigits: 2
                 });
                 
-                $(this).val('RM ' + formatted);
+                $(this).val(formatted);
+
             }
         }
     });
