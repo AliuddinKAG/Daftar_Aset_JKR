@@ -80,8 +80,127 @@ class MainComponent extends Model
     }
 
     /**
-     * Scopes
+     * ========================================
+     * MEASUREMENTS RELATIONSHIPS (NEW)
+     * ========================================
      */
+    
+    /**
+     * Get all measurements (ordered)
+     */
+    public function measurements()
+    {
+        return $this->hasMany(MainComponentMeasurement::class)->orderBy('order');
+    }
+
+    /**
+     * Get saiz measurements only
+     */
+    public function saizMeasurements()
+    {
+        return $this->measurements()->where('type', 'saiz');
+    }
+
+    /**
+     * Get kadaran measurements only
+     */
+    public function kadaranMeasurements()
+    {
+        return $this->measurements()->where('type', 'kadaran');
+    }
+
+    /**
+     * Get kapasiti measurements only
+     */
+    public function kapasitiMeasurements()
+    {
+        return $this->measurements()->where('type', 'kapasiti');
+    }
+
+    /**
+     * ========================================
+     * MEASUREMENT HELPER METHODS (NEW)
+     * ========================================
+     */
+
+    /**
+     * Get formatted saiz (all values with units)
+     * Returns: "1200x400x500 mm, 800 cm"
+     */
+    public function getSaizFormattedAttribute(): string
+    {
+        $measurements = $this->saizMeasurements;
+        
+        if ($measurements->isEmpty()) {
+            return '-';
+        }
+
+        return $measurements->map(function ($m) {
+            return trim($m->value . ' ' . $m->unit);
+        })->implode(', ');
+    }
+
+    /**
+     * Get formatted kadaran (all values with units)
+     * Returns: "15 kW, 20 HP"
+     */
+    public function getKadaranFormattedAttribute(): string
+    {
+        $measurements = $this->kadaranMeasurements;
+        
+        if ($measurements->isEmpty()) {
+            return '-';
+        }
+
+        return $measurements->map(function ($m) {
+            return trim($m->value . ' ' . $m->unit);
+        })->implode(', ');
+    }
+
+    /**
+     * Get formatted kapasiti (all values with units)
+     * Returns: "2000 L, 1.5 ton"
+     */
+    public function getKapasitiFormattedAttribute(): string
+    {
+        $measurements = $this->kapasitiMeasurements;
+        
+        if ($measurements->isEmpty()) {
+            return '-';
+        }
+
+        return $measurements->map(function ($m) {
+            return trim($m->value . ' ' . $m->unit);
+        })->implode(', ');
+    }
+
+    /**
+     * Get all measurements grouped by type
+     * Returns: ['saiz' => [...], 'kadaran' => [...], 'kapasiti' => [...]]
+     */
+    public function getMeasurementsByTypeAttribute(): array
+    {
+        return [
+            'saiz' => $this->saizMeasurements,
+            'kadaran' => $this->kadaranMeasurements,
+            'kapasiti' => $this->kapasitiMeasurements,
+        ];
+    }
+
+    /**
+     * Check if has any measurements
+     */
+    public function hasMeasurements(): bool
+    {
+        return $this->measurements()->exists();
+    }
+
+    /**
+     * ========================================
+     * EXISTING SCOPES
+     * ========================================
+     */
+    
     public function scopeAktif($query)
     {
         return $query->where('status', 'aktif');
@@ -98,8 +217,11 @@ class MainComponent extends Model
     }
 
     /**
-     * Accessors
+     * ========================================
+     * EXISTING ACCESSORS
+     * ========================================
      */
+    
     public function getIsWarrantyExpiredAttribute()
     {
         return $this->tarikh_waranti_tamat?->isPast();

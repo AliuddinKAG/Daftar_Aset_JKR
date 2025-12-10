@@ -28,20 +28,21 @@ class SubComponentController extends Controller
 
             DB::beginTransaction();
 
-            // SIMPLE STRING - NO JSON ENCODING untuk saiz, kadaran, kapasiti
-            $validated['saiz'] = $request->input('saiz') ?: null;
-            $validated['saiz_unit'] = $request->input('saiz_unit') ?: null;
-            $validated['kadaran'] = $request->input('kadaran') ?: null;
-            $validated['kadaran_unit'] = $request->input('kadaran_unit') ?: null;
-            $validated['kapasiti'] = $request->input('kapasiti') ?: null;
-            $validated['kapasiti_unit'] = $request->input('kapasiti_unit') ?: null;
+            // BUANG old measurement fields dari validated (akan guna table measurements)
+            unset($validated['saiz'], $validated['saiz_unit']);
+            unset($validated['kadaran'], $validated['kadaran_unit']);
+            unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-            // Handle dokumen berkaitan - HANYA ini yang JSON array
+            // Handle dokumen berkaitan - organized by category
             $validated['dokumen_berkaitan'] = $this->processDokumenBerkaitan($request);
 
             $validated['status'] = $request->input('status', 'aktif');
             
-            SubComponent::create($validated);
+            // Create sub component
+            $subComponent = SubComponent::create($validated);
+
+            // Save measurements ke table baru
+            $this->saveMeasurements($subComponent, $request);
 
             DB::commit();
 
@@ -63,8 +64,11 @@ class SubComponentController extends Controller
      */
     public function show(SubComponent $subComponent)
     {
-        // Load hanya relationships yang wujud
-        $subComponent->load(['mainComponent.component']);
+        // Load relationships
+        $subComponent->load([
+            'mainComponent.component',
+            'measurements' // Load measurements
+        ]);
         
         return view('components.view-sub-component', compact('subComponent'));
     }
@@ -75,6 +79,9 @@ class SubComponentController extends Controller
     public function edit(SubComponent $subComponent)
     {
         $mainComponents = MainComponent::with('component')->get();
+        
+        // Load measurements untuk edit form
+        $subComponent->load('measurements');
         
         return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
     }
@@ -89,18 +96,20 @@ class SubComponentController extends Controller
 
             DB::beginTransaction();
 
-            // SIMPLE STRING - NO JSON ENCODING untuk saiz, kadaran, kapasiti
-            $validated['saiz'] = $request->input('saiz') ?: null;
-            $validated['saiz_unit'] = $request->input('saiz_unit') ?: null;
-            $validated['kadaran'] = $request->input('kadaran') ?: null;
-            $validated['kadaran_unit'] = $request->input('kadaran_unit') ?: null;
-            $validated['kapasiti'] = $request->input('kapasiti') ?: null;
-            $validated['kapasiti_unit'] = $request->input('kapasiti_unit') ?: null;
+            // BUANG old measurement fields
+            unset($validated['saiz'], $validated['saiz_unit']);
+            unset($validated['kadaran'], $validated['kadaran_unit']);
+            unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-            // Handle dokumen berkaitan - HANYA ini yang JSON array
+            // Handle dokumen berkaitan
             $validated['dokumen_berkaitan'] = $this->processDokumenBerkaitan($request);
 
+            // Update sub component
             $subComponent->update($validated);
+
+            // Delete & recreate measurements
+            $subComponent->measurements()->delete();
+            $this->saveMeasurements($subComponent, $request);
 
             DB::commit();
 
@@ -166,10 +175,76 @@ class SubComponentController extends Controller
     }
 
     /**
-     * Helper: Process dokumen berkaitan as array (will be auto JSON by cast)
+     * ========================================
+     * NEW METHOD: Save Measurements
+     * ========================================
+     */
+    private function saveMeasurements(SubComponent $subComponent, Request $request): void
+    {
+        // Process Saiz
+        $saizValues = $request->input('saiz', []);
+        $saizUnits = $request->input('saiz_unit', []);
+        
+        if (is_array($saizValues)) {
+            foreach ($saizValues as $index => $value) {
+                if (!empty(trim($value ?? ''))) {
+                    $subComponent->measurements()->create([
+                        'type' => 'saiz',
+                        'value' => $value,
+                        'unit' => $saizUnits[$index] ?? null,
+                        'order' => $index + 1
+                    ]);
+                }
+            }
+        }
+
+        // Process Kadaran
+        $kadaranValues = $request->input('kadaran', []);
+        $kadaranUnits = $request->input('kadaran_unit', []);
+        
+        if (is_array($kadaranValues)) {
+            foreach ($kadaranValues as $index => $value) {
+                if (!empty(trim($value ?? ''))) {
+                    $subComponent->measurements()->create([
+                        'type' => 'kadaran',
+                        'value' => $value,
+                        'unit' => $kadaranUnits[$index] ?? null,
+                        'order' => $index + 1
+                    ]);
+                }
+            }
+        }
+
+        // Process Kapasiti
+        $kapasitiValues = $request->input('kapasiti', []);
+        $kapasitiUnits = $request->input('kapasiti_unit', []);
+        
+        if (is_array($kapasitiValues)) {
+            foreach ($kapasitiValues as $index => $value) {
+                if (!empty(trim($value ?? ''))) {
+                    $subComponent->measurements()->create([
+                        'type' => 'kapasiti',
+                        'value' => $value,
+                        'unit' => $kapasitiUnits[$index] ?? null,
+                        'order' => $index + 1
+                    ]);
+                }
+            }
+        }
+    }
+
+    /**
+     * ========================================
+     * HELPER METHODS
+     * ========================================
+     */
+
+    /**
+     * Helper: Process dokumen berkaitan organized by category
      */
     private function processDokumenBerkaitan(Request $request)
     {
+        $categories = $request->input('doc_category', []);
         $bils = $request->input('doc_bil', []);
         $namas = $request->input('doc_nama', []);
         $rujukans = $request->input('doc_rujukan', []);
@@ -177,10 +252,30 @@ class SubComponentController extends Controller
 
         $documents = [];
 
-        if (is_array($namas)) {
+        // If using category-based organization
+        if (!empty($categories) && is_array($categories)) {
+            foreach ($categories as $categoryIndex => $category) {
+                if (isset($namas[$category]) && is_array($namas[$category])) {
+                    foreach ($namas[$category] as $index => $nama) {
+                        if (!empty(trim($nama ?? ''))) {
+                            $documents[] = [
+                                'kategori' => $category,
+                                'bil' => $bils[$category][$index] ?? ($index + 1),
+                                'nama' => $nama,
+                                'rujukan' => $rujukans[$category][$index] ?? null,
+                                'catatan' => $catatans[$category][$index] ?? null,
+                            ];
+                        }
+                    }
+                }
+            }
+        } 
+        // Fallback: simple array without categories
+        else if (is_array($namas)) {
             foreach ($namas as $index => $nama) {
                 if (!empty(trim($nama ?? ''))) {
                     $documents[] = [
+                        'kategori' => 'umum',
                         'bil' => $bils[$index] ?? ($index + 1),
                         'nama' => $nama,
                         'rujukan' => $rujukans[$index] ?? null,
@@ -211,15 +306,26 @@ class SubComponentController extends Controller
             'kuantiti' => 'nullable|integer|min:1',
             'catatan' => 'nullable|string',
             
-            // Atribut Spesifikasi - SIMPLE STRING
+            // Atribut Spesifikasi
             'jenis' => 'nullable|string|max:255',
             'bahan' => 'nullable|string|max:255',
-            'saiz' => 'nullable|string|max:255',
-            'saiz_unit' => 'nullable|string|max:255',
-            'kadaran' => 'nullable|string|max:255',
-            'kadaran_unit' => 'nullable|string|max:255',
-            'kapasiti' => 'nullable|string|max:255',
-            'kapasiti_unit' => 'nullable|string|max:255',
+            
+            // Array validation untuk measurements
+            'saiz' => 'nullable|array',
+            'saiz.*' => 'nullable|string|max:255',
+            'saiz_unit' => 'nullable|array',
+            'saiz_unit.*' => 'nullable|string|max:50',
+            
+            'kadaran' => 'nullable|array',
+            'kadaran.*' => 'nullable|string|max:255',
+            'kadaran_unit' => 'nullable|array',
+            'kadaran_unit.*' => 'nullable|string|max:50',
+            
+            'kapasiti' => 'nullable|array',
+            'kapasiti.*' => 'nullable|string|max:255',
+            'kapasiti_unit' => 'nullable|array',
+            'kapasiti_unit.*' => 'nullable|string|max:50',
+            
             'catatan_atribut' => 'nullable|string',
             
             // Maklumat Pembelian
@@ -241,7 +347,8 @@ class SubComponentController extends Controller
             'no_telefon_kontraktor' => 'nullable|string|max:50',
             'catatan_pembelian' => 'nullable|string',
             
-            // Dokumen - array inputs
+            // Dokumen - array inputs (with optional categories)
+            'doc_category' => 'nullable|array',
             'doc_bil' => 'nullable|array',
             'doc_nama' => 'nullable|array',
             'doc_rujukan' => 'nullable|array',

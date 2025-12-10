@@ -72,6 +72,12 @@ class SubComponent extends Model
     ];
 
     /**
+     * ========================================
+     * RELATIONSHIPS
+     * ========================================
+     */
+    
+    /**
      * Hubungan ke Komponen Utama
      */
     public function mainComponent(): BelongsTo
@@ -80,8 +86,121 @@ class SubComponent extends Model
     }
 
     /**
-     * Scopes
+     * Get all measurements (ordered)
      */
+    public function measurements()
+    {
+        return $this->hasMany(SubComponentMeasurement::class)->orderBy('order');
+    }
+
+    /**
+     * Get saiz measurements only
+     */
+    public function saizMeasurements()
+    {
+        return $this->measurements()->where('type', 'saiz');
+    }
+
+    /**
+     * Get kadaran measurements only
+     */
+    public function kadaranMeasurements()
+    {
+        return $this->measurements()->where('type', 'kadaran');
+    }
+
+    /**
+     * Get kapasiti measurements only
+     */
+    public function kapasitiMeasurements()
+    {
+        return $this->measurements()->where('type', 'kapasiti');
+    }
+
+    /**
+     * ========================================
+     * MEASUREMENT HELPER METHODS (NEW)
+     * ========================================
+     */
+
+    /**
+     * Get formatted saiz (all values with units)
+     * Returns: "1200x400x500 mm, 800 cm"
+     */
+    public function getSaizFormattedAttribute(): string
+    {
+        $measurements = $this->saizMeasurements;
+        
+        if ($measurements->isEmpty()) {
+            return $this->getSaizFormatted(); // Fallback to old method
+        }
+
+        return $measurements->map(function ($m) {
+            return trim($m->value . ' ' . $m->unit);
+        })->implode(', ');
+    }
+
+    /**
+     * Get formatted kadaran (all values with units)
+     * Returns: "15 kW, 20 HP"
+     */
+    public function getKadaranFormattedAttribute(): string
+    {
+        $measurements = $this->kadaranMeasurements;
+        
+        if ($measurements->isEmpty()) {
+            return $this->getKadaranFormatted(); // Fallback to old method
+        }
+
+        return $measurements->map(function ($m) {
+            return trim($m->value . ' ' . $m->unit);
+        })->implode(', ');
+    }
+
+    /**
+     * Get formatted kapasiti (all values with units)
+     * Returns: "2000 L, 1.5 ton"
+     */
+    public function getKapasitiFormattedAttribute(): string
+    {
+        $measurements = $this->kapasitiMeasurements;
+        
+        if ($measurements->isEmpty()) {
+            return $this->getKapasitiFormatted(); // Fallback to old method
+        }
+
+        return $measurements->map(function ($m) {
+            return trim($m->value . ' ' . $m->unit);
+        })->implode(', ');
+    }
+
+    /**
+     * Get all measurements grouped by type
+     * Returns: ['saiz' => [...], 'kadaran' => [...], 'kapasiti' => [...]]
+     */
+    public function getMeasurementsByTypeAttribute(): array
+    {
+        return [
+            'saiz' => $this->saizMeasurements,
+            'kadaran' => $this->kadaranMeasurements,
+            'kapasiti' => $this->kapasitiMeasurements,
+        ];
+    }
+
+    /**
+     * Check if has any measurements
+     */
+    public function hasMeasurements(): bool
+    {
+        return $this->measurements()->exists();
+    }
+
+    /**
+     * ========================================
+     * EXISTING SCOPES
+     * ========================================
+     */
+    
     public function scopeAktif($query)
     {
         return $query->where('status', 'aktif');
@@ -93,19 +212,25 @@ class SubComponent extends Model
     }
 
     /**
-     * Accessors
+     * ========================================
+     * EXISTING ACCESSORS
+     * ========================================
      */
+    
     public function getIsWarrantyExpiredAttribute()
     {
         return $this->tarikh_waranti_tamat?->isPast();
     }
 
     /**
-     * HELPER METHODS untuk display formatted values
+     * ========================================
+     * LEGACY HELPER METHODS (BACKWARD COMPATIBLE)
+     * Untuk support old data yang masih guna single columns
+     * ========================================
      */
     
     /**
-     * Get saiz with unit formatted - SIMPLE VERSION
+     * Get saiz with unit formatted - SIMPLE VERSION (LEGACY)
      */
     public function getSaizFormatted()
     {
@@ -120,7 +245,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get kadaran with unit formatted - SIMPLE VERSION
+     * Get kadaran with unit formatted - SIMPLE VERSION (LEGACY)
      */
     public function getKadaranFormatted()
     {
@@ -135,7 +260,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get kapasiti with unit formatted - SIMPLE VERSION
+     * Get kapasiti with unit formatted - SIMPLE VERSION (LEGACY)
      */
     public function getKapasitiFormatted()
     {
@@ -150,7 +275,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get saiz value - untuk edit form
+     * Get saiz value - untuk edit form (LEGACY)
      */
     public function getSaizValue()
     {
@@ -158,7 +283,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get saiz unit - untuk edit form
+     * Get saiz unit - untuk edit form (LEGACY)
      */
     public function getSaizUnitValue()
     {
@@ -166,7 +291,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get kadaran value - untuk edit form
+     * Get kadaran value - untuk edit form (LEGACY)
      */
     public function getKadaranValue()
     {
@@ -174,7 +299,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get kadaran unit - untuk edit form
+     * Get kadaran unit - untuk edit form (LEGACY)
      */
     public function getKadaranUnitValue()
     {
@@ -182,7 +307,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get kapasiti value - untuk edit form
+     * Get kapasiti value - untuk edit form (LEGACY)
      */
     public function getKapasitiValue()
     {
@@ -190,7 +315,7 @@ class SubComponent extends Model
     }
 
     /**
-     * Get kapasiti unit - untuk edit form
+     * Get kapasiti unit - untuk edit form (LEGACY)
      */
     public function getKapasitiUnitValue()
     {

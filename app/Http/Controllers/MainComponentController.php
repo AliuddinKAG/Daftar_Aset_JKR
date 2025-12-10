@@ -7,159 +7,137 @@ use App\Models\Component;
 use App\Models\Sistem;
 use App\Models\Subsistem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MainComponentController extends Controller
 {
-    /**
-     * Helper: Process array field to JSON array (structured)
-     */
-    private function processArrayFieldToJson($values, $units): ?string
-    {
-        if (empty($values) && empty($units)) {
-            return null;
-        }
-        
-        $result = [];
-        $valuesArray = is_array($values) ? $values : [$values];
-        $unitsArray = is_array($units) ? $units : [$units];
-        
-        foreach ($valuesArray as $index => $value) {
-            if ($value !== null && $value !== '') {
-                $result[] = [
-                    'nilai' => $value,
-                    'unit' => $unitsArray[$index] ?? null
-                ];
-            }
-        }
-        
-        return !empty($result) ? json_encode($result) : null;
-    }
-
-    /**
-     * Helper: Decode JSON field for editing
-     */
-    private function decodeJsonField($jsonString)
-    {
-        if (empty($jsonString)) {
-            return ['nilai' => '', 'unit' => ''];
-        }
-        
-        $data = is_string($jsonString) ? json_decode($jsonString, true) : $jsonString;
-        
-        if (is_array($data) && !empty($data)) {
-            return [
-                'nilai' => $data[0]['nilai'] ?? '',
-                'unit' => $data[0]['unit'] ?? ''
-            ];
-        }
-        
-        return ['nilai' => '', 'unit' => ''];
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate($this->validationRules());
 
-        // Handle checkboxes
-        $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
-        $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
-        $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
-        $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
-        $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
+        DB::beginTransaction();
+        try {
+            // Handle checkboxes
+            $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
+            $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
+            $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
+            $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
+            $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-        // Handle Saiz - simpan sebagai string sahaja
-        $validated['saiz'] = $request->input('saiz'); // contoh: "1200*400*200"
-        $validated['saiz_unit'] = $request->input('saiz_unit'); // contoh: "MM"
-    
-        // Handle Kadaran - simpan sebagai string sahaja
-        $validated['kadaran'] = $request->input('kadaran'); // contoh: "240"
-        $validated['kadaran_unit'] = $request->input('kadaran_unit'); // contoh: "V"
-    
-        // Handle Kapasiti - simpan sebagai string sahaja
-        $validated['kapasiti'] = $request->input('kapasiti'); // contoh: "5000"
-        $validated['kapasiti_unit'] = $request->input('kapasiti_unit'); // contoh: "BTU"
+            // BUANG old measurement fields dari validated (akan guna table measurements)
+            unset($validated['saiz'], $validated['saiz_unit']);
+            unset($validated['kadaran'], $validated['kadaran_unit']);
+            unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-        // Atribut tambahan
-        $validated['jenis'] = $request->input('jenis');
-        $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
-        $validated['bahan'] = $request->input('bahan');
-        $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
-        $validated['catatan_atribut'] = $request->input('catatan_atribut');
-        $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
-        $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
-        $validated['nota'] = $request->input('nota');
+            // Atribut tambahan
+            $validated['jenis'] = $request->input('jenis');
+            $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
+            $validated['bahan'] = $request->input('bahan');
+            $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
+            $validated['catatan_atribut'] = $request->input('catatan_atribut');
+            $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
+            $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
+            $validated['nota'] = $request->input('nota');
 
-        // Save Sistem & Subsistem
-        if (!empty($validated['sistem'])) {
-            $this->saveSistem($validated['sistem']);
+            // Save Sistem & Subsistem
+            if (!empty($validated['sistem'])) {
+                $this->saveSistem($validated['sistem']);
+            }
+            
+            if (!empty($validated['subsistem'])) {
+                $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
+            }
+
+            $validated['status'] = $request->input('status', 'aktif');
+            
+            // Create main component
+            $mainComponent = MainComponent::create($validated);
+
+            // Save measurements ke table baru
+            $this->saveMeasurements($mainComponent, $request);
+
+            // Save related data
+            $this->saveRelatedComponents($mainComponent, $request);
+            $this->saveRelatedDocuments($mainComponent, $request);
+
+            DB::commit();
+
+            return redirect()->route('components.index')
+                ->with('success', 'Komponen Utama berjaya ditambah');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error creating main component: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->with('error', 'Gagal menyimpan: ' . $e->getMessage())
+                ->withInput();
         }
-        
-        if (!empty($validated['subsistem'])) {
-            $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
-        }
-
-        $validated['status'] = $request->input('status', 'aktif');
-        
-        $mainComponent = MainComponent::create($validated);
-
-        $this->saveRelatedComponents($mainComponent, $request);
-        $this->saveRelatedDocuments($mainComponent, $request);
-
-        return redirect()->route('components.index')
-            ->with('success', 'Komponen Utama berjaya ditambah');
     }
 
     public function update(Request $request, MainComponent $mainComponent)
     {
         $validated = $request->validate($this->validationRules());
 
-        // Handle checkboxes
-        $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
-        $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
-        $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
-        $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
-        $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
+        DB::beginTransaction();
+        try {
+            // Handle checkboxes
+            $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
+            $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
+            $validated['elv_ict'] = $request->has('elv_ict') ? 1 : 0;
+            $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
+            $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-        // Handle Saiz - simpan sebagai string sahaja
-        $validated['saiz'] = $request->input('saiz');
-        $validated['saiz_unit'] = $request->input('saiz_unit');
-    
-        // Handle Kadaran - simpan sebagai string sahaja
-        $validated['kadaran'] = $request->input('kadaran');
-        $validated['kadaran_unit'] = $request->input('kadaran_unit');
-    
-        // Handle Kapasiti - simpan sebagai string sahaja
-        $validated['kapasiti'] = $request->input('kapasiti');
-        $validated['kapasiti_unit'] = $request->input('kapasiti_unit');
+            // BUANG old measurement fields
+            unset($validated['saiz'], $validated['saiz_unit']);
+            unset($validated['kadaran'], $validated['kadaran_unit']);
+            unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-        // Atribut tambahan
-        $validated['jenis'] = $request->input('jenis');
-        $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
-        $validated['bahan'] = $request->input('bahan');
-        $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
-        $validated['catatan_atribut'] = $request->input('catatan_atribut');
-        $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
-        $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
-        $validated['nota'] = $request->input('nota');
+            // Atribut tambahan
+            $validated['jenis'] = $request->input('jenis');
+            $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
+            $validated['bahan'] = $request->input('bahan');
+            $validated['kaedah_pemasangan'] = $request->input('kaedah_pemasangan');
+            $validated['catatan_atribut'] = $request->input('catatan_atribut');
+            $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
+            $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
+            $validated['nota'] = $request->input('nota');
 
-        if (!empty($validated['sistem'])) {
-            $this->saveSistem($validated['sistem']);
+            if (!empty($validated['sistem'])) {
+                $this->saveSistem($validated['sistem']);
+            }
+            
+            if (!empty($validated['subsistem'])) {
+                $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
+            }
+
+            // Update main component
+            $mainComponent->update($validated);
+
+            // Delete & recreate measurements
+            $mainComponent->measurements()->delete();
+            $this->saveMeasurements($mainComponent, $request);
+
+            // Update related data
+            $mainComponent->relatedComponents()->delete();
+            $this->saveRelatedComponents($mainComponent, $request);
+
+            $mainComponent->relatedDocuments()->delete();
+            $this->saveRelatedDocuments($mainComponent, $request);
+
+            DB::commit();
+
+            return redirect()->route('components.index')
+                ->with('success', 'Komponen Utama berjaya dikemaskini');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error updating main component: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->with('error', 'Gagal mengemaskini: ' . $e->getMessage())
+                ->withInput();
         }
-        
-        if (!empty($validated['subsistem'])) {
-            $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
-        }
-
-        $mainComponent->update($validated);
-
-        $mainComponent->relatedComponents()->delete();
-        $this->saveRelatedComponents($mainComponent, $request);
-
-        $mainComponent->relatedDocuments()->delete();
-        $this->saveRelatedDocuments($mainComponent, $request);
-
-        return redirect()->route('components.index')
-            ->with('success', 'Komponen Utama berjaya dikemaskini');
     }
 
     public function edit(MainComponent $mainComponent)
@@ -168,11 +146,79 @@ class MainComponentController extends Controller
         $sistems = Sistem::orderBy('kod')->get();
         $subsistems = Subsistem::orderBy('kod')->get();
 
-    return view('components.edit-main-component', compact(
-        'mainComponent', 'components', 'sistems', 'subsistems'
-    ));
+        // Load measurements untuk edit form
+        $mainComponent->load('measurements');
+
+        return view('components.edit-main-component', compact(
+            'mainComponent', 'components', 'sistems', 'subsistems'
+        ));
     }
 
+    /**
+     * ========================================
+     * NEW METHOD: Save Measurements
+     * ========================================
+     */
+    private function saveMeasurements(MainComponent $mainComponent, Request $request): void
+    {
+        // Process Saiz
+        $saizValues = $request->input('saiz', []);
+        $saizUnits = $request->input('saiz_unit', []);
+        
+        if (is_array($saizValues)) {
+            foreach ($saizValues as $index => $value) {
+                if (!empty(trim($value ?? ''))) {
+                    $mainComponent->measurements()->create([
+                        'type' => 'saiz',
+                        'value' => $value,
+                        'unit' => $saizUnits[$index] ?? null,
+                        'order' => $index + 1
+                    ]);
+                }
+            }
+        }
+
+        // Process Kadaran
+        $kadaranValues = $request->input('kadaran', []);
+        $kadaranUnits = $request->input('kadaran_unit', []);
+        
+        if (is_array($kadaranValues)) {
+            foreach ($kadaranValues as $index => $value) {
+                if (!empty(trim($value ?? ''))) {
+                    $mainComponent->measurements()->create([
+                        'type' => 'kadaran',
+                        'value' => $value,
+                        'unit' => $kadaranUnits[$index] ?? null,
+                        'order' => $index + 1
+                    ]);
+                }
+            }
+        }
+
+        // Process Kapasiti
+        $kapasitiValues = $request->input('kapasiti', []);
+        $kapasitiUnits = $request->input('kapasiti_unit', []);
+        
+        if (is_array($kapasitiValues)) {
+            foreach ($kapasitiValues as $index => $value) {
+                if (!empty(trim($value ?? ''))) {
+                    $mainComponent->measurements()->create([
+                        'type' => 'kapasiti',
+                        'value' => $value,
+                        'unit' => $kapasitiUnits[$index] ?? null,
+                        'order' => $index + 1
+                    ]);
+                }
+            }
+        }
+    }
+
+    /**
+     * ========================================
+     * EXISTING METHODS (unchanged)
+     * ========================================
+     */
+    
     private function validationRules(): array
     {
         return [
@@ -215,12 +261,23 @@ class MainComponentController extends Controller
             'bekalan_elektrik' => 'nullable|string|max:255',
             'bahan' => 'nullable|string|max:255',
             'kaedah_pemasangan' => 'nullable|string|max:255',
-            'saiz' => 'nullable',
-            'saiz_unit' => 'nullable',
-            'kadaran' => 'nullable',
-            'kadaran_unit' => 'nullable',
-            'kapasiti' => 'nullable',
-            'kapasiti_unit' => 'nullable',
+            
+            // Array validation untuk measurements
+            'saiz' => 'nullable|array',
+            'saiz.*' => 'nullable|string|max:255',
+            'saiz_unit' => 'nullable|array',
+            'saiz_unit.*' => 'nullable|string|max:50',
+            
+            'kadaran' => 'nullable|array',
+            'kadaran.*' => 'nullable|string|max:255',
+            'kadaran_unit' => 'nullable|array',
+            'kadaran_unit.*' => 'nullable|string|max:50',
+            
+            'kapasiti' => 'nullable|array',
+            'kapasiti.*' => 'nullable|string|max:255',
+            'kapasiti_unit' => 'nullable|array',
+            'kapasiti_unit.*' => 'nullable|string|max:50',
+            
             'catatan_atribut' => 'nullable|string',
             'catatan_komponen_berhubung' => 'nullable|string',
             'catatan_dokumen' => 'nullable|string',
@@ -340,7 +397,8 @@ class MainComponentController extends Controller
             'component', 
             'subComponents', 
             'relatedComponents', 
-            'relatedDocuments'
+            'relatedDocuments',
+            'measurements' // Load measurements
         ]);
         
         return view('components.view-main-component', compact('mainComponent'));
