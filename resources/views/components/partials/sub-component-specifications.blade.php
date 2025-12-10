@@ -3,83 +3,48 @@
     $jenis = old('jenis', $subComponent->jenis ?? '');
     $bahan = old('bahan', $subComponent->bahan ?? '');
     
-    // Simple string values - NO JSON, NO ARRAY
-    // Kalau database ada JSON/array lama, bersihkan
-    $saiz = old('saiz', $subComponent->saiz ?? '');
-    if (is_array($saiz)) {
-        $saiz = $saiz[0] ?? '';
-    } elseif (is_string($saiz) && (str_starts_with($saiz, '[') || str_starts_with($saiz, '{"'))) {
-        $decoded = json_decode($saiz, true);
-        $saiz = is_array($decoded) ? ($decoded[0] ?? '') : $saiz;
-    }
-    $saiz = trim($saiz, '[]"');
+    // Spesifikasi arrays - handle both old single values and new array format
+    $saizList = old('saiz', isset($subComponent->saiz) ? (is_array($subComponent->saiz) ? $subComponent->saiz : [$subComponent->saiz]) : ['']);
+    $saizUnitList = old('saiz_unit', isset($subComponent->saiz_unit) ? (is_array($subComponent->saiz_unit) ? $subComponent->saiz_unit : [$subComponent->saiz_unit]) : ['']);
     
-    $saizUnit = old('saiz_unit', $subComponent->saiz_unit ?? '');
-    if (is_array($saizUnit)) {
-        $saizUnit = $saizUnit[0] ?? '';
-    } elseif (is_string($saizUnit) && (str_starts_with($saizUnit, '[') || str_starts_with($saizUnit, '{"'))) {
-        $decoded = json_decode($saizUnit, true);
-        $saizUnit = is_array($decoded) ? ($decoded[0] ?? '') : $saizUnit;
-    }
-    $saizUnit = trim($saizUnit, '[]"');
+    $kapasitiList = old('kapasiti', isset($subComponent->kapasiti) ? (is_array($subComponent->kapasiti) ? $subComponent->kapasiti : [$subComponent->kapasiti]) : ['']);
+    $kapasitiUnitList = old('kapasiti_unit', isset($subComponent->kapasiti_unit) ? (is_array($subComponent->kapasiti_unit) ? $subComponent->kapasiti_unit : [$subComponent->kapasiti_unit]) : ['']);
     
-    $kapasiti = old('kapasiti', $subComponent->kapasiti ?? '');
-    if (is_array($kapasiti)) {
-        $kapasiti = $kapasiti[0] ?? '';
-    } elseif (is_string($kapasiti) && (str_starts_with($kapasiti, '[') || str_starts_with($kapasiti, '{"'))) {
-        $decoded = json_decode($kapasiti, true);
-        $kapasiti = is_array($decoded) ? ($decoded[0] ?? '') : $kapasiti;
-    }
-    $kapasiti = trim($kapasiti, '[]"');
+    $kadaranList = old('kadaran', isset($subComponent->kadaran) ? (is_array($subComponent->kadaran) ? $subComponent->kadaran : [$subComponent->kadaran]) : ['']);
+    $kadaranUnitList = old('kadaran_unit', isset($subComponent->kadaran_unit) ? (is_array($subComponent->kadaran_unit) ? $subComponent->kadaran_unit : [$subComponent->kadaran_unit]) : ['']);
     
-    $kapasitiUnit = old('kapasiti_unit', $subComponent->kapasiti_unit ?? '');
-    if (is_array($kapasitiUnit)) {
-        $kapasitiUnit = $kapasitiUnit[0] ?? '';
-    } elseif (is_string($kapasitiUnit) && (str_starts_with($kapasitiUnit, '[') || str_starts_with($kapasitiUnit, '{"'))) {
-        $decoded = json_decode($kapasitiUnit, true);
-        $kapasitiUnit = is_array($decoded) ? ($kapasitiUnit[0] ?? '') : $kapasitiUnit;
-    }
-    $kapasitiUnit = trim($kapasitiUnit, '[]"');
-    
-    $kadaran = old('kadaran', $subComponent->kadaran ?? '');
-    if (is_array($kadaran)) {
-        $kadaran = $kadaran[0] ?? '';
-    } elseif (is_string($kadaran) && (str_starts_with($kadaran, '[') || str_starts_with($kadaran, '{"'))) {
-        $decoded = json_decode($kadaran, true);
-        $kadaran = is_array($decoded) ? ($decoded[0] ?? '') : $kadaran;
-    }
-    $kadaran = trim($kadaran, '[]"');
-    
-    $kadaranUnit = old('kadaran_unit', $subComponent->kadaran_unit ?? '');
-    if (is_array($kadaranUnit)) {
-        $kadaranUnit = $kadaranUnit[0] ?? '';
-    } elseif (is_string($kadaranUnit) && (str_starts_with($kadaranUnit, '[') || str_starts_with($kadaranUnit, '{"'))) {
-        $decoded = json_decode($kadaranUnit, true);
-        $kadaranUnit = is_array($decoded) ? ($decoded[0] ?? '') : $kadaranUnit;
-    }
-    $kadaranUnit = trim($kadaranUnit, '[]"');
-    
-    // Purchase info - TARIKH DIPERBAIKI
-    // Format tarikh untuk input type="date" (Y-m-d)
+    // Purchase info - Format tarikh untuk input type="date" (Y-m-d)
     $tarikhPembelian = old('tarikh_pembelian');
     if (!$tarikhPembelian && isset($subComponent->tarikh_pembelian)) {
-        $tarikhPembelian = $subComponent->tarikh_pembelian instanceof \Carbon\Carbon 
-            ? $subComponent->tarikh_pembelian->format('Y-m-d')
-            : (\Carbon\Carbon::parse($subComponent->tarikh_pembelian)->format('Y-m-d') ?? '');
+        try {
+            $tarikhPembelian = $subComponent->tarikh_pembelian instanceof \Carbon\Carbon 
+                ? $subComponent->tarikh_pembelian->format('Y-m-d')
+                : \Carbon\Carbon::parse($subComponent->tarikh_pembelian)->format('Y-m-d');
+        } catch (\Exception $e) {
+            $tarikhPembelian = '';
+        }
     }
     
     $tarikhDipasang = old('tarikh_dipasang');
     if (!$tarikhDipasang && isset($subComponent->tarikh_dipasang)) {
-        $tarikhDipasang = $subComponent->tarikh_dipasang instanceof \Carbon\Carbon 
-            ? $subComponent->tarikh_dipasang->format('Y-m-d')
-            : (\Carbon\Carbon::parse($subComponent->tarikh_dipasang)->format('Y-m-d') ?? '');
+        try {
+            $tarikhDipasang = $subComponent->tarikh_dipasang instanceof \Carbon\Carbon 
+                ? $subComponent->tarikh_dipasang->format('Y-m-d')
+                : \Carbon\Carbon::parse($subComponent->tarikh_dipasang)->format('Y-m-d');
+        } catch (\Exception $e) {
+            $tarikhDipasang = '';
+        }
     }
     
     $tarikhWaranti = old('tarikh_waranti_tamat');
     if (!$tarikhWaranti && isset($subComponent->tarikh_waranti_tamat)) {
-        $tarikhWaranti = $subComponent->tarikh_waranti_tamat instanceof \Carbon\Carbon 
-            ? $subComponent->tarikh_waranti_tamat->format('Y-m-d')
-            : (\Carbon\Carbon::parse($subComponent->tarikh_waranti_tamat)->format('Y-m-d') ?? '');
+        try {
+            $tarikhWaranti = $subComponent->tarikh_waranti_tamat instanceof \Carbon\Carbon 
+                ? $subComponent->tarikh_waranti_tamat->format('Y-m-d')
+                : \Carbon\Carbon::parse($subComponent->tarikh_waranti_tamat)->format('Y-m-d');
+        } catch (\Exception $e) {
+            $tarikhWaranti = '';
+        }
     }
     
     $kosPerolehan = old('kos_perolehan', $subComponent->kos_perolehan ?? '');
@@ -96,10 +61,19 @@
     $alamatKontraktor = old('alamat_kontraktor', $subComponent->alamat_kontraktor ?? '');
     $noTelKontraktor = old('no_telefon_kontraktor', $subComponent->no_telefon_kontraktor ?? '');
     
-    // Documents
-    $dokumenList = isset($subComponent) && $subComponent->dokumen_berkaitan 
-        ? $subComponent->dokumen_berkaitan 
-        : [];
+    // Documents - organized by category
+    $dokumenByCategory = [];
+    if (isset($subComponent) && $subComponent->dokumen_berkaitan) {
+        if (is_array($subComponent->dokumen_berkaitan)) {
+            foreach ($subComponent->dokumen_berkaitan as $doc) {
+                $category = $doc['kategori'] ?? 'umum';
+                if (!isset($dokumenByCategory[$category])) {
+                    $dokumenByCategory[$category] = [];
+                }
+                $dokumenByCategory[$category][] = $doc;
+            }
+        }
+    }
     
     // Notes
     $catatanAtribut = old('catatan_atribut', $subComponent->catatan_atribut ?? '');
@@ -107,6 +81,7 @@
     $catatanDokumen = old('catatan_dokumen', $subComponent->catatan_dokumen ?? '');
     $nota = old('nota', $subComponent->nota ?? '');
 @endphp
+
 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
 <div class="card mb-4 mt-4">
     <div class="card-header bg-dark text-white">
@@ -124,53 +99,100 @@
             </div>
         </div>
 
-        <!-- Saiz Fizikal -->
-        <div class="card mb-3">
-            <div class="card-header bg-light">
-                <strong>Saiz Fizikal</strong>
-                <small class="text-muted ms-2">(Contoh: 1200x400x500 untuk Panjang x Lebar x Tinggi)</small>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <input type="text" class="form-control" name="saiz" value="{{ $saiz }}" placeholder="Contoh: 1200x400x500 atau 1200">
+        <!-- SPESIFIKASI CONTAINER -->
+        <div id="spesifikasiContainer">
+            <!-- Saiz Fizikal -->
+            <div class="card mb-3 spesifikasi-card" data-type="saiz">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Saiz Fizikal</strong>
+                        <small class="text-muted ms-2">(Contoh: 1200x400x500 untuk Panjang x Lebar x Tinggi)</small>
                     </div>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" name="saiz_unit" value="{{ $saizUnit }}" placeholder="Unit (mm/cm/m)">
+                    <button type="button" class="btn btn-sm btn-success" onclick="addSpesifikasi('saiz')">
+                        <i class="bi bi-plus"></i> Tambah Saiz
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="spesifikasi-rows">
+                        @foreach($saizList as $index => $saiz)
+                        <div class="row mb-2 spesifikasi-row">
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" name="saiz[]" value="{{ $saiz }}" placeholder="Contoh: 1200x400x500 atau 1200">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="saiz_unit[]" value="{{ $saizUnitList[$index] ?? '' }}" placeholder="Unit (mm/cm/m)">
+                            </div>
+                            <div class="col-md-1">
+                                @if($index > 0)
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Kadaran -->
-        <div class="card mb-3">
-            <div class="card-header bg-light">
-                <strong>Kadaran</strong>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <input type="text" class="form-control" name="kadaran" value="{{ $kadaran }}" placeholder="Nilai">
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" name="kadaran_unit" value="{{ $kadaranUnit }}" placeholder="Unit (kW/HP/A)">
+            <!-- Kadaran -->
+            <div class="card mb-3 spesifikasi-card" data-type="kadaran">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <strong>Kadaran</strong>
+                    <button type="button" class="btn btn-sm btn-success" onclick="addSpesifikasi('kadaran')">
+                        <i class="bi bi-plus"></i> Tambah Kadaran
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="spesifikasi-rows">
+                        @foreach($kadaranList as $index => $kadaran)
+                        <div class="row mb-2 spesifikasi-row">
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" name="kadaran[]" value="{{ $kadaran }}" placeholder="Nilai">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="kadaran_unit[]" value="{{ $kadaranUnitList[$index] ?? '' }}" placeholder="Unit (kW/HP/A)">
+                            </div>
+                            <div class="col-md-1">
+                                @if($index > 0)
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Kapasiti -->
-        <div class="card mb-3">
-            <div class="card-header bg-light">
-                <strong>Kapasiti</strong>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <input type="text" class="form-control" name="kapasiti" value="{{ $kapasiti }}" placeholder="Nilai">
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" name="kapasiti_unit" value="{{ $kapasitiUnit }}" placeholder="Unit (L/kg/ton)">
+            <!-- Kapasiti -->
+            <div class="card mb-3 spesifikasi-card" data-type="kapasiti">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <strong>Kapasiti</strong>
+                    <button type="button" class="btn btn-sm btn-success" onclick="addSpesifikasi('kapasiti')">
+                        <i class="bi bi-plus"></i> Tambah Kapasiti
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="spesifikasi-rows">
+                        @foreach($kapasitiList as $index => $kapasiti)
+                        <div class="row mb-2 spesifikasi-row">
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" name="kapasiti[]" value="{{ $kapasiti }}" placeholder="Nilai">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="kapasiti_unit[]" value="{{ $kapasitiUnitList[$index] ?? '' }}" placeholder="Unit (L/kg/ton)">
+                            </div>
+                            <div class="col-md-1">
+                                @if($index > 0)
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -296,51 +318,98 @@
 
 <!-- DOKUMEN BERKAITAN -->
 <div class="card mb-4">
-    <div class="card-header bg-dark text-white">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <strong>Dokumen Berkaitan (Jika Ada)</strong>
+        
     </div>
     <div class="card-body">
-        <table class="table table-bordered table-sm">
-            <thead class="table-light">
-                <tr>
-                    <th width="5%">Bil</th>
-                    <th width="35%">Nama Dokumen</th>
-                    <th width="30%">No Rujukan</th>
-                    <th width="25%">Catatan</th>
-                    <th width="5%"></th>
-                </tr>
-            </thead>
-            <tbody id="documentsContainer">
-                @if(count($dokumenList) > 0)
-                    @foreach($dokumenList as $index => $doc)
-                    <tr class="document-row">
-                        <td><input type="number" class="form-control form-control-sm" name="doc_bil[]" value="{{ $doc['bil'] ?? ($index + 1) }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="doc_nama[]" value="{{ $doc['nama'] ?? '' }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[]" value="{{ $doc['rujukan'] ?? '' }}"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[]" value="{{ $doc['catatan'] ?? '' }}"></td>
-                        <td>
-                            @if($index > 0)
-                            <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
+        <div id="documentCategoriesContainer">
+            @if(count($dokumenByCategory) > 0)
+                @foreach($dokumenByCategory as $category => $documents)
+                <div class="document-category-card card mb-3" data-category="{{ $category }}">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <strong>Kategori:</strong>
+                            <input type="text" class="form-control form-control-sm d-inline-block" style="width: 200px;" name="doc_category[]" value="{{ $category }}" placeholder="Nama Kategori">
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-success me-2" onclick="addDocumentToCategory(this)">
+                                <i class="bi bi-plus"></i> Tambah Dokumen
+                            </button>
+                            @if($loop->index > 0)
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeCategory(this)">
                                 <i class="bi bi-x"></i>
                             </button>
                             @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                @else
-                <tr class="document-row">
-                    <td><input type="number" class="form-control form-control-sm" name="doc_bil[]" value="1"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="doc_nama[]" placeholder="Nama Dokumen"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[]" placeholder="No Rujukan"></td>
-                    <td><input type="text" class="form-control form-control-sm" name="doc_catatan[]" placeholder="Catatan"></td>
-                    <td></td>
-                </tr>
-                @endif
-            </tbody>
-        </table>
-        <button type="button" class="btn btn-sm btn-success mt-2" onclick="addDocument()">
-            <i class="bi bi-plus"></i> Tambah Baris
-        </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">Bil</th>
+                                    <th width="35%">Nama Dokumen</th>
+                                    <th width="30%">No Rujukan</th>
+                                    <th width="25%">Catatan</th>
+                                    <th width="5%"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="documents-tbody">
+                                @foreach($documents as $index => $doc)
+                                <tr class="document-row">
+                                    <td><input type="number" class="form-control form-control-sm" name="doc_bil[{{ $category }}][]" value="{{ $doc['bil'] ?? ($index + 1) }}"></td>
+                                    <td><input type="text" class="form-control form-control-sm" name="doc_nama[{{ $category }}][]" value="{{ $doc['nama'] ?? '' }}"></td>
+                                    <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[{{ $category }}][]" value="{{ $doc['rujukan'] ?? '' }}"></td>
+                                    <td><input type="text" class="form-control form-control-sm" name="doc_catatan[{{ $category }}][]" value="{{ $doc['catatan'] ?? '' }}"></td>
+                                    <td>
+                                        @if($index > 0)
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @endforeach
+            @else
+                <div class="document-category-card card mb-3" data-category="umum">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        
+                        <div>
+                            <button type="button" class="btn btn-sm btn-success me-2" onclick="addDocumentToCategory(this)">
+                                <i class="bi bi-plus"></i> Tambah Dokumen
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">Bil</th>
+                                    <th width="35%">Nama Dokumen</th>
+                                    <th width="30%">No Rujukan</th>
+                                    <th width="25%">Catatan</th>
+                                    <th width="5%"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="documents-tbody">
+                                <tr class="document-row">
+                                    <td><input type="number" class="form-control form-control-sm" name="doc_bil[umum][]" value="1"></td>
+                                    <td><input type="text" class="form-control form-control-sm" name="doc_nama[umum][]" placeholder="Nama Dokumen"></td>
+                                    <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[umum][]" placeholder="No Rujukan"></td>
+                                    <td><input type="text" class="form-control form-control-sm" name="doc_catatan[umum][]" placeholder="Catatan"></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+        </div>
 
         <div class="mt-3">
             <label for="catatan_dokumen" class="form-label">Catatan:</label>
@@ -350,7 +419,8 @@
         <div class="alert alert-info mt-3 mb-0">
             <small><strong>Nota:</strong></small><br>
             <small>* Sila gunakan lampiran jika Maklumat Sub Komponen diperolehi bagi kuantiti yang melebihi 1.</small><br>
-            <small>** Maklumat Spesifikasi diisi merujuk kepada Kategori Aset Khusus yang telah dan berkaitan spesifikasi sahaja.</small>
+            <small>** Maklumat Spesifikasi diisi merujuk kepada Kategori Aset Khusus yang telah dan berkaitan spesifikasi sahaja.</small><br>
+            <small>*** Dokumen boleh dikategorikan mengikut jenis (cth: Waranti, Manual, Sijil, Kontrak, dll).</small>
         </div>
     </div>
 </div>
@@ -381,25 +451,135 @@
 </div>
 
 <script>
-let docCounter = {{ count($dokumenList) > 0 ? count($dokumenList) : 1 }};
+let categoryCounter = 0;
 
-// Dokumen Berkaitan
-function addDocument() {
-    docCounter++;
-    const container = document.getElementById('documentsContainer');
+// Fungsi untuk tambah spesifikasi (saiz/kadaran/kapasiti)
+function addSpesifikasi(type) {
+    const card = document.querySelector(`.spesifikasi-card[data-type="${type}"]`);
+    const container = card.querySelector('.spesifikasi-rows');
+    
+    const newRow = document.createElement('div');
+    newRow.className = 'row mb-2 spesifikasi-row';
+    
+    let placeholderValue = '';
+    let placeholderUnit = '';
+    
+    if (type === 'saiz') {
+        placeholderValue = 'Contoh: 1200x400x500 atau 1200';
+        placeholderUnit = 'Unit (mm/cm/m)';
+    } else if (type === 'kadaran') {
+        placeholderValue = 'Nilai';
+        placeholderUnit = 'Unit (kW/HP/A)';
+    } else if (type === 'kapasiti') {
+        placeholderValue = 'Nilai';
+        placeholderUnit = 'Unit (L/kg/ton)';
+    }
+    
+    newRow.innerHTML = `
+        <div class="col-md-7">
+            <input type="text" class="form-control" name="${type}[]" placeholder="${placeholderValue}">
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="${type}_unit[]" placeholder="${placeholderUnit}">
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(newRow);
+}
+
+// Fungsi untuk buang baris spesifikasi
+function removeSpesifikasi(button) {
+    button.closest('.spesifikasi-row').remove();
+}
+
+// Fungsi untuk tambah kategori dokumen baru
+function addDocumentCategory() {
+    categoryCounter++;
+    const categoryName = 'kategori_' + categoryCounter;
+    const container = document.getElementById('documentCategoriesContainer');
+    
+    const categoryCard = document.createElement('div');
+    categoryCard.className = 'document-category-card card mb-3';
+    categoryCard.setAttribute('data-category', categoryName);
+    
+    categoryCard.innerHTML = `
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <strong>Kategori:</strong>
+                <input type="text" class="form-control form-control-sm d-inline-block" style="width: 200px;" name="doc_category[]" value="${categoryName}" placeholder="Nama Kategori">
+            </div>
+            <div>
+                <button type="button" class="btn btn-sm btn-success me-2" onclick="addDocumentToCategory(this)">
+                    <i class="bi bi-plus"></i> Tambah Dokumen
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeCategory(this)">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th width="5%">Bil</th>
+                        <th width="35%">Nama Dokumen</th>
+                        <th width="30%">No Rujukan</th>
+                        <th width="25%">Catatan</th>
+                        <th width="5%"></th>
+                    </tr>
+                </thead>
+                <tbody class="documents-tbody">
+                    <tr class="document-row">
+                        <td><input type="number" class="form-control form-control-sm" name="doc_bil[${categoryName}][]" value="1"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_nama[${categoryName}][]" placeholder="Nama Dokumen"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[${categoryName}][]" placeholder="No Rujukan"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[${categoryName}][]" placeholder="Catatan"></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.appendChild(categoryCard);
+}
+
+// Fungsi untuk tambah dokumen dalam kategori tertentu
+function addDocumentToCategory(button) {
+    const categoryCard = button.closest('.document-category-card');
+    const tbody = categoryCard.querySelector('.documents-tbody');
+    const categoryInput = categoryCard.querySelector('input[name="doc_category[]"]');
+    const categoryName = categoryInput.value || 'umum';
+    
+    const rowCount = tbody.querySelectorAll('.document-row').length;
+    const newBil = rowCount + 1;
+    
     const newRow = document.createElement('tr');
     newRow.className = 'document-row';
     newRow.innerHTML = `
-        <td><input type="number" class="form-control form-control-sm" name="doc_bil[]" value="${docCounter}"></td>
-        <td><input type="text" class="form-control form-control-sm" name="doc_nama[]" placeholder="Nama Dokumen"></td>
-        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[]" placeholder="No Rujukan"></td>
-        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[]" placeholder="Catatan"></td>
+        <td><input type="number" class="form-control form-control-sm" name="doc_bil[${categoryName}][]" value="${newBil}"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_nama[${categoryName}][]" placeholder="Nama Dokumen"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[${categoryName}][]" placeholder="No Rujukan"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[${categoryName}][]" placeholder="Catatan"></td>
         <td>
             <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
                 <i class="bi bi-x"></i>
             </button>
         </td>
     `;
-    container.appendChild(newRow);
+    
+    tbody.appendChild(newRow);
+}
+
+// Fungsi untuk buang kategori dokumen
+function removeCategory(button) {
+    if (confirm('Adakah anda pasti mahu membuang kategori dokumen ini?')) {
+        button.closest('.document-category-card').remove();
+    }
 }
 </script>
