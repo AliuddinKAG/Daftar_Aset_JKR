@@ -112,6 +112,10 @@
                 <label for="bahan" class="form-label">Bahan<span class="text-danger">*</span></label>
                 <input id="bahan" type="text" class="form-control" name="bahan" value="{{ $bahan }}">
             </div>
+            <div class="col-md-6">
+                <label for="bekalan_elektrik" class="form-label">Bekalan Elektrik(MSB/SSB/FP/DB.....)<span class="text-danger">*</span></label>
+                <input id="bekalan_elektrik" type="text" class="form-control" name="bekalan_elektrik" value="">
+            </div>
         </div>
 
         <!-- SPESIFIKASI CONTAINER -->
