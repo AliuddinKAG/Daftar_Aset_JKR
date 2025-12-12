@@ -69,6 +69,10 @@
                                         <strong>Kuantiti:</strong>
                                         <p class="mb-0">{{ $mainComponent->kuantiti ?? 1 }}</p>
                                     </div>
+                                    <div class="col-md-4">
+                                        <strong>No Perolehan (1GFMAS)</strong>
+                                    <!--    <p class="mb-0">{{ $mainComponent->no_perolehan_1gfmas ?? '-' }}</p> -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -127,6 +131,10 @@
                                     <tr>
                                         <td><strong>No. Pesanan Rasmi</strong></td>
                                         <td>{{ $mainComponent->no_pesanan_rasmi_kontrak ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Kod PTJ</strong></td>
+                                    <!--    <td>{{ $mainComponent->kod_ptj ?? '-' }}</td> -->
                                     </tr>
                                 </table>
                             </div>

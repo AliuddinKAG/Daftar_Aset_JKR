@@ -197,7 +197,8 @@
         <td colspan="4" class="value-cell" rowspan="2">{{ $mainComponent->gambar_komponen ?? '' }}<span>Sila Lampirkan gambar jika perlu dan pastikan dimuat naik ke dalam Sitem mySPATA</span></td>
     </tr>
     <tr>
-        <td colspan="2" class="label-cell">No Perolehan (1GFMAS)</td>
+        <td colspan="1" class="label-cell">No Perolehan (1GFMAS)</td>
+        <td colspan="1" class="value-cell">{{ $mainComponent->no_perolehan_1gfmas ?? '' }}</td>
     </tr>
 
 <!-- Bidang Kejuruteraan -->
@@ -255,7 +256,8 @@
         <td colspan="4" class="value-cell">{{ $mainComponent->tarikh_tamat_dlp?->format('d/m/Y') ?? '' }}</td>
     </tr>
     <tr>
-        <td colspan="2" class="label-cell">Kod PTJ</td>
+        <td colspan="1" class="label-cell">Kod PTJ</td>
+        <td colspan="1" class="value-cell">{{ $mainComponent->kod_ptj ?? '' }}</td>
         <td class="label-cell">Jangka Hayat</td>
         <td colspan="4" class="value-cell">{{ $mainComponent->jangka_hayat ? $mainComponent->jangka_hayat . ' Tahun' : '' }}</td>
     </tr>

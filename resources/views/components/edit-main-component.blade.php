@@ -114,6 +114,10 @@
                                             <label class="form-label">Kuantiti<span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="kuantiti" value="{{ old('kuantiti', $mainComponent->kuantiti ?? 1) }}" min="1">
                                         </div>
+                                        <div class="col-md-4 mt-3">
+                                            <label class="form-label">No. Perolehan (1GFMAS)<span class="text-danger">*</span></label>
+                                           <!-- <input type="text" class="form-control" name="no_perolehan_1gfmas" value="{{ old('no_perolehan_1gfmas', $mainComponent->no_perolehan_1gfmas) }}"> -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -193,6 +197,10 @@
                                         <tr>
                                             <td>No. Pesanan Rasmi Kerajaan/Kontrak</td>
                                             <td><input type="text" class="form-control form-control-sm" name="no_pesanan_rasmi_kontrak" value="{{ old('no_pesanan_rasmi_kontrak', $mainComponent->no_pesanan_rasmi_kontrak) }}"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Kod PTJ</td>
+                                         <!--   <td><input type="text" class="form-control form-control-sm" name="kod_ptj" value="{{ old('kod_ptj', $mainComponent->kod_ptj) }}"></td> -->
                                         </tr>
                                     </table>
                                 </div>
