@@ -24,7 +24,7 @@ class MainComponentController extends Controller
             $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
             $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-            // BUANG old measurement fields dari validated (akan guna table measurements)
+            // BUANG measurement fields (akan guna table measurements)
             unset($validated['saiz'], $validated['saiz_unit']);
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
@@ -88,7 +88,7 @@ class MainComponentController extends Controller
             $validated['mekanikal'] = $request->has('mekanikal') ? 1 : 0;
             $validated['bio_perubatan'] = $request->has('bio_perubatan') ? 1 : 0;
 
-            // BUANG old measurement fields
+            // BUANG measurement fields
             unset($validated['saiz'], $validated['saiz_unit']);
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
@@ -146,8 +146,15 @@ class MainComponentController extends Controller
         $sistems = Sistem::orderBy('kod')->get();
         $subsistems = Subsistem::orderBy('kod')->get();
 
-        // Load measurements untuk edit form
-        $mainComponent->load('measurements');
+        // Load measurements dengan relationships untuk edit form
+        $mainComponent->load([
+            'measurements',
+            'saizMeasurements',
+            'kadaranMeasurements',
+            'kapasitiMeasurements',
+            'relatedComponents',
+            'relatedDocuments'
+        ]);
 
         return view('components.edit-main-component', compact(
             'mainComponent', 'components', 'sistems', 'subsistems'
@@ -156,7 +163,7 @@ class MainComponentController extends Controller
 
     /**
      * ========================================
-     * NEW METHOD: Save Measurements
+     * SAVE MEASUREMENTS METHOD
      * ========================================
      */
     private function saveMeasurements(MainComponent $mainComponent, Request $request): void
@@ -215,10 +222,9 @@ class MainComponentController extends Controller
 
     /**
      * ========================================
-     * EXISTING METHODS (unchanged)
+     * VALIDATION RULES
      * ========================================
      */
-    
     private function validationRules(): array
     {
         return [
@@ -286,6 +292,12 @@ class MainComponentController extends Controller
         ];
     }
 
+    /**
+     * ========================================
+     * HELPER METHODS
+     * ========================================
+     */
+    
     private function saveSistem(string $kod): void
     {
         $exists = Sistem::where('kod', $kod)->exists();
@@ -365,6 +377,12 @@ class MainComponentController extends Controller
         }
     }
 
+    /**
+     * ========================================
+     * CRUD METHODS
+     * ========================================
+     */
+    
     public function generateKodLokasi(Request $request)
     {
         $componentId = $request->get('component_id');
@@ -398,7 +416,10 @@ class MainComponentController extends Controller
             'subComponents', 
             'relatedComponents', 
             'relatedDocuments',
-            'measurements' // Load measurements
+            'measurements',
+            'saizMeasurements',
+            'kadaranMeasurements',
+            'kapasitiMeasurements'
         ]);
         
         return view('components.view-main-component', compact('mainComponent'));

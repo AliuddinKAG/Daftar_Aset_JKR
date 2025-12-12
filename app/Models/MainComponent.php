@@ -24,14 +24,12 @@ class MainComponent extends Model
         'alamat_kontraktor', 'no_telefon_kontraktor', 'catatan_maklumat',
         'deskripsi', 'status_komponen', 'jenama', 'model', 'no_siri',
         'no_tag_label', 'no_sijil_pendaftaran', 'jenis', 'bekalan_elektrik',
-        'bahan', 'kaedah_pemasangan', 'saiz', 'saiz_unit', 'kadaran', 'kadaran_unit',
-        'kapasiti', 'kapasiti_unit', 'catatan_atribut', 'catatan_komponen_berhubung',
+        'bahan', 'kaedah_pemasangan', 'catatan_atribut', 'catatan_komponen_berhubung',
         'catatan_dokumen', 'nota', 'status'
     ];
 
     /**
      * Casts — untuk tarikh dan boolean sahaja
-     * NOTA: saiz, kadaran, kapasiti adalah STRING kerana boleh ada multiple values
      */
     protected $casts = [
         // Discipline flags
@@ -47,17 +45,18 @@ class MainComponent extends Model
         'tarikh_waranti_tamat' => 'date',
         'tarikh_tamat_dlp' => 'date',
 
-        // Numbers - hanya yang betul-betul number
+        // Numbers
         'kuantiti' => 'integer',
         'komponen_sama_jenis' => 'integer',
         'jangka_hayat' => 'integer',
-        
-        // TIDAK cast saiz, kadaran, kapasiti kerana boleh ada format seperti "1200x400x500"
     ];
 
     /**
-     * Relationships
+     * ========================================
+     * RELATIONSHIPS
+     * ========================================
      */
+    
     public function component()
     {
         return $this->belongsTo(Component::class);
@@ -81,7 +80,7 @@ class MainComponent extends Model
 
     /**
      * ========================================
-     * MEASUREMENTS RELATIONSHIPS (NEW)
+     * MEASUREMENTS RELATIONSHIPS
      * ========================================
      */
     
@@ -98,7 +97,9 @@ class MainComponent extends Model
      */
     public function saizMeasurements()
     {
-        return $this->measurements()->where('type', 'saiz');
+        return $this->hasMany(MainComponentMeasurement::class)
+            ->where('type', 'saiz')
+            ->orderBy('order');
     }
 
     /**
@@ -106,7 +107,9 @@ class MainComponent extends Model
      */
     public function kadaranMeasurements()
     {
-        return $this->measurements()->where('type', 'kadaran');
+        return $this->hasMany(MainComponentMeasurement::class)
+            ->where('type', 'kadaran')
+            ->orderBy('order');
     }
 
     /**
@@ -114,12 +117,14 @@ class MainComponent extends Model
      */
     public function kapasitiMeasurements()
     {
-        return $this->measurements()->where('type', 'kapasiti');
+        return $this->hasMany(MainComponentMeasurement::class)
+            ->where('type', 'kapasiti')
+            ->orderBy('order');
     }
 
     /**
      * ========================================
-     * MEASUREMENT HELPER METHODS (NEW)
+     * MEASUREMENT HELPER METHODS
      * ========================================
      */
 
@@ -136,7 +141,7 @@ class MainComponent extends Model
         }
 
         return $measurements->map(function ($m) {
-            return trim($m->value . ' ' . $m->unit);
+            return trim($m->value . ' ' . ($m->unit ?? ''));
         })->implode(', ');
     }
 
@@ -153,7 +158,7 @@ class MainComponent extends Model
         }
 
         return $measurements->map(function ($m) {
-            return trim($m->value . ' ' . $m->unit);
+            return trim($m->value . ' ' . ($m->unit ?? ''));
         })->implode(', ');
     }
 
@@ -170,7 +175,7 @@ class MainComponent extends Model
         }
 
         return $measurements->map(function ($m) {
-            return trim($m->value . ' ' . $m->unit);
+            return trim($m->value . ' ' . ($m->unit ?? ''));
         })->implode(', ');
     }
 
@@ -197,7 +202,7 @@ class MainComponent extends Model
 
     /**
      * ========================================
-     * EXISTING SCOPES
+     * SCOPES
      * ========================================
      */
     
@@ -218,7 +223,7 @@ class MainComponent extends Model
 
     /**
      * ========================================
-     * EXISTING ACCESSORS
+     * ACCESSORS
      * ========================================
      */
     

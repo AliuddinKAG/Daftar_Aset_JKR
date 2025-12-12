@@ -26,12 +26,6 @@ class SubComponent extends Model
         'catatan',
         'jenis',
         'bahan',
-        'saiz',
-        'saiz_unit',
-        'kadaran',
-        'kadaran_unit',
-        'kapasiti',
-        'kapasiti_unit',
         'catatan_atribut',
         'tarikh_pembelian',
         'kos_perolehan',
@@ -55,10 +49,11 @@ class SubComponent extends Model
     ];
 
     /**
-     * Casts - BUANG array cast untuk saiz, kadaran, kapasiti
+     * Casts - JSON fields dan dates sahaja
+     * BUANG saiz, kadaran, kapasiti dari casts kerana guna measurements table
      */
     protected $casts = [
-        // JSON fields - hanya dokumen_berkaitan
+        // JSON fields
         'dokumen_berkaitan' => 'array',
         
         // Dates
@@ -98,7 +93,9 @@ class SubComponent extends Model
      */
     public function saizMeasurements()
     {
-        return $this->measurements()->where('type', 'saiz');
+        return $this->hasMany(SubComponentMeasurement::class)
+            ->where('type', 'saiz')
+            ->orderBy('order');
     }
 
     /**
@@ -106,7 +103,9 @@ class SubComponent extends Model
      */
     public function kadaranMeasurements()
     {
-        return $this->measurements()->where('type', 'kadaran');
+        return $this->hasMany(SubComponentMeasurement::class)
+            ->where('type', 'kadaran')
+            ->orderBy('order');
     }
 
     /**
@@ -114,12 +113,14 @@ class SubComponent extends Model
      */
     public function kapasitiMeasurements()
     {
-        return $this->measurements()->where('type', 'kapasiti');
+        return $this->hasMany(SubComponentMeasurement::class)
+            ->where('type', 'kapasiti')
+            ->orderBy('order');
     }
 
     /**
      * ========================================
-     * MEASUREMENT HELPER METHODS (NEW)
+     * MEASUREMENT HELPER METHODS
      * ========================================
      */
 
@@ -132,11 +133,11 @@ class SubComponent extends Model
         $measurements = $this->saizMeasurements;
         
         if ($measurements->isEmpty()) {
-            return $this->getSaizFormatted(); // Fallback to old method
+            return '-';
         }
 
         return $measurements->map(function ($m) {
-            return trim($m->value . ' ' . $m->unit);
+            return trim($m->value . ' ' . ($m->unit ?? ''));
         })->implode(', ');
     }
 
@@ -149,11 +150,11 @@ class SubComponent extends Model
         $measurements = $this->kadaranMeasurements;
         
         if ($measurements->isEmpty()) {
-            return $this->getKadaranFormatted(); // Fallback to old method
+            return '-';
         }
 
         return $measurements->map(function ($m) {
-            return trim($m->value . ' ' . $m->unit);
+            return trim($m->value . ' ' . ($m->unit ?? ''));
         })->implode(', ');
     }
 
@@ -166,11 +167,11 @@ class SubComponent extends Model
         $measurements = $this->kapasitiMeasurements;
         
         if ($measurements->isEmpty()) {
-            return $this->getKapasitiFormatted(); // Fallback to old method
+            return '-';
         }
 
         return $measurements->map(function ($m) {
-            return trim($m->value . ' ' . $m->unit);
+            return trim($m->value . ' ' . ($m->unit ?? ''));
         })->implode(', ');
     }
 
@@ -197,7 +198,7 @@ class SubComponent extends Model
 
     /**
      * ========================================
-     * EXISTING SCOPES
+     * SCOPES
      * ========================================
      */
     
@@ -213,113 +214,13 @@ class SubComponent extends Model
 
     /**
      * ========================================
-     * EXISTING ACCESSORS
+     * ACCESSORS
      * ========================================
      */
     
     public function getIsWarrantyExpiredAttribute()
     {
         return $this->tarikh_waranti_tamat?->isPast();
-    }
-
-    /**
-     * ========================================
-     * LEGACY HELPER METHODS (BACKWARD COMPATIBLE)
-     * Untuk support old data yang masih guna single columns
-     * ========================================
-     */
-    
-    /**
-     * Get saiz with unit formatted - SIMPLE VERSION (LEGACY)
-     */
-    public function getSaizFormatted()
-    {
-        $saiz = $this->saiz ?? '';
-        $unit = $this->saiz_unit ?? '';
-        
-        if (empty($saiz)) {
-            return '-';
-        }
-        
-        return trim($saiz . ' ' . $unit);
-    }
-
-    /**
-     * Get kadaran with unit formatted - SIMPLE VERSION (LEGACY)
-     */
-    public function getKadaranFormatted()
-    {
-        $kadaran = $this->kadaran ?? '';
-        $unit = $this->kadaran_unit ?? '';
-        
-        if (empty($kadaran)) {
-            return '-';
-        }
-        
-        return trim($kadaran . ' ' . $unit);
-    }
-
-    /**
-     * Get kapasiti with unit formatted - SIMPLE VERSION (LEGACY)
-     */
-    public function getKapasitiFormatted()
-    {
-        $kapasiti = $this->kapasiti ?? '';
-        $unit = $this->kapasiti_unit ?? '';
-        
-        if (empty($kapasiti)) {
-            return '-';
-        }
-        
-        return trim($kapasiti . ' ' . $unit);
-    }
-
-    /**
-     * Get saiz value - untuk edit form (LEGACY)
-     */
-    public function getSaizValue()
-    {
-        return $this->saiz ?? '';
-    }
-
-    /**
-     * Get saiz unit - untuk edit form (LEGACY)
-     */
-    public function getSaizUnitValue()
-    {
-        return $this->saiz_unit ?? '';
-    }
-
-    /**
-     * Get kadaran value - untuk edit form (LEGACY)
-     */
-    public function getKadaranValue()
-    {
-        return $this->kadaran ?? '';
-    }
-
-    /**
-     * Get kadaran unit - untuk edit form (LEGACY)
-     */
-    public function getKadaranUnitValue()
-    {
-        return $this->kadaran_unit ?? '';
-    }
-
-    /**
-     * Get kapasiti value - untuk edit form (LEGACY)
-     */
-    public function getKapasitiValue()
-    {
-        return $this->kapasiti ?? '';
-    }
-
-    /**
-     * Get kapasiti unit - untuk edit form (LEGACY)
-     */
-    public function getKapasitiUnitValue()
-    {
-        return $this->kapasiti_unit ?? '';
     }
 
     /**

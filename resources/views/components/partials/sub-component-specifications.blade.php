@@ -1,19 +1,76 @@
 @php
-    // Get existing values for edit mode
+    // ========================================
+    // BASIC FIELDS
+    // ========================================
     $jenis = old('jenis', $subComponent->jenis ?? '');
     $bahan = old('bahan', $subComponent->bahan ?? '');
     
-    // Spesifikasi arrays - handle both old single values and new array format
-    $saizList = old('saiz', isset($subComponent->saiz) ? (is_array($subComponent->saiz) ? $subComponent->saiz : [$subComponent->saiz]) : ['']);
-    $saizUnitList = old('saiz_unit', isset($subComponent->saiz_unit) ? (is_array($subComponent->saiz_unit) ? $subComponent->saiz_unit : [$subComponent->saiz_unit]) : ['']);
+    // ========================================
+    // SPESIFIKASI - SAIZ
+    // Load dari measurements table via relationship
+    // ========================================
+    $saizList = old('saiz', []);
+    $saizUnitList = old('saiz_unit', []);
     
-    $kapasitiList = old('kapasiti', isset($subComponent->kapasiti) ? (is_array($subComponent->kapasiti) ? $subComponent->kapasiti : [$subComponent->kapasiti]) : ['']);
-    $kapasitiUnitList = old('kapasiti_unit', isset($subComponent->kapasiti_unit) ? (is_array($subComponent->kapasiti_unit) ? $subComponent->kapasiti_unit : [$subComponent->kapasiti_unit]) : ['']);
+    if (empty($saizList) && isset($subComponent) && $subComponent->exists) {
+        // Guna relationship saizMeasurements() dari model
+        $saizMeasurements = $subComponent->saizMeasurements;
+        
+        foreach ($saizMeasurements as $measurement) {
+            $saizList[] = $measurement->value;
+            $saizUnitList[] = $measurement->unit ?? '';
+        }
+    }
     
-    $kadaranList = old('kadaran', isset($subComponent->kadaran) ? (is_array($subComponent->kadaran) ? $subComponent->kadaran : [$subComponent->kadaran]) : ['']);
-    $kadaranUnitList = old('kadaran_unit', isset($subComponent->kadaran_unit) ? (is_array($subComponent->kadaran_unit) ? $subComponent->kadaran_unit : [$subComponent->kadaran_unit]) : ['']);
+    // Default: sekurang-kurangnya 1 empty row
+    if (empty($saizList)) {
+        $saizList = [''];
+        $saizUnitList = [''];
+    }
     
-    // Purchase info - Format tarikh untuk input type="date" (Y-m-d)
+    // ========================================
+    // SPESIFIKASI - KAPASITI
+    // ========================================
+    $kapasitiList = old('kapasiti', []);
+    $kapasitiUnitList = old('kapasiti_unit', []);
+    
+    if (empty($kapasitiList) && isset($subComponent) && $subComponent->exists) {
+        $kapasitiMeasurements = $subComponent->kapasitiMeasurements;
+        
+        foreach ($kapasitiMeasurements as $measurement) {
+            $kapasitiList[] = $measurement->value;
+            $kapasitiUnitList[] = $measurement->unit ?? '';
+        }
+    }
+    
+    if (empty($kapasitiList)) {
+        $kapasitiList = [''];
+        $kapasitiUnitList = [''];
+    }
+    
+    // ========================================
+    // SPESIFIKASI - KADARAN
+    // ========================================
+    $kadaranList = old('kadaran', []);
+    $kadaranUnitList = old('kadaran_unit', []);
+    
+    if (empty($kadaranList) && isset($subComponent) && $subComponent->exists) {
+        $kadaranMeasurements = $subComponent->kadaranMeasurements;
+        
+        foreach ($kadaranMeasurements as $measurement) {
+            $kadaranList[] = $measurement->value;
+            $kadaranUnitList[] = $measurement->unit ?? '';
+        }
+    }
+    
+    if (empty($kadaranList)) {
+        $kadaranList = [''];
+        $kadaranUnitList = [''];
+    }
+    
+    // ========================================
+    // PURCHASE INFO - Format tarikh untuk input type="date"
+    // ========================================
     $tarikhPembelian = old('tarikh_pembelian');
     if (!$tarikhPembelian && isset($subComponent->tarikh_pembelian)) {
         try {
@@ -52,7 +109,9 @@
     $kodPtj = old('kod_ptj', $subComponent->kod_ptj ?? '');
     $jangkaHayat = old('jangka_hayat', $subComponent->jangka_hayat ?? '');
     
-    // Supplier info
+    // ========================================
+    // SUPPLIER INFO
+    // ========================================
     $namaPengilang = old('nama_pengilang', $subComponent->nama_pengilang ?? '');
     $namaPembekal = old('nama_pembekal', $subComponent->nama_pembekal ?? '');
     $alamatPembekal = old('alamat_pembekal', $subComponent->alamat_pembekal ?? '');
@@ -61,7 +120,9 @@
     $alamatKontraktor = old('alamat_kontraktor', $subComponent->alamat_kontraktor ?? '');
     $noTelKontraktor = old('no_telefon_kontraktor', $subComponent->no_telefon_kontraktor ?? '');
     
-    // Documents - organized by category
+    // ========================================
+    // DOCUMENTS - organized by category
+    // ========================================
     $dokumenByCategory = [];
     if (isset($subComponent) && $subComponent->dokumen_berkaitan) {
         if (is_array($subComponent->dokumen_berkaitan)) {
@@ -75,12 +136,17 @@
         }
     }
     
-    // Notes
+    // ========================================
+    // NOTES
+    // ========================================
     $catatanAtribut = old('catatan_atribut', $subComponent->catatan_atribut ?? '');
     $catatanPembelian = old('catatan_pembelian', $subComponent->catatan_pembelian ?? '');
     $catatanDokumen = old('catatan_dokumen', $subComponent->catatan_dokumen ?? '');
     $nota = old('nota', $subComponent->nota ?? '');
 @endphp
+
+{{-- HTML form sama seperti yang ada sekarang --}}
+{{-- Kod HTML tidak perlu diubah --}}
 
 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
 <div class="card mb-4 mt-4">

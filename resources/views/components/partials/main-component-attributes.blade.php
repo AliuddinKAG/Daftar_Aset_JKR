@@ -1,52 +1,87 @@
 @php
-    // Get existing values for edit mode
+    // ========================================
+    // BASIC FIELDS
+    // ========================================
     $jenis = old('jenis', $mainComponent->jenis ?? '');
     $bahan = old('bahan', $mainComponent->bahan ?? '');
+    $bekalanElektrik = old('bekalan_elektrik', $mainComponent->bekalan_elektrik ?? '');
     
-    // Spesifikasi - convert string to array for multiple inputs
+    // ========================================
+    // SPESIFIKASI - SAIZ
+    // Load dari measurements table via relationship
+    // ========================================
     $saizList = old('saiz', []);
     $saizUnitList = old('saiz_unit', []);
-    if (empty($saizList) && isset($mainComponent->saiz)) {
-        $saizList = [$mainComponent->saiz];
-        $saizUnitList = [$mainComponent->saiz_unit ?? ''];
+    
+    if (empty($saizList) && isset($mainComponent) && $mainComponent->exists) {
+        // Guna relationship saizMeasurements() dari model
+        $saizMeasurements = $mainComponent->saizMeasurements;
+        
+        foreach ($saizMeasurements as $measurement) {
+            $saizList[] = $measurement->value;
+            $saizUnitList[] = $measurement->unit ?? '';
+        }
     }
+    
+    // Default: sekurang-kurangnya 1 empty row
     if (empty($saizList)) {
         $saizList = [''];
         $saizUnitList = [''];
     }
     
+    // ========================================
+    // SPESIFIKASI - KAPASITI
+    // ========================================
     $kapasitiList = old('kapasiti', []);
     $kapasitiUnitList = old('kapasiti_unit', []);
-    if (empty($kapasitiList) && isset($mainComponent->kapasiti)) {
-        $kapasitiList = [$mainComponent->kapasiti];
-        $kapasitiUnitList = [$mainComponent->kapasiti_unit ?? ''];
+    
+    if (empty($kapasitiList) && isset($mainComponent) && $mainComponent->exists) {
+        $kapasitiMeasurements = $mainComponent->kapasitiMeasurements;
+        
+        foreach ($kapasitiMeasurements as $measurement) {
+            $kapasitiList[] = $measurement->value;
+            $kapasitiUnitList[] = $measurement->unit ?? '';
+        }
     }
+    
     if (empty($kapasitiList)) {
         $kapasitiList = [''];
         $kapasitiUnitList = [''];
     }
     
+    // ========================================
+    // SPESIFIKASI - KADARAN
+    // ========================================
     $kadaranList = old('kadaran', []);
     $kadaranUnitList = old('kadaran_unit', []);
-    if (empty($kadaranList) && isset($mainComponent->kadaran)) {
-        $kadaranList = [$mainComponent->kadaran];
-        $kadaranUnitList = [$mainComponent->kadaran_unit ?? ''];
+    
+    if (empty($kadaranList) && isset($mainComponent) && $mainComponent->exists) {
+        $kadaranMeasurements = $mainComponent->kadaranMeasurements;
+        
+        foreach ($kadaranMeasurements as $measurement) {
+            $kadaranList[] = $measurement->value;
+            $kadaranUnitList[] = $measurement->unit ?? '';
+        }
     }
+    
     if (empty($kadaranList)) {
         $kadaranList = [''];
         $kadaranUnitList = [''];
     }
     
-    // Purchase info
+    // ========================================
+    // PURCHASE INFO
+    // ========================================
     $tarikhPembelian = old('tarikh_pembelian', $mainComponent->tarikh_pembelian ?? '');
     $kosPerolehan = old('kos_perolehan', $mainComponent->kos_perolehan ?? '');
     $noPesananRasmi = old('no_pesanan_rasmi_kontrak', $mainComponent->no_pesanan_rasmi_kontrak ?? '');
-    $kodPtj = old('kod_ptj', $mainComponent->kod_ptj ?? '');
     $tarikhDipasang = old('tarikh_dipasang', $mainComponent->tarikh_dipasang ?? '');
     $tarikhWaranti = old('tarikh_waranti_tamat', $mainComponent->tarikh_waranti_tamat ?? '');
     $jangkaHayat = old('jangka_hayat', $mainComponent->jangka_hayat ?? '');
     
-    // Supplier info
+    // ========================================
+    // SUPPLIER INFO
+    // ========================================
     $namaPengilang = old('nama_pengilang', $mainComponent->nama_pengilang ?? '');
     $namaPembekal = old('nama_pembekal', $mainComponent->nama_pembekal ?? '');
     $alamatPembekal = old('alamat_pembekal', $mainComponent->alamat_pembekal ?? '');
@@ -55,7 +90,10 @@
     $alamatKontraktor = old('alamat_kontraktor', $mainComponent->alamat_kontraktor ?? '');
     $noTelKontraktor = old('no_telefon_kontraktor', $mainComponent->no_telefon_kontraktor ?? '');
     
-    // Related components - from relatedComponents relationship
+    // ========================================
+    // RELATED COMPONENTS
+    // Load dari relatedComponents relationship
+    // ========================================
     $komponenBerkaitan = [];
     if (isset($mainComponent) && $mainComponent->exists) {
         $relatedComps = $mainComponent->relatedComponents ?? collect();
@@ -68,11 +106,16 @@
             ];
         }
     }
+    
+    // Default: sekurang-kurangnya 1 empty row
     if (count($komponenBerkaitan) == 0) {
         $komponenBerkaitan = [['bil' => 1, 'nama' => '', 'no_siri' => '', 'catatan' => '']];
     }
     
-    // Documents - from relatedDocuments relationship
+    // ========================================
+    // RELATED DOCUMENTS
+    // Load dari relatedDocuments relationship
+    // ========================================
     $dokumenList = [];
     if (isset($mainComponent) && $mainComponent->exists) {
         $relatedDocs = $mainComponent->relatedDocuments ?? collect();
@@ -85,17 +128,23 @@
             ];
         }
     }
+    
+    // Default: sekurang-kurangnya 1 empty row
     if (count($dokumenList) == 0) {
         $dokumenList = [['bil' => 1, 'nama' => '', 'rujukan' => '', 'catatan' => '']];
     }
     
-    // Notes
+    // ========================================
+    // NOTES/CATATAN
+    // ========================================
     $catatanAtribut = old('catatan_atribut', $mainComponent->catatan_atribut ?? '');
     $catatanKomponen = old('catatan_komponen_berhubung', $mainComponent->catatan_komponen_berhubung ?? '');
-    $catatanPembelian = old('catatan_pembelian', $mainComponent->catatan_pembelian ?? '');
     $catatanDokumen = old('catatan_dokumen', $mainComponent->catatan_dokumen ?? '');
     $nota = old('nota', $mainComponent->nota ?? '');
 @endphp
+
+{{-- Letakkan HTML form anda di bawah sini --}}
+{{-- Form code sama seperti yang ada sekarang --}}
 
 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
 <div class="card mb-4 mt-4">

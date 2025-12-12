@@ -28,7 +28,7 @@ class SubComponentController extends Controller
 
             DB::beginTransaction();
 
-            // BUANG old measurement fields dari validated (akan guna table measurements)
+            // BUANG measurement fields dari validated (akan guna table measurements)
             unset($validated['saiz'], $validated['saiz_unit']);
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
@@ -64,10 +64,13 @@ class SubComponentController extends Controller
      */
     public function show(SubComponent $subComponent)
     {
-        // Load relationships
+        // Load relationships including measurements
         $subComponent->load([
             'mainComponent.component',
-            'measurements' // Load measurements
+            'measurements',
+            'saizMeasurements',
+            'kadaranMeasurements',
+            'kapasitiMeasurements'
         ]);
         
         return view('components.view-sub-component', compact('subComponent'));
@@ -80,8 +83,13 @@ class SubComponentController extends Controller
     {
         $mainComponents = MainComponent::with('component')->get();
         
-        // Load measurements untuk edit form
-        $subComponent->load('measurements');
+        // Load measurements dengan relationships untuk edit form
+        $subComponent->load([
+            'measurements',
+            'saizMeasurements',
+            'kadaranMeasurements',
+            'kapasitiMeasurements'
+        ]);
         
         return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
     }
@@ -96,7 +104,7 @@ class SubComponentController extends Controller
 
             DB::beginTransaction();
 
-            // BUANG old measurement fields
+            // BUANG measurement fields
             unset($validated['saiz'], $validated['saiz_unit']);
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
@@ -176,7 +184,7 @@ class SubComponentController extends Controller
 
     /**
      * ========================================
-     * NEW METHOD: Save Measurements
+     * SAVE MEASUREMENTS METHOD
      * ========================================
      */
     private function saveMeasurements(SubComponent $subComponent, Request $request): void
@@ -257,30 +265,65 @@ class SubComponentController extends Controller
             foreach ($categories as $categoryIndex => $category) {
                 if (isset($namas[$category]) && is_array($namas[$category])) {
                     foreach ($namas[$category] as $index => $nama) {
-                        if (!empty(trim($nama ?? ''))) {
+                        // Ensure $nama is string before trim
+                        $namaStr = is_string($nama) ? trim($nama) : '';
+                        
+                        if (!empty($namaStr)) {
                             $documents[] = [
-                                'kategori' => $category,
+                                'kategori' => is_string($category) ? $category : 'umum',
                                 'bil' => $bils[$category][$index] ?? ($index + 1),
-                                'nama' => $nama,
-                                'rujukan' => $rujukans[$category][$index] ?? null,
-                                'catatan' => $catatans[$category][$index] ?? null,
+                                'nama' => $namaStr,
+                                'rujukan' => isset($rujukans[$category][$index]) && is_string($rujukans[$category][$index]) 
+                                    ? $rujukans[$category][$index] 
+                                    : null,
+                                'catatan' => isset($catatans[$category][$index]) && is_string($catatans[$category][$index])
+                                    ? $catatans[$category][$index]
+                                    : null,
                             ];
                         }
                     }
                 }
             }
         } 
-        // Fallback: simple array without categories
+        // Fallback: simple array without categories (when doc_nama is directly an array)
         else if (is_array($namas)) {
-            foreach ($namas as $index => $nama) {
-                if (!empty(trim($nama ?? ''))) {
-                    $documents[] = [
-                        'kategori' => 'umum',
-                        'bil' => $bils[$index] ?? ($index + 1),
-                        'nama' => $nama,
-                        'rujukan' => $rujukans[$index] ?? null,
-                        'catatan' => $catatans[$index] ?? null,
-                    ];
+            // Check if this is a direct array of names (not nested)
+            foreach ($namas as $key => $value) {
+                // If value is string, it's a direct list
+                if (is_string($value)) {
+                    $namaStr = trim($value);
+                    if (!empty($namaStr)) {
+                        $documents[] = [
+                            'kategori' => 'umum',
+                            'bil' => is_array($bils) && isset($bils[$key]) ? $bils[$key] : ($key + 1),
+                            'nama' => $namaStr,
+                            'rujukan' => is_array($rujukans) && isset($rujukans[$key]) && is_string($rujukans[$key])
+                                ? $rujukans[$key]
+                                : null,
+                            'catatan' => is_array($catatans) && isset($catatans[$key]) && is_string($catatans[$key])
+                                ? $catatans[$key]
+                                : null,
+                        ];
+                    }
+                }
+                // If value is array, it might be nested category structure
+                else if (is_array($value)) {
+                    foreach ($value as $index => $nama) {
+                        $namaStr = is_string($nama) ? trim($nama) : '';
+                        if (!empty($namaStr)) {
+                            $documents[] = [
+                                'kategori' => is_string($key) ? $key : 'umum',
+                                'bil' => isset($bils[$key][$index]) ? $bils[$key][$index] : ($index + 1),
+                                'nama' => $namaStr,
+                                'rujukan' => isset($rujukans[$key][$index]) && is_string($rujukans[$key][$index])
+                                    ? $rujukans[$key][$index]
+                                    : null,
+                                'catatan' => isset($catatans[$key][$index]) && is_string($catatans[$key][$index])
+                                    ? $catatans[$key][$index]
+                                    : null,
+                            ];
+                        }
+                    }
                 }
             }
         }
