@@ -134,7 +134,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Kod PTJ</strong></td>
-                                    <!--    <td>{{ $mainComponent->kod_ptj ?? '-' }}</td> -->
+                                        <td>{{ $mainComponent->kod_ptj ?? '-' }}</td>
                                     </tr>
                                 </table>
                             </div>
