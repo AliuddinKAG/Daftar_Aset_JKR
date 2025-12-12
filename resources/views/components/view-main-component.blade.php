@@ -212,16 +212,16 @@
                                 <p class="mb-0">
                                     @switch($mainComponent->status_komponen)
                                         @case('operational')
-                                            <span class="badge bg-success">Operational</span>
+                                            <span class="badge bg-success">Beropreasi</span>
                                             @break
                                         @case('under_maintenance')
-                                            <span class="badge bg-warning">Under Maintenance</span>
+                                            <span class="badge bg-warning">Sedang Diselenggara</span>
                                             @break
                                         @case('rosak')
                                             <span class="badge bg-danger">Rosak</span>
                                             @break
                                         @case('retired')
-                                            <span class="badge bg-secondary">Retired</span>
+                                            <span class="badge bg-secondary">Dilupuskan</span>
                                             @break
                                         @default
                                             <span class="badge bg-light text-dark">-</span>
