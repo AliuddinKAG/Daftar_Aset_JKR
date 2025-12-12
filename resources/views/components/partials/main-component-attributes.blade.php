@@ -5,6 +5,7 @@
     $jenis = old('jenis', $mainComponent->jenis ?? '');
     $bahan = old('bahan', $mainComponent->bahan ?? '');
     $bekalanElektrik = old('bekalan_elektrik', $mainComponent->bekalan_elektrik ?? '');
+    $kaedahPemasangan = old('kaedah_pemasangan', $mainComponent->kaedah_pemasangan ?? '');
     
     // ========================================
     // SPESIFIKASI - SAIZ
@@ -163,7 +164,11 @@
             </div>
             <div class="col-md-6">
                 <label for="bekalan_elektrik" class="form-label">Bekalan Elektrik(MSB/SSB/FP/DB.....)<span class="text-danger">*</span></label>
-                <input id="bekalan_elektrik" type="text" class="form-control" name="bekalan_elektrik" value="">
+                <input id="bekalan_elektrik" type="text" class="form-control" name="bekalan_elektrik" value=" {{ $bekalanElektrik }}">
+            </div>
+            <div class="col-md-6">
+                <label for="kaedah_pemasangan" class="form-label">Kaedah Pemasangan<span class="text-danger">*</span></label>
+                <input id="kaedah_pemasangan" type="text" class="form-control" name="kaedah_pemasangan" value="{{ $kaedahPemasangan }}">
             </div>
         </div>
 
