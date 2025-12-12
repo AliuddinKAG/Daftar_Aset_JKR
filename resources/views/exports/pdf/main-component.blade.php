@@ -44,26 +44,6 @@
             text-decoration: underline;
         }
         
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 1px;
-        }
-
-        .info-group {
-            display: flex;
-            gap: 5px;
-        }
-
-        .info-group span {
-            text-align: left;
-        }
-
-        .info-group-right span {
-            text-align: right;
-        }
-
         .section-title {
             background-color: #000;
             color: white;
@@ -194,7 +174,7 @@
         <td class="label-cell">Kuantiti<br><small>(Komponen yang sama jenis)</small></td>
         <td colspan="1" class="value-cell">{{ $mainComponent->kuantiti ?? '' }}</td>
         <td class="label-cell" rowspan="2" style="vertical-align: middle;">Gambar Komponen</td>
-        <td colspan="4" class="value-cell" rowspan="2">{{ $mainComponent->gambar_komponen ?? '' }}<span>Sila Lampirkan gambar jika perlu dan pastikan dimuat naik ke dalam Sitem mySPATA</span></td>
+        <td colspan="4" class="value-cell" rowspan="2"><span>Sila Lampirkan gambar jika perlu dan pastikan dimuat naik ke dalam Sistem mySPATA</span></td>
     </tr>
     <tr>
         <td colspan="1" class="label-cell">No Perolehan (1GFMAS)</td>
@@ -214,7 +194,7 @@
                 <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->mekanikal ? '✓' : '' }}</span> Mekanikal<br>
                 <span class="checkbox">{{ $mainComponent->bio_perubatan ? '✓' : '' }}</span> Bio Perubatan
                 <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->lain_lain ? '✓' : '' }}</span> Lain-lain: 
-                <span class="inline-field">{{ $mainComponent->lain_lain ?? '' }}</span>
+                <span class="inline-field">{{ $mainComponent->lain_lain_text ?? '' }}</span>
             </div>
         </td>
     </tr>
@@ -238,11 +218,8 @@
     <td class="label-cell">Kos Perolehan/Kontrak</td>
     <td class="value-cell">
         @php
-            // Remove all non-numeric characters except decimal point
             $kosBersih = preg_replace('/[^0-9.]/', '', $mainComponent->kos_perolehan ?? '');
-            // Convert to float
             $kosFloat = (float) $kosBersih;
-            // Format and display
             echo $kosFloat > 0 ? 'RM ' . number_format($kosFloat, 2) : '';
         @endphp
     </td>
@@ -268,7 +245,7 @@
     <tr>
         <td class="label-cell">Pembekal</td>
         <td class="value-cell">{{ $mainComponent->nama_pembekal ?? '' }}</td>
-        <td class="value-cell">No. Telefon</td>
+        <td class="label-cell">No. Telefon</td>
         <td colspan="4" class="value-cell">{{ $mainComponent->no_telefon_pembekal ?? '' }}</td>        
     </tr>
     <tr>
@@ -276,18 +253,14 @@
         <td colspan="6" class="value-cell">{{ $mainComponent->alamat_pembekal ?? '' }}</td>
     </tr>
     <tr>
-        <td class="label-cell">Pengilang</td>
-        <td colspan="6" class="value-cell">{{ $mainComponent->nama_pengilang ?? '' }}</td>
-    </tr>
-    <tr>
         <td class="label-cell">Kontraktor</td>
         <td class="value-cell">{{ $mainComponent->nama_kontraktor ?? '' }}</td>
-        <td class="value-cell">No. Telefon</td>
+        <td class="label-cell">No. Telefon</td>
         <td colspan="4" class="value-cell">{{ $mainComponent->no_telefon_kontraktor ?? '' }}</td>        
     </tr>
     <tr>
         <td class="label-cell">Alamat Kontraktor</td>
-        <td colspan="6" class="value-cell">{{ $mainComponent->alamat_pembekal ?? '' }}</td>
+        <td colspan="6" class="value-cell">{{ $mainComponent->alamat_kontraktor ?? '' }}</td>
     </tr>
     <tr>
         <td colspan="7" style="min-height: 15px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_maklumat ?? '' }}</td>
@@ -351,24 +324,72 @@
         <td style="text-align: center; font-weight: bold;" colspan="1">Kadaran</td>
         <td style="text-align: center; font-weight: bold;" colspan="3">Unit</td>
     </tr>
+    @php
+        // FIXED: Use correct type values matching MainComponentMeasurement model
+        $saizFizikalData = isset($mainComponent->measurements) && is_object($mainComponent->measurements) 
+            ? $mainComponent->measurements->where('type', 'saiz')->sortBy('order')
+            : collect();
+        
+        $kadaranData = isset($mainComponent->measurements) && is_object($mainComponent->measurements)
+            ? $mainComponent->measurements->where('type', 'kadaran')->sortBy('order')
+            : collect();
+        
+        $hasSaiz = $saizFizikalData->count() > 0;
+        $hasKadaran = $kadaranData->count() > 0;
+        $maxRows = max(
+            $hasSaiz ? $saizFizikalData->count() : 0,
+            $hasKadaran ? $kadaranData->count() : 0,
+            4
+        );
+    @endphp
+    @for($i = 0; $i < $maxRows; $i++)
     <tr>
-        <td style="text-align: center; width: 120px;">{{ $mainComponent->saiz ?? '' }}</td>
-        <td style="width: 120px;">{{ $mainComponent->saiz_unit ?? '' }}</td>
-        <td style="width: 120px;"><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
-        <td style="text-align: center;">{{ $mainComponent->kadaran ?? '' }}</td>
-        <td>{{ $mainComponent->kadaran_unit ?? '' }}</td>
-        <td colspan="2" ><span>(Voltan/Arus/Kuasa/<br>Rating/Ratio/Keamatan Bunyi/Fluks/Faktor/Kuasa/<br>Kecekapan/Fotometri/<br>Bandwidth dll)</span></td>
+        <td style="text-align: center; width: 120px;">
+            {{ $hasSaiz && isset($saizFizikalData->values()[$i]) ? $saizFizikalData->values()[$i]->value ?? '' : '' }}
+        </td>
+        <td style="width: 120px;">
+            {{ $hasSaiz && isset($saizFizikalData->values()[$i]) ? $saizFizikalData->values()[$i]->unit ?? '' : '' }}
+        </td>
+        @if($i === 0)
+        <td style="width: 120px;" rowspan="{{ $maxRows }}"><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
+        @endif
+        <td style="text-align: center;">
+            {{ $hasKadaran && isset($kadaranData->values()[$i]) ? $kadaranData->values()[$i]->value ?? '' : '' }}
+        </td>
+        <td>
+            {{ $hasKadaran && isset($kadaranData->values()[$i]) ? $kadaranData->values()[$i]->unit ?? '' : '' }}
+        </td>
+        @if($i === 0)
+        <td colspan="2" rowspan="{{ $maxRows }}"><span>(Voltan/Arus/Kuasa/<br>Rating/Ratio/Keamatan Bunyi/Fluks/Faktor/Kuasa/<br>Kecekapan/Fotometri/<br>Bandwidth dll)</span></td>
+        @endif
     </tr>
+    @endfor
     <tr>
         <td style="text-align: center; font-weight: bold;" colspan="1">Kapasiti</td>
         <td style="text-align: center; font-weight: bold;" colspan="2">Unit</td>
-        <td colspan="4" class="value-cell" rowspan="2" style="min-height: 15px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_atribut ?? '' }}</td>
+        @php
+            $kapasitiData = isset($mainComponent->measurements) && is_object($mainComponent->measurements)
+                ? $mainComponent->measurements->where('type', 'kapasiti')->sortBy('order')
+                : collect();
+            
+            $hasKapasiti = $kapasitiData->count() > 0;
+            $kapastiRows = max($hasKapasiti ? $kapasitiData->count() : 0, 4);
+        @endphp
+        <td colspan="4" class="value-cell" rowspan="{{ $kapastiRows + 1 }}" style="min-height: 15px;"><strong>Catatan:</strong> {{ $mainComponent->catatan_atribut ?? '' }}</td>
     </tr>
+    @for($i = 0; $i < $kapastiRows; $i++)
     <tr>
-        <td style="text-align: center;">{{ $mainComponent->kapasiti ?? '' }}</td>
-        <td>{{ $mainComponent->kapasiti_unit ?? '' }}</td>
-        <td><span>(Isipadu/Head/Berat/Btu/Velocity/Speed dll)</span></td>
+        <td style="text-align: center;">
+            {{ $hasKapasiti && isset($kapasitiData->values()[$i]) ? $kapasitiData->values()[$i]->value ?? '' : '' }}
+        </td>
+        <td>
+            {{ $hasKapasiti && isset($kapasitiData->values()[$i]) ? $kapasitiData->values()[$i]->unit ?? '' : '' }}
+        </td>
+        @if($i === 0)
+        <td rowspan="{{ $kapastiRows }}"><span>(Isipadu/Head/Berat/Btu/Velocity/Speed dll)</span></td>
+        @endif
     </tr>
+    @endfor
 
 <!-- KOMPONEN YANG BERHUBUNGKAIT -->
     <tr>

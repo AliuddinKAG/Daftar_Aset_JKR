@@ -212,95 +212,81 @@
         <td style="text-align: center; font-weight: bold;" colspan="1">Kadaran</td>
         <td style="text-align: center; font-weight: bold;" colspan="4">Unit</td>
     </tr>
+    @php
+        // FIXED: Use correct relationship and field names
+        $saizFizikalData = isset($subComponent->measurements) && is_object($subComponent->measurements) 
+            ? $subComponent->measurements->where('type', 'saiz')->sortBy('order')
+            : collect();
+        
+        $kadaranData = isset($subComponent->measurements) && is_object($subComponent->measurements)
+            ? $subComponent->measurements->where('type', 'kadaran')->sortBy('order')
+            : collect();
+        
+        $hasSaiz = $saizFizikalData->count() > 0;
+        $hasKadaran = $kadaranData->count() > 0;
+        $maxRows = max(
+            $hasSaiz ? $saizFizikalData->count() : 0,
+            $hasKadaran ? $kadaranData->count() : 0,
+            4
+        );
+    @endphp
+    @for($i = 0; $i < $maxRows; $i++)
     <tr>
         <td colspan="1" style="text-align: center;">
-            @php
-                $saiz = is_string($subComponent->saiz) ? json_decode($subComponent->saiz, true) : $subComponent->saiz;
-            @endphp
-            @if(is_array($saiz) && !empty($saiz))
-                @foreach($saiz as $s)
-                    {{ $s }}{{ !$loop->last ? ', ' : '' }}
-                @endforeach
-            @else
-                {{ $subComponent->saiz ?? '' }}
-            @endif
+            {{-- FIXED: Use 'value' instead of 'nilai' --}}
+            {{ $hasSaiz && isset($saizFizikalData->values()[$i]) ? $saizFizikalData->values()[$i]->value ?? '' : '' }}
         </td>
         <td colspan="1" style="width: 150px;">
-            @php
-                $saiz_unit = is_string($subComponent->saiz_unit) ? json_decode($subComponent->saiz_unit, true) : $subComponent->saiz_unit;
-            @endphp
-            @if(is_array($saiz_unit) && !empty($saiz_unit))
-                @foreach($saiz_unit as $su)
-                    {{ $su }}{{ !$loop->last ? ', ' : '' }}
-                @endforeach
-            @else
-                {{ $subComponent->saiz_unit ?? '' }}
-            @endif
+            {{ $hasSaiz && isset($saizFizikalData->values()[$i]) ? $saizFizikalData->values()[$i]->unit ?? '' : '' }}
         </td>
-        <td colspan="1"><span>(Panjang/Tinggi/<br>Lebar/Luas/<br>Dalam/Lebar/Tebal/<br>Diameter/Jarak dll)</span></td>
+        @if($i === 0)
+        <td colspan="1" rowspan="{{ $maxRows }}"><span>(Panjang/Tinggi/<br>Lebar/Luas/<br>Dalam/Lebar/Tebal/<br>Diameter/Jarak dll)</span></td>
+        @endif
         <td style="text-align: center;">
-            @php
-                $kadaran = is_string($subComponent->kadaran) ? json_decode($subComponent->kadaran, true) : $subComponent->kadaran;
-            @endphp
-            @if(is_array($kadaran) && !empty($kadaran))
-                @foreach($kadaran as $k)
-                    {{ $k }}{{ !$loop->last ? ', ' : '' }}
-                @endforeach
-            @else
-                {{ $subComponent->kadaran ?? '' }}
-            @endif
+            {{-- FIXED: Use 'value' instead of 'nilai' --}}
+            {{ $hasKadaran && isset($kadaranData->values()[$i]) ? $kadaranData->values()[$i]->value ?? '' : '' }}
         </td>
         <td colspan="1">
-            @php
-                $kadaran_unit = is_string($subComponent->kadaran_unit) ? json_decode($subComponent->kadaran_unit, true) : $subComponent->kadaran_unit;
-            @endphp
-            @if(is_array($kadaran_unit) && !empty($kadaran_unit))
-                @foreach($kadaran_unit as $ku)
-                    {{ $ku }}{{ !$loop->last ? ', ' : '' }}
-                @endforeach
-            @else
-                {{ $subComponent->kadaran_unit ?? '' }}
-            @endif
+            {{ $hasKadaran && isset($kadaranData->values()[$i]) ? $kadaranData->values()[$i]->unit ?? '' : '' }}
         </td>
-        <td colspan="2"><span>(Voltan/Arus/Kuasa/<br>Rating/Ratio/Keamatan Bunyi/Fluks/<br>Faktor Kuasa/Kecekapan/<br>Fotometri/Bandwidth dll)</span></td>
+        @if($i === 0)
+        <td colspan="2" rowspan="{{ $maxRows }}"><span>(Voltan/Arus/Kuasa/<br>Rating/Ratio/Keamatan Bunyi/Fluks/<br>Faktor Kuasa/Kecekapan/<br>Fotometri/Bandwidth dll)</span></td>
+        @endif
     </tr>
+    @endfor
     <tr style="background-color: #ffffffff;">
         <td style="text-align: center; font-weight: bold;" colspan="1">Kapasiti</td>
         <td style="text-align: center; font-weight: bold;" colspan="2">Unit</td>
-        <td colspan="2" class="value-cell" rowspan="2" style="min-height: 15px; vertical-align: top;">
+        @php
+            // FIXED: Use correct type value
+            $kapasitiData = isset($subComponent->measurements) && is_object($subComponent->measurements)
+                ? $subComponent->measurements->where('type', 'kapasiti')->sortBy('order')
+                : collect();
+            
+            $hasKapasiti = $kapasitiData->count() > 0;
+            $kapastiRows = max($hasKapasiti ? $kapasitiData->count() : 0, 4);
+        @endphp
+        <td colspan="2" class="value-cell" rowspan="{{ $kapastiRows + 1 }}" style="min-height: 15px; vertical-align: top;">
             <strong>Gambar Sub Komponen</strong><br>
         </td>
-        <td colspan="2" class="value-cell" rowspan="2">
+        <td colspan="2" class="value-cell" rowspan="{{ $kapastiRows + 1 }}">
             <span style="font-size: 7pt;">Sila lampirkan gambar jika perlu, dan pastikan dimuat naik ke dalam Sistem mySPATA</span>
         </td>
     </tr>
+    @for($i = 0; $i < $kapastiRows; $i++)
     <tr>
         <td style="text-align: center;">
-            @php
-                $kapasiti = is_string($subComponent->kapasiti) ? json_decode($subComponent->kapasiti, true) : $subComponent->kapasiti;
-            @endphp
-            @if(is_array($kapasiti) && !empty($kapasiti))
-                @foreach($kapasiti as $kap)
-                    {{ $kap }}{{ !$loop->last ? ', ' : '' }}
-                @endforeach
-            @else
-                {{ $subComponent->kapasiti ?? '' }}
-            @endif
+            {{-- FIXED: Use 'value' instead of 'nilai' --}}
+            {{ $hasKapasiti && isset($kapasitiData->values()[$i]) ? $kapasitiData->values()[$i]->value ?? '' : '' }}
         </td>
         <td>
-            @php
-                $kapasiti_unit = is_string($subComponent->kapasiti_unit) ? json_decode($subComponent->kapasiti_unit, true) : $subComponent->kapasiti_unit;
-            @endphp
-            @if(is_array($kapasiti_unit) && !empty($kapasiti_unit))
-                @foreach($kapasiti_unit as $kapu)
-                    {{ $kapu }}{{ !$loop->last ? ', ' : '' }}
-                @endforeach
-            @else
-                {{ $subComponent->kapasiti_unit ?? '' }}
-            @endif
+            {{ $hasKapasiti && isset($kapasitiData->values()[$i]) ? $kapasitiData->values()[$i]->unit ?? '' : '' }}
         </td>
-        <td><span>(Isipadu/Head/Berat/Btu/ Velocity/Speed dll)</span></td>
+        @if($i === 0)
+        <td rowspan="{{ $kapastiRows }}"><span>(Isipadu/Head/Berat/Btu/ Velocity/Speed dll)</span></td>
+        @endif
     </tr>
+    @endfor
     <tr>
         <td colspan="7" style="min-height: 15px;"><strong>Catatan:</strong> {{ $subComponent->catatan_atribut ?? '' }}</td>
     </tr>
