@@ -46,11 +46,10 @@
                                 <div class="col-md-4">
                                     <label class="form-label">Kod Lokasi <span class="text-danger">*</span></label>
                                     <input type="text" 
-                                        class="form-control bg-light @error('kod_lokasi') is-invalid @enderror" 
+                                        class="form-control @error('kod_lokasi') is-invalid @enderror" 
                                         name="kod_lokasi" 
                                         id="kod_lokasi"
                                         value="{{ old('kod_lokasi', $mainComponent->kod_lokasi) }}" 
-                                        readonly
                                         required>
                                     @error('kod_lokasi')
                                         <div class="invalid-feedback">{{ $message }}</div>

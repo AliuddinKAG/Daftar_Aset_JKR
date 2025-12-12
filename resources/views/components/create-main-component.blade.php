@@ -46,17 +46,15 @@
                                 <div class="col-md-4">
                                     <label class="form-label">Kod Lokasi <span class="text-danger">*</span></label>
                                     <input type="text" 
-                                        class="form-control bg-light @error('kod_lokasi') is-invalid @enderror" 
-                                        name="kod_lokasi" 
-                                        id="kod_lokasi"
-                                        value="{{ old('kod_lokasi') }}" 
-                                        placeholder="Auto-generated"
-                                        readonly
-                                        required>
+                                    class="form-control @error('kod_lokasi') is-invalid @enderror" 
+                                    name="kod_lokasi" 
+                                    id="kod_lokasi"
+                                    value="{{ old('kod_lokasi') }}" 
+                                    placeholder="Contoh: KU-01-123"
+                                    required>
                                     @error('kod_lokasi')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Format: KU-[ID]-[NO]</small>
                                 </div>
                             </div>
 
