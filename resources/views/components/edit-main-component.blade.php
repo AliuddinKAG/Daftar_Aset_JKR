@@ -116,7 +116,7 @@
                                         </div>
                                         <div class="col-md-4 mt-3">
                                             <label class="form-label">No. Perolehan (1GFMAS)<span class="text-danger">*</span></label>
-                                           <!-- <input type="text" class="form-control" name="no_perolehan_1gfmas" value="{{ old('no_perolehan_1gfmas', $mainComponent->no_perolehan_1gfmas) }}"> -->
+                                            <input type="text" class="form-control" name="no_perolehan_1gfmas" value="{{ old('no_perolehan_1gfmas', $mainComponent->no_perolehan_1gfmas) }}"> 
                                         </div>
                                     </div>
                                 </div>
@@ -200,7 +200,7 @@
                                         </tr>
                                         <tr>
                                             <td>Kod PTJ</td>
-                                         <!--   <td><input type="text" class="form-control form-control-sm" name="kod_ptj" value="{{ old('kod_ptj', $mainComponent->kod_ptj) }}"></td> -->
+                                            <td><input type="text" class="form-control form-control-sm" name="kod_ptj" value="{{ old('kod_ptj', $mainComponent->kod_ptj) }}"></td> 
                                         </tr>
                                     </table>
                                 </div>

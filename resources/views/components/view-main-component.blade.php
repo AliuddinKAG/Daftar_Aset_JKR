@@ -71,7 +71,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <strong>No Perolehan (1GFMAS)</strong>
-                                    <!--    <p class="mb-0">{{ $mainComponent->no_perolehan_1gfmas ?? '-' }}</p> -->
+                                        <p class="mb-0">{{ $mainComponent->no_perolehan_1gfmas ?? '-' }}</p> 
                                     </div>
                                 </div>
                             </div>

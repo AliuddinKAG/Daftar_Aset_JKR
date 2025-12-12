@@ -29,7 +29,7 @@ class MainComponentController extends Controller
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-            // Atribut tambahan
+            // Atribut tambahan - PASTIKAN kod_ptj dan no_perolehan_1gfmas disimpan
             $validated['jenis'] = $request->input('jenis');
             $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
             $validated['bahan'] = $request->input('bahan');
@@ -38,6 +38,10 @@ class MainComponentController extends Controller
             $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
             $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
             $validated['nota'] = $request->input('nota');
+            
+            // IMPORTANT: Explicitly set kod_ptj and no_perolehan_1gfmas
+            $validated['kod_ptj'] = $request->input('kod_ptj');
+            $validated['no_perolehan_1gfmas'] = $request->input('no_perolehan_1gfmas');
 
             // Save Sistem & Subsistem
             if (!empty($validated['sistem'])) {
@@ -93,7 +97,7 @@ class MainComponentController extends Controller
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-            // Atribut tambahan
+            // Atribut tambahan - PASTIKAN kod_ptj dan no_perolehan_1gfmas dikemaskini
             $validated['jenis'] = $request->input('jenis');
             $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
             $validated['bahan'] = $request->input('bahan');
@@ -102,6 +106,10 @@ class MainComponentController extends Controller
             $validated['catatan_komponen_berhubung'] = $request->input('catatan_komponen_berhubung');
             $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
             $validated['nota'] = $request->input('nota');
+            
+            // IMPORTANT: Explicitly set kod_ptj and no_perolehan_1gfmas untuk update
+            $validated['kod_ptj'] = $request->input('kod_ptj');
+            $validated['no_perolehan_1gfmas'] = $request->input('no_perolehan_1gfmas');
 
             if (!empty($validated['sistem'])) {
                 $this->saveSistem($validated['sistem']);
@@ -267,6 +275,8 @@ class MainComponentController extends Controller
             'bekalan_elektrik' => 'nullable|string|max:255',
             'bahan' => 'nullable|string|max:255',
             'kaedah_pemasangan' => 'nullable|string|max:255',
+            'kod_ptj' => 'nullable|string|max:100',
+            'no_perolehan_1gfmas' => 'nullable|string|max:255',
             
             // Array validation untuk measurements
             'saiz' => 'nullable|array',

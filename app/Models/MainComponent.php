@@ -25,7 +25,9 @@ class MainComponent extends Model
         'deskripsi', 'status_komponen', 'jenama', 'model', 'no_siri',
         'no_tag_label', 'no_sijil_pendaftaran', 'jenis', 'bekalan_elektrik',
         'bahan', 'kaedah_pemasangan', 'catatan_atribut', 'catatan_komponen_berhubung',
-        'catatan_dokumen', 'nota', 'status'
+        'catatan_dokumen', 'nota', 'status',
+        // TAMBAH fields yang tertinggal
+        'kod_ptj', 'no_perolehan_1gfmas'
     ];
 
     /**
