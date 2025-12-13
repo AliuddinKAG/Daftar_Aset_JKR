@@ -157,11 +157,22 @@
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                            <!-- Hidden field untuk nama aras -->
-                                            <input type="hidden" name="nama_aras" id="nama_aras" value="{{ old('nama_aras') }}">
                                         </td>
                                     </tr>
-                                    <tr>
+                                        <tr id="nama-aras-row" style="display: none;">
+                                        <td>Nama Aras</td>
+                                        <td>
+                                            <div class="nama-field-wrapper">
+                                                <input type="text" class="form-control" id="nama_aras" name="nama_aras" 
+                                                       value="{{ old('nama_aras') }}"
+                                                       placeholder="Nama akan dijana automatik atau anda boleh edit">
+                                                <span class="autofill-indicator" id="autofill-indicator-aras" style="display: none;">
+                                                    <i class="bi bi-magic"></i> Auto
+                                                </span>
+                                            </div>
+                                            <small class="text-success hint-text" id="nama-aras-hint"></small>
+                                        </td>
+                                    </tr>
                                         <td>Kod Ruang</td>
                                         <td>
                                             <div class="input-group">
