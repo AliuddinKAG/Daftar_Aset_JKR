@@ -405,33 +405,12 @@ $(document).ready(function() {
     });
 
     // ===========================
-    // Auto-fill DPA dan generate Kod Lokasi
+    // Auto-fill DPA sahaja (tanpa kod lokasi)
     // ===========================
     $('#component_id').on('change', function() {
         var $selected = $(this).find(':selected');
-        var componentId = $(this).val();
-        
-        // Auto-fill DPA
+        // Hanya auto-fill DPA
         $('#display_dpa').val($selected.data('dpa') || '');
-        
-        // Generate Kod Lokasi automatically via AJAX
-        if (componentId) {
-            $.ajax({
-                url: '/main-components/generate-kod-lokasi',
-                type: 'GET',
-                data: { component_id: componentId },
-                success: function(response) {
-                    $('#kod_lokasi').val(response.kod_lokasi);
-                },
-                error: function() {
-                    // Fallback: generate simple kod lokasi
-                    var timestamp = Date.now().toString().slice(-6);
-                    $('#kod_lokasi').val('KU-' + componentId + '-' + timestamp);
-                }
-            });
-        } else {
-            $('#kod_lokasi').val('');
-        }
     });
     
     // Trigger on page load if component already selected
