@@ -127,7 +127,7 @@
                                                     <option value="">-- Pilih atau Taip Kod Ruang --</option>
                                                     @foreach($kodRuangs as $ruang)
                                                         <option value="{{ $ruang->kod }}" {{ old('kod_ruang', $component->kod_ruang) == $ruang->kod ? 'selected' : '' }}>
-                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                            {{ $ruang->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -246,7 +246,7 @@
                                                     <option value="">-- Pilih atau Taip Kod Ruang --</option>
                                                     @foreach($kodRuangs as $ruang)
                                                         <option value="{{ $ruang->kod }}" {{ old('kod_ruang_binaan', $component->kod_ruang_binaan) == $ruang->kod ? 'selected' : '' }}>
-                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                            {{ $ruang->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>

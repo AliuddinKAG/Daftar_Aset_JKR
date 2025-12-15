@@ -182,7 +182,7 @@
                                                         <option value="{{ $ruang->kod }}" 
                                                                 data-nama="{{ $ruang->nama }}"
                                                                 {{ old('kod_ruang') == $ruang->kod ? 'selected' : '' }}>
-                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                            {{ $ruang->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -315,7 +315,7 @@
                                                         <option value="{{ $ruang->kod }}" 
                                                                 data-nama="{{ $ruang->nama }}"
                                                                 {{ old('kod_ruang_binaan') == $ruang->kod ? 'selected' : '' }}>
-                                                            {{ $ruang->kod }} - {{ $ruang->nama }}
+                                                            {{ $ruang->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>
