@@ -59,60 +59,119 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-    .component-item {
+    .table-container {
         background: white;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
-        margin-bottom: 1.5rem;
         overflow: hidden;
     }
 
-    .component-header {
+    .data-table {
+        margin-bottom: 0;
+    }
+
+    .data-table thead th {
         background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 1.25rem 1.5rem;
-    }
-
-    .nested-item {
-        border-left: 3px solid #e2e8f0;
-        padding: 1rem;
-        margin: 0.75rem 0;
-        border-radius: 6px;
-        background: #f8fafc;
-    }
-
-    .nested-item.level-2 {
-        border-left-color: #10b981;
-    }
-
-    .nested-item.level-3 {
-        border-left-color: #06b6d4;
-    }
-
-    .info-row {
-        display: flex;
-        gap: 1rem;
-        margin: 0.5rem 0;
-        flex-wrap: wrap;
-    }
-
-    .info-item {
-        font-size: 0.85rem;
-    }
-
-    .info-label {
         color: #64748b;
-        margin-right: 0.25rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 1rem;
     }
 
-    .info-value {
-        font-weight: 600;
+    .data-table tbody tr {
+        transition: background-color 0.15s;
+    }
+
+    .data-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .expand-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #64748b;
+        font-size: 1.1rem;
+        padding: 0.25rem 0.5rem;
+        transition: transform 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+    }
+
+    .expand-btn:hover {
+        background: #f1f5f9;
         color: #1e293b;
     }
 
+    .expand-btn.expanded {
+        transform: rotate(90deg);
+    }
+
+    .nested-row {
+        display: none;
+        background: #f8fafc;
+    }
+
+    .nested-row.show {
+        display: table-row;
+    }
+
+    .nested-row td {
+        padding: 0 !important;
+        border: none;
+    }
+
+    .nested-table {
+        width: 100%;
+        margin: 0;
+        background: #f8fafc;
+    }
+
+    .nested-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: white;
+    }
+
+    .nested-table.level-2 td {
+        padding-left: 3rem;
+        background: #fefefe;
+    }
+
+    .nested-table.level-3 td {
+        padding-left: 5rem;
+        background: #f9fafb;
+    }
+
+    .row-level-2 {
+        border-left: 3px solid #10b981;
+    }
+
+    .row-level-3 {
+        border-left: 3px solid #06b6d4;
+    }
+    
+    /* Main component row border */
+    .main-component-row td {
+        border-top: 2px solid #e2e8f0;
+    }
+
     .btn-icon {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
         padding: 0;
         display: inline-flex;
         align-items: center;
@@ -131,6 +190,11 @@
         font-size: 3rem;
         color: #cbd5e1;
         margin-bottom: 1rem;
+    }
+
+    .location-info {
+        font-size: 0.85rem;
+        color: #64748b;
     }
 </style>
 
@@ -214,174 +278,184 @@
     </div>
 </div>
 
-<!-- Components List -->
-@forelse($components as $component)
-<div class="component-item">
-    <div class="component-header">
-        <div class="d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-                <div class="mb-2">
-                    <span class="badge bg-primary">Komponen</span>
-                    <span class="badge {{ $component->status == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
-                        {{ $component->status == 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
-                    </span>
-                </div>
-                <h5 class="mb-2">{{ $component->nama_premis }}</h5>
-                <div class="text-muted small">
-                    <i class="bi bi-hash"></i> {{ $component->nombor_dpa }}
-                </div>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('components.edit', $component) }}" class="btn btn-light btn-icon">
-                    <i class="bi bi-pencil"></i>
-                        <a href="{{ route('components.show', $component) }}" class="btn btn-info btn-sm btn-icon">
-                            <i class="bi bi-eye"></i>                
-                </a>
-                <form action="{{ route('components.delete', $component) }}" method="POST" 
-                      onsubmit="return confirm('Padam komponen ini?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-icon">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card-body">
-        <!-- Location Info -->
-        @if($component->ada_blok || $component->ada_binaan_luar)
-        <div class="info-row mb-3">
-            @if($component->kod_blok)
-            <div class="info-item">
-                <span class="info-label"><i class="bi bi-building"></i> Blok:</span>
-                <span class="info-value">{{ $component->kod_blok }}</span>
-            </div>
-            @endif
-            @if($component->nama_ruang)
-            <div class="info-item">
-                <span class="info-label"><i class="bi bi-door-open"></i> Ruang:</span>
-                <span class="info-value">{{ $component->nama_ruang }}</span>
-            </div>
-            @endif
-            @if($component->nama_binaan_luar)
-            <div class="info-item">
-                <span class="info-label"><i class="bi bi-geo-alt"></i> Binaan:</span>
-                <span class="info-value">{{ $component->nama_binaan_luar }}</span>
-            </div>
-            @endif
-        </div>
-        @endif
-
-        <!-- Main Components -->
-        @if($component->mainComponents->count() > 0)
-            <h6 class="text-muted mb-3">
-                <i class="bi bi-layers"></i> Komponen Utama ({{ $component->mainComponents->count() }})
-            </h6>
-            
-            @foreach($component->mainComponents as $mainComponent)
-                <div class="nested-item level-2">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div class="flex-grow-1">
-                            <div class="mb-2">
-                                <span class="badge bg-success small">Komponen Utama</span>
-                                <span class="badge {{ $mainComponent->status == 'aktif' ? 'bg-success' : 'bg-secondary' }} small">
-                                    {{ $mainComponent->status == 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
-                                </span>
-                            </div>
-                            <h6 class="mb-1">{{ $mainComponent->nama_komponen_utama }}</h6>
-                            @if($mainComponent->jenama || $mainComponent->model)
-                            <div class="text-muted small">
-                                @if($mainComponent->jenama)
-                                    <span><i class="bi bi-tag"></i> {{ $mainComponent->jenama }}</span>
+<!-- Components Table -->
+@if($components->count() > 0)
+<div class="table-container">
+    <table class="table data-table">
+        <thead>
+            <tr>
+                <th width="50"></th>
+                <th>Komponen / Lokasi</th>
+                <th>Status</th>
+                <th>Nombor DPA</th>
+                <th width="120">Tindakan</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($components as $component)
+                <!-- Component Row -->
+                <tr>
+                    <td>
+                        @if($component->mainComponents->count() > 0)
+                            <button class="expand-btn" onclick="toggleRow('comp-{{ $component->id }}', this)">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        @endif
+                    </td>
+                    <td>
+                        <div>
+                            <strong>{{ $component->nama_premis }}</strong>
+                            <div class="location-info mt-1">
+                                @if($component->kod_blok)
+                                    <i class="bi bi-building"></i> {{ $component->kod_blok }}
                                 @endif
-                                @if($mainComponent->model)
-                                    <span class="ms-2"><i class="bi bi-box"></i> {{ $mainComponent->model }}</span>
+                                @if($component->nama_ruang)
+                                    · <i class="bi bi-door-open"></i> {{ $component->nama_ruang }}
+                                @endif
+                                @if($component->nama_binaan_luar)
+                                    · <i class="bi bi-geo-alt"></i> {{ $component->nama_binaan_luar }}
                                 @endif
                             </div>
-                            @endif
                         </div>
-                        <div class="d-flex gap-2">
-                            <a href="{{ route('main-components.edit', $mainComponent) }}" class="btn btn-light btn-icon">
+                    </td>
+                    <td>
+                        <span class="badge {{ $component->status == 'aktif' ? 'bg-success' : 'bg-secondary' }}">
+                            {{ $component->status == 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
+                        </span>
+                    </td>
+                    <td>{{ $component->nombor_dpa }}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{{ route('components.show', $component) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ route('components.edit', $component) }}" class="btn btn-light btn-sm btn-icon" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <a href="{{ route('main-components.show', $mainComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
-                            <i class="bi bi-eye"></i>
-                            </a>
-                            <form action="{{ route('main-components.delete', $mainComponent) }}" method="POST"
-                                  onsubmit="return confirm('Padam komponen utama ini?')">
+                            <form action="{{ route('components.delete', $component) }}" method="POST" 
+                                  onsubmit="return confirm('Padam komponen ini?')" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm btn-icon">
+                                <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Padam">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
                         </div>
-                    </div>
+                    </td>
+                </tr>
 
-                    <!-- Sub Components -->
-                    @if($mainComponent->subComponents->count() > 0)
-                        <div class="mt-3 ms-3">
-                            <div class="text-muted small mb-2">
-                                <i class="bi bi-diagram-3"></i> Sub Komponen ({{ $mainComponent->subComponents->count() }})
-                            </div>
-                            
-                            @foreach($mainComponent->subComponents as $subComponent)
-                                <div class="nested-item level-3 mb-2">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <div class="mb-1">
-                                                <span class="badge bg-info small">Sub Komponen</span>
-                                                <span class="badge {{ $subComponent->status == 'aktif' ? 'bg-success' : 'bg-secondary' }} small">
-                                                    {{ $subComponent->status == 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
-                                                </span>
-                                            </div>
-                                            <div class="fw-semibold small">{{ $subComponent->nama_sub_komponen }}</div>
-                                            @if($subComponent->jenama || $subComponent->model)
-                                            <div class="text-muted small">
-                                                @if($subComponent->jenama){{ $subComponent->jenama }}@endif
-                                                @if($subComponent->model) · {{ $subComponent->model }}@endif
-                                            </div>
+                <!-- Main Components Nested Rows -->
+                @foreach($component->mainComponents as $mainComponent)
+                    <tr class="nested-row" data-parent="comp-{{ $component->id }}">
+                        <td colspan="5">
+                            <table class="nested-table level-2">
+                                <tr class="row-level-2">
+                                    <td width="50">
+                                        @if($mainComponent->subComponents->count() > 0)
+                                            <button class="expand-btn" onclick="toggleRow('main-{{ $mainComponent->id }}', this)">
+                                                <i class="bi bi-chevron-right"></i>
+                                            </button>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span class="badge bg-success small me-2">Komponen Utama</span>
+                                            <strong>{{ $mainComponent->nama_komponen_utama }}</strong>
+                                            @if($mainComponent->jenama || $mainComponent->model)
+                                                <div class="location-info mt-1">
+                                                    @if($mainComponent->jenama)
+                                                        <i class="bi bi-tag"></i> {{ $mainComponent->jenama }}
+                                                    @endif
+                                                    @if($mainComponent->model)
+                                                        · <i class="bi bi-box"></i> {{ $mainComponent->model }}
+                                                    @endif
+                                                </div>
                                             @endif
                                         </div>
-                                        <div class="d-flex gap-2">
-                                            <a href="{{ route('sub-components.edit', $subComponent) }}" class="btn btn-light btn-icon">
+                                    </td>
+                                    <td width="100">
+                                        <span class="badge {{ $mainComponent->status == 'aktif' ? 'bg-success' : 'bg-secondary' }} small">
+                                            {{ $mainComponent->status == 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
+                                        </span>
+                                    </td>
+                                    <td width="120"></td>
+                                    <td width="120">
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ route('main-components.show', $mainComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ route('main-components.edit', $mainComponent) }}" class="btn btn-light btn-sm btn-icon" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a href="{{ route('sub-components.show', $subComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
-                                            <i class="bi bi-eye"></i>
-                                            </a>
-                                            <form action="{{ route('sub-components.delete', $subComponent) }}" method="POST"
-                                                  onsubmit="return confirm('Padam sub komponen ini?')">
+                                            <form action="{{ route('main-components.delete', $mainComponent) }}" method="POST"
+                                                  onsubmit="return confirm('Padam komponen utama ini?')" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm btn-icon">
+                                                <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Padam">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
                                         </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="alert alert-light mt-3 mb-0 py-2 small">
-                            <i class="bi bi-info-circle"></i> Tiada sub komponen. 
-                            <a href="{{ route('sub-components.create') }}">Tambah</a>
-                        </div>
-                    @endif
-                </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Sub Components Nested Rows -->
+                                @foreach($mainComponent->subComponents as $subComponent)
+                                    <tr class="nested-row" data-parent="main-{{ $mainComponent->id }}">
+                                        <td colspan="5">
+                                            <table class="nested-table level-3">
+                                                <tr class="row-level-3">
+                                                    <td width="50"></td>
+                                                    <td>
+                                                        <div>
+                                                            <span class="badge bg-info small me-2">Sub Komponen</span>
+                                                            <strong>{{ $subComponent->nama_sub_komponen }}</strong>
+                                                            @if($subComponent->jenama || $subComponent->model)
+                                                                <div class="location-info mt-1">
+                                                                    @if($subComponent->jenama){{ $subComponent->jenama }}@endif
+                                                                    @if($subComponent->model) · {{ $subComponent->model }}@endif
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td width="100">
+                                                        <span class="badge {{ $subComponent->status == 'aktif' ? 'bg-success' : 'bg-secondary' }} small">
+                                                            {{ $subComponent->status == 'aktif' ? 'Aktif' : 'Tidak Aktif' }}
+                                                        </span>
+                                                    </td>
+                                                    <td width="120"></td>
+                                                    <td width="120">
+                                                        <div class="d-flex gap-1">
+                                                            <a href="{{ route('sub-components.show', $subComponent) }}" class="btn btn-info btn-sm btn-icon" title="Lihat">
+                                                                <i class="bi bi-eye"></i>
+                                                            </a>
+                                                            <a href="{{ route('sub-components.edit', $subComponent) }}" class="btn btn-light btn-sm btn-icon" title="Edit">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                            <form action="{{ route('sub-components.delete', $subComponent) }}" method="POST"
+                                                                  onsubmit="return confirm('Padam sub komponen ini?')" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Padam">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                        </td>
+                    </tr>
+                @endforeach
             @endforeach
-        @else
-            <div class="alert alert-light mb-0">
-                <i class="bi bi-info-circle"></i> Tiada komponen utama. 
-                <a href="{{ route('main-components.create') }}">Tambah komponen utama</a>
-            </div>
-        @endif
-    </div>
+        </tbody>
+    </table>
 </div>
-@empty
+@else
 <div class="empty-state">
     <div class="empty-icon">
         <i class="bi bi-inbox"></i>
@@ -392,6 +466,33 @@
         <i class="bi bi-plus-circle"></i> Tambah Komponen
     </a>
 </div>
-@endforelse
+@endif
+
+<script>
+function toggleRow(parentId, button) {
+    // Toggle button rotation
+    button.classList.toggle('expanded');
+    
+    // Find all rows with matching parent
+    const rows = document.querySelectorAll(`[data-parent="${parentId}"]`);
+    
+    rows.forEach(row => {
+        row.classList.toggle('show');
+        
+        // If closing, also close all nested children
+        if (!row.classList.contains('show')) {
+            const nestedButtons = row.querySelectorAll('.expand-btn.expanded');
+            nestedButtons.forEach(btn => {
+                btn.classList.remove('expanded');
+            });
+            
+            const childRows = row.querySelectorAll('.nested-row.show');
+            childRows.forEach(child => {
+                child.classList.remove('show');
+            });
+        }
+    });
+}
+</script>
 
 @endsection
