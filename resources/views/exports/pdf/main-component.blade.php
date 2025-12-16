@@ -194,7 +194,7 @@
                 <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->mekanikal ? '✓' : '' }}</span> Mekanikal<br>
                 <span class="checkbox">{{ $mainComponent->bio_perubatan ? '✓' : '' }}</span> Bio Perubatan
                 <span style="margin-left: 10px;" class="checkbox">{{ $mainComponent->lain_lain ? '✓' : '' }}</span> Lain-lain: 
-                <span class="inline-field">{{ $mainComponent->lain_lain_text ?? '' }}</span>
+                <span class="inline-field">{{ $mainComponent->lain_lain ?? '' }}</span>
             </div>
         </td>
     </tr>
