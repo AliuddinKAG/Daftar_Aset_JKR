@@ -6,6 +6,7 @@ use App\Http\Controllers\MainComponentController;
 use App\Http\Controllers\SubComponentController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\KodBinaanLuarController;
+use App\Http\Controllers\Api\MasterDataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,11 +24,15 @@ Route::get('/', [ComponentController::class, 'index'])->name('dashboard');
 
 Route::prefix('api')->name('api.')->group(function () {
     // Check Kod Blok dan auto-populate nama
-    Route::post('/check-kod-blok', [App\Http\Controllers\Api\MasterDataController::class, 'checkKodBlok'])
+    Route::post('/check-kod-blok', [MasterDataController::class, 'checkKodBlok'])
         ->name('check-kod-blok');
     
+    // Check Kod Aras dan auto-populate nama (FIXED - guna MasterDataController)
+    Route::post('/check-kod-aras', [MasterDataController::class, 'checkKodAras'])
+        ->name('check-kod-aras');
+    
     // Get master data by type (kod-blok, kod-aras, kod-ruang, nama-ruang)
-    Route::get('/master-data/{type}', [App\Http\Controllers\Api\MasterDataController::class, 'getMasterData'])
+    Route::get('/master-data/{type}', [MasterDataController::class, 'getMasterData'])
         ->name('master-data');
 });
 

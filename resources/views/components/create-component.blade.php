@@ -31,10 +31,10 @@
     font-size: 0.75rem;
     margin-left: 5px;
 }
-.nama-blok-wrapper {
+.nama-field-wrapper {
     position: relative;
 }
-.nama-blok-wrapper .autofill-indicator {
+.nama-field-wrapper .autofill-indicator {
     position: absolute;
     right: 10px;
     top: 50%;
@@ -130,11 +130,11 @@
                                     <tr id="nama-blok-row" style="display: none;">
                                         <td>Nama Blok</td>
                                         <td>
-                                            <div class="nama-blok-wrapper">
+                                            <div class="nama-field-wrapper">
                                                 <input type="text" class="form-control" id="nama_blok" name="nama_blok" 
                                                        value="{{ old('nama_blok') }}"
                                                        placeholder="Nama akan dijana automatik atau anda boleh edit">
-                                                <span class="autofill-indicator" id="autofill-indicator" style="display: none;">
+                                                <span class="autofill-indicator" id="autofill-indicator-blok" style="display: none;">
                                                     <i class="bi bi-magic"></i> Auto
                                                 </span>
                                             </div>
@@ -142,7 +142,10 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Kod Aras</td>
+                                        <td>
+                                            Kod Aras
+                                            <span id="kod-aras-status" class="ms-2"></span>
+                                        </td>
                                         <td>
                                             <div class="input-group">
                                                 <select class="form-select select2-aras" name="kod_aras" id="kod_aras">
@@ -159,7 +162,7 @@
                                             </div>
                                         </td>
                                     </tr>
-                                        <tr id="nama-aras-row" style="display: none;">
+                                    <tr id="nama-aras-row" style="display: none;">
                                         <td>Nama Aras</td>
                                         <td>
                                             <div class="nama-field-wrapper">
@@ -170,9 +173,10 @@
                                                     <i class="bi bi-magic"></i> Auto
                                                 </span>
                                             </div>
-                                            <small class="text-success hint-text" id="nama-aras-hint"></small>
+                                            <small class="text-success" id="nama-aras-hint"></small>
                                         </td>
                                     </tr>
+                                    <tr>
                                         <td>Kod Ruang</td>
                                         <td>
                                             <div class="input-group">
@@ -188,7 +192,6 @@
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                            <!-- Hidden field untuk nama ruang dari kod ruang -->
                                             <input type="hidden" name="nama_ruang_dari_kod" id="nama_ruang_dari_kod" value="{{ old('nama_ruang_dari_kod') }}">
                                         </td>
                                     </tr>
@@ -263,7 +266,6 @@
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                            <!-- Hidden field untuk nama binaan luar -->
                                             <input type="hidden" name="nama_binaan_luar_dari_kod" id="nama_binaan_luar_dari_kod" value="{{ old('nama_binaan_luar_dari_kod') }}">
                                         </td>
                                     </tr>
@@ -301,7 +303,6 @@
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                            <!-- Hidden field untuk nama aras binaan -->
                                             <input type="hidden" name="nama_aras_binaan" id="nama_aras_binaan" value="{{ old('nama_aras_binaan') }}">
                                         </td>
                                     </tr>
@@ -321,7 +322,6 @@
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                            <!-- Hidden field untuk nama ruang binaan dari kod -->
                                             <input type="hidden" name="nama_ruang_binaan_dari_kod" id="nama_ruang_binaan_dari_kod" value="{{ old('nama_ruang_binaan_dari_kod') }}">
                                         </td>
                                     </tr>
@@ -412,8 +412,32 @@ $(document).ready(function() {
         }
     });
 
+    // Initialize Select2 for Kod Aras with tags
+    $('.select2-aras').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
+        }
+    });
+
     // Initialize other Select2 dropdowns
-    $('.select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar').select2({
+    $('.select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
         theme: 'bootstrap-5',
         tags: true,
         placeholder: 'Pilih atau taip nilai baru',
@@ -432,11 +456,11 @@ $(document).ready(function() {
     // ========================================
     // AUTOFILL MAGIC - Kod Blok
     // ========================================
-    let typingTimer;
+    let typingTimerBlok;
     const doneTypingInterval = 500; // 0.5 second
 
     $('#kod_blok').on('select2:select select2:unselect change', function(e) {
-        clearTimeout(typingTimer);
+        clearTimeout(typingTimerBlok);
         
         const kodValue = $(this).val();
         
@@ -446,7 +470,7 @@ $(document).ready(function() {
             return;
         }
 
-        typingTimer = setTimeout(function() {
+        typingTimerBlok = setTimeout(function() {
             checkKodBlok(kodValue);
         }, doneTypingInterval);
     });
@@ -469,13 +493,13 @@ $(document).ready(function() {
                     $('#kod-blok-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
                     $('#nama_blok').val(response.data.nama).prop('readonly', true);
                     $('#nama-blok-hint').text('✓ Kod ini sudah wujud dalam database');
-                    $('#autofill-indicator').hide();
+                    $('#autofill-indicator-blok').hide();
                 } else {
                     // New kod - show suggestion
                     $('#kod-blok-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
                     $('#nama_blok').val(response.suggestion).prop('readonly', false);
                     $('#nama-blok-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
-                    $('#autofill-indicator').show();
+                    $('#autofill-indicator-blok').show();
                 }
             },
             error: function() {
@@ -486,13 +510,77 @@ $(document).ready(function() {
         });
     }
 
-    // Allow user to edit auto-filled name
+    // Allow user to edit auto-filled name for Blok
     $('#nama_blok').on('focus', function() {
         $(this).prop('readonly', false);
-        $('#autofill-indicator').hide();
+        $('#autofill-indicator-blok').hide();
     });
 
+    // ========================================
+    // AUTOFILL MAGIC - Kod Aras (NEW!)
+    // ========================================
+    let typingTimerAras;
+
+    $('#kod_aras').on('select2:select select2:unselect change', function(e) {
+        clearTimeout(typingTimerAras);
+        
+        const kodValue = $(this).val();
+        
+        if (!kodValue) {
+            $('#nama-aras-row').hide();
+            $('#kod-aras-status').html('');
+            return;
+        }
+
+        typingTimerAras = setTimeout(function() {
+            checkKodAras(kodValue);
+        }, doneTypingInterval);
+    });
+
+    function checkKodAras(kod) {
+        if (!kod) return;
+
+        // Show loading
+        $('#kod-aras-status').html('<span class="badge bg-secondary">Menyemak...</span>');
+        $('#nama-aras-row').show();
+        $('#nama_aras').prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '{{ route("api.check-kod-aras") }}',
+            method: 'POST',
+            data: { kod: kod },
+            success: function(response) {
+                if (response.exists) {
+                    // Kod already exists
+                    $('#kod-aras-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $('#nama_aras').val(response.data.nama).prop('readonly', true);
+                    $('#nama-aras-hint').text('✓ Kod ini sudah wujud dalam database');
+                    $('#autofill-indicator-aras').hide();
+                } else {
+                    // New kod - show suggestion
+                    $('#kod-aras-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $('#nama_aras').val(response.suggestion).prop('readonly', false);
+                    $('#nama-aras-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#autofill-indicator-aras').show();
+                }
+            },
+            error: function() {
+                $('#kod-aras-status').html('<span class="badge bg-danger">Ralat</span>');
+                $('#nama_aras').val('').prop('readonly', false);
+                $('#nama-aras-hint').text('');
+            }
+        });
+    }
+
+    // Allow user to edit auto-filled name for Aras
+    $('#nama_aras').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-aras').hide();
+    });
+
+    // ========================================
     // Toggle sections
+    // ========================================
     $('#ada_blok').on('change', function() {
         $('#blok_section').slideToggle(300);
     });
@@ -501,12 +589,20 @@ $(document).ready(function() {
         $('#binaan_section').slideToggle(300);
     });
 
+    // ========================================
     // Check on page load
+    // ========================================
     if ($('#ada_blok').is(':checked')) {
         $('#blok_section').show();
+        
         const kodBlokValue = $('#kod_blok').val();
         if (kodBlokValue) {
             checkKodBlok(kodBlokValue);
+        }
+        
+        const kodArasValue = $('#kod_aras').val();
+        if (kodArasValue) {
+            checkKodAras(kodArasValue);
         }
     }
     
