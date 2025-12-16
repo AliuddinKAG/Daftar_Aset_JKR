@@ -388,9 +388,6 @@
                             <button type="button" class="btn btn-sm btn-success me-2" onclick="addDocumentToCategory(this)">
                                 <i class="bi bi-plus"></i> Tambah Dokumen
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="removeCategory(this)">
-                                <i class="bi bi-x"></i> Buang Kategori
-                            </button>
                         </div>
                     </div>
                     <div class="card-body">
