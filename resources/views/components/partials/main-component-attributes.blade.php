@@ -144,9 +144,6 @@
     $nota = old('nota', $mainComponent->nota ?? '');
 @endphp
 
-{{-- Letakkan HTML form anda di bawah sini --}}
-{{-- Form code sama seperti yang ada sekarang --}}
-
 <!-- MAKLUMAT ATRIBUT SPESIFIKASI -->
 <div class="card mb-4 mt-4">
     <div class="card-header bg-dark text-white">
@@ -196,11 +193,9 @@
                                 <input type="text" class="form-control" name="saiz_unit[]" value="{{ $saizUnitList[$index] ?? '' }}" placeholder="Unit (mm/cm/m)">
                             </div>
                             <div class="col-md-1">
-                                @if($index > 0)
                                 <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
                                     <i class="bi bi-x"></i>
                                 </button>
-                                @endif
                             </div>
                         </div>
                         @endforeach
@@ -227,11 +222,9 @@
                                 <input type="text" class="form-control" name="kadaran_unit[]" value="{{ $kadaranUnitList[$index] ?? '' }}" placeholder="Unit (kW/HP/A/V)">
                             </div>
                             <div class="col-md-1">
-                                @if($index > 0)
                                 <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
                                     <i class="bi bi-x"></i>
                                 </button>
-                                @endif
                             </div>
                         </div>
                         @endforeach
@@ -258,11 +251,9 @@
                                 <input type="text" class="form-control" name="kapasiti_unit[]" value="{{ $kapasitiUnitList[$index] ?? '' }}" placeholder="Unit (L/kg/ton/BTU)">
                             </div>
                             <div class="col-md-1">
-                                @if($index > 0)
                                 <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
                                     <i class="bi bi-x"></i>
                                 </button>
-                                @endif
                             </div>
                         </div>
                         @endforeach
@@ -305,11 +296,9 @@
                     <td><input type="text" class="form-control form-control-sm" name="related_dpa[]" value="{{ $komponen['no_siri'] ?? '' }}" placeholder="No DPA / Kod Ruang"></td>
                     <td><input type="text" class="form-control form-control-sm" name="related_tag[]" value="{{ $komponen['catatan'] ?? '' }}" placeholder="No Tag / Label"></td>
                     <td>
-                        @if($index > 0)
                         <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
                             <i class="bi bi-x"></i>
                         </button>
-                        @endif
                     </td>
                 </tr>
                 @endforeach
@@ -350,11 +339,9 @@
                     <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[]" value="{{ $doc['rujukan'] ?? '' }}" placeholder="No Rujukan"></td>
                     <td><input type="text" class="form-control form-control-sm" name="doc_catatan[]" value="{{ $doc['catatan'] ?? '' }}" placeholder="Catatan"></td>
                     <td>
-                        @if($index > 0)
                         <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
                             <i class="bi bi-x"></i>
                         </button>
-                        @endif
                     </td>
                 </tr>
                 @endforeach
