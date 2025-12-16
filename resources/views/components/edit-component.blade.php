@@ -14,9 +14,32 @@
 .input-group-text {
     background-color: #e9ecef;
 }
-/* Highlight untuk tag baru */
-.select2-results__option .badge {
+.new-tag-badge {
+    background: #10b981;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-left: 5px;
+}
+.existing-tag-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-left: 5px;
+}
+.nama-field-wrapper {
+    position: relative;
+}
+.nama-field-wrapper .autofill-indicator {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 0.875rem;
+    color: #10b981;
 }
 </style>
 @endsection
@@ -88,13 +111,18 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td width="30%">Kod Blok</td>
+                                        <td width="30%">
+                                            Kod Blok
+                                            <span id="kod-blok-status" class="ms-2"></span>
+                                        </td>
                                         <td>
                                             <div class="input-group">
                                                 <select class="form-select select2-blok" name="kod_blok" id="kod_blok">
                                                     <option value="">-- Pilih atau Taip Kod Blok --</option>
                                                     @foreach($kodBloks as $blok)
-                                                        <option value="{{ $blok->kod }}" {{ old('kod_blok', $component->kod_blok) == $blok->kod ? 'selected' : '' }}>
+                                                        <option value="{{ $blok->kod }}" 
+                                                            data-nama="{{ $blok->nama }}"
+                                                            {{ old('kod_blok', $component->kod_blok) == $blok->kod ? 'selected' : '' }}>
                                                             {{ $blok->kod }} - {{ $blok->nama }}
                                                         </option>
                                                     @endforeach
@@ -103,20 +131,53 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr id="nama-blok-row" style="display: {{ old('nama_blok', $component->nama_blok) ? 'table-row' : 'none' }};">
+                                        <td>Nama Blok</td>
+                                        <td>
+                                            <div class="nama-field-wrapper">
+                                                <input type="text" class="form-control" id="nama_blok" name="nama_blok" 
+                                                       value="{{ old('nama_blok', $component->nama_blok) }}"
+                                                       placeholder="Nama akan dijana automatik atau anda boleh edit">
+                                                <span class="autofill-indicator" id="autofill-indicator-blok" style="display: none;">
+                                                    <i class="bi bi-magic"></i> Auto
+                                                </span>
+                                            </div>
+                                            <small class="text-success" id="nama-blok-hint"></small>
+                                        </td>
+                                    </tr>
                                     <tr>
-                                        <td>Kod Aras</td>
+                                        <td>
+                                            Kod Aras
+                                            <span id="kod-aras-status" class="ms-2"></span>
+                                        </td>
                                         <td>
                                             <div class="input-group">
                                                 <select class="form-select select2-aras" name="kod_aras" id="kod_aras">
                                                     <option value="">-- Pilih atau Taip Kod Aras --</option>
                                                     @foreach($kodAras as $aras)
-                                                        <option value="{{ $aras->kod }}" {{ old('kod_aras', $component->kod_aras) == $aras->kod ? 'selected' : '' }}>
+                                                        <option value="{{ $aras->kod }}" 
+                                                                data-nama="{{ $aras->nama }}"
+                                                                {{ old('kod_aras', $component->kod_aras) == $aras->kod ? 'selected' : '' }}>
                                                             {{ $aras->kod }} - {{ $aras->nama }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
+                                        </td>
+                                    </tr>
+                                    <tr id="nama-aras-row" style="display: {{ old('nama_aras', $component->nama_aras) ? 'table-row' : 'none' }};">
+                                        <td>Nama Aras</td>
+                                        <td>
+                                            <div class="nama-field-wrapper">
+                                                <input type="text" class="form-control" id="nama_aras" name="nama_aras" 
+                                                       value="{{ old('nama_aras', $component->nama_aras) }}"
+                                                       placeholder="Nama akan dijana automatik atau anda boleh edit">
+                                                <span class="autofill-indicator" id="autofill-indicator-aras" style="display: none;">
+                                                    <i class="bi bi-magic"></i> Auto
+                                                </span>
+                                            </div>
+                                            <small class="text-success" id="nama-aras-hint"></small>
                                         </td>
                                     </tr>
                                     <tr>
@@ -126,7 +187,9 @@
                                                 <select class="form-select select2-ruang" name="kod_ruang" id="kod_ruang">
                                                     <option value="">-- Pilih atau Taip Kod Ruang --</option>
                                                     @foreach($kodRuangs as $ruang)
-                                                        <option value="{{ $ruang->kod }}" {{ old('kod_ruang', $component->kod_ruang) == $ruang->kod ? 'selected' : '' }}>
+                                                        <option value="{{ $ruang->kod }}" 
+                                                                data-nama="{{ $ruang->nama }}"
+                                                                {{ old('kod_ruang', $component->kod_ruang) == $ruang->kod ? 'selected' : '' }}>
                                                             {{ $ruang->kod }}
                                                         </option>
                                                     @endforeach
@@ -142,7 +205,9 @@
                                                 <select class="form-select select2-nama-ruang" name="nama_ruang" id="nama_ruang">
                                                     <option value="">-- Pilih atau Taip Nama Ruang --</option>
                                                     @foreach($namaRuangs as $nama)
-                                                        <option value="{{ $nama->nama }}" {{ old('nama_ruang', $component->nama_ruang) == $nama->nama ? 'selected' : '' }}>
+                                                        <option value="{{ $nama->nama }}" 
+                                                                data-kod="{{ $nama->kod }}"
+                                                                {{ old('nama_ruang', $component->nama_ruang) == $nama->nama ? 'selected' : '' }}>
                                                             {{ $nama->nama }}
                                                         </option>
                                                     @endforeach
@@ -181,21 +246,17 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td width="30%">Nama Binaan Luar</td>
-                                        <td><input type="text" class="form-control" name="nama_binaan_luar" 
-                                                   value="{{ old('nama_binaan_luar', $component->nama_binaan_luar) }}" 
-                                                   placeholder="Contoh: Kolam Renang A"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Kod Binaan Luar</td>
+                                        <td width="30%">Kod Binaan Luar</td>
                                         <td>
                                             <div class="input-group">
                                                 <select class="form-select select2-binaan-luar" name="kod_binaan_luar" id="kod_binaan_luar">
                                                     <option value="">-- Pilih atau Taip Kod Binaan Luar --</option>
                                                     @if(isset($kodBinaanLuar))
                                                         @foreach($kodBinaanLuar as $binaan)
-                                                            <option value="{{ $binaan->kod }}" {{ old('kod_binaan_luar', $component->kod_binaan_luar) == $binaan->kod ? 'selected' : '' }}>
-                                                                {{ $binaan->kod }} - {{ $binaan->nama }}
+                                                            <option value="{{ $binaan->kod }}" 
+                                                                    data-nama="{{ $binaan->nama }}"
+                                                                    {{ old('kod_binaan_luar', $component->kod_binaan_luar) == $binaan->kod ? 'selected' : '' }}>
+                                                                {{ $binaan->kod }}
                                                             </option>
                                                         @endforeach
                                                     @endif
@@ -223,19 +284,38 @@
                                         <td colspan="2" class="fw-bold">Diisi Jika Binaan Luar Mempunyai Aras dan Ruang</td>
                                     </tr>
                                     <tr>
-                                        <td>Kod Aras</td>
+                                        <td>
+                                            Kod Aras
+                                            <span id="kod-aras-binaan-status" class="ms-2"></span>
+                                        </td>
                                         <td>
                                             <div class="input-group">
                                                 <select class="form-select select2-aras-binaan" name="kod_aras_binaan" id="kod_aras_binaan">
                                                     <option value="">-- Pilih atau Taip Kod Aras --</option>
                                                     @foreach($kodAras as $aras)
-                                                        <option value="{{ $aras->kod }}" {{ old('kod_aras_binaan', $component->kod_aras_binaan) == $aras->kod ? 'selected' : '' }}>
-                                                            {{ $aras->kod }} - {{ $aras->nama }}
+                                                        <option value="{{ $aras->kod }}" 
+                                                                data-nama="{{ $aras->nama }}"
+                                                                {{ old('kod_aras_binaan', $component->kod_aras_binaan) == $aras->kod ? 'selected' : '' }}>
+                                                            {{ $aras->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
+                                        </td>
+                                    </tr>
+                                    <tr id="nama-aras-binaan-row" style="display: {{ old('nama_aras_binaan', $component->nama_aras_binaan) ? 'table-row' : 'none' }};">
+                                        <td>Nama Aras</td>
+                                        <td>
+                                            <div class="nama-field-wrapper">
+                                                <input type="text" class="form-control" id="nama_aras_binaan" name="nama_aras_binaan" 
+                                                       value="{{ old('nama_aras_binaan', $component->nama_aras_binaan) }}"
+                                                       placeholder="Nama akan dijana automatik atau anda boleh edit">
+                                                <span class="autofill-indicator" id="autofill-indicator-aras-binaan" style="display: none;">
+                                                    <i class="bi bi-magic"></i> Auto
+                                                </span>
+                                            </div>
+                                            <small class="text-success" id="nama-aras-binaan-hint"></small>
                                         </td>
                                     </tr>
                                     <tr>
@@ -245,7 +325,9 @@
                                                 <select class="form-select select2-ruang-binaan" name="kod_ruang_binaan" id="kod_ruang_binaan">
                                                     <option value="">-- Pilih atau Taip Kod Ruang --</option>
                                                     @foreach($kodRuangs as $ruang)
-                                                        <option value="{{ $ruang->kod }}" {{ old('kod_ruang_binaan', $component->kod_ruang_binaan) == $ruang->kod ? 'selected' : '' }}>
+                                                        <option value="{{ $ruang->kod }}" 
+                                                                data-nama="{{ $ruang->nama }}"
+                                                                {{ old('kod_ruang_binaan', $component->kod_ruang_binaan) == $ruang->kod ? 'selected' : '' }}>
                                                             {{ $ruang->kod }}
                                                         </option>
                                                     @endforeach
@@ -261,7 +343,9 @@
                                                 <select class="form-select select2-nama-ruang-binaan" name="nama_ruang_binaan" id="nama_ruang_binaan">
                                                     <option value="">-- Pilih atau Taip Nama Ruang --</option>
                                                     @foreach($namaRuangs as $nama)
-                                                        <option value="{{ $nama->nama }}" {{ old('nama_ruang_binaan', $component->nama_ruang_binaan) == $nama->nama ? 'selected' : '' }}>
+                                                        <option value="{{ $nama->nama }}" 
+                                                                data-kod="{{ $nama->kod }}"
+                                                                {{ old('nama_ruang_binaan', $component->nama_ruang_binaan) == $nama->nama ? 'selected' : '' }}>
                                                             {{ $nama->nama }}
                                                         </option>
                                                     @endforeach
@@ -312,103 +396,341 @@
 
 <script>
 $(document).ready(function() {
-    // Initialize Select2 dengan clear button dan delete capability
-    $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
+    // CSRF Token untuk AJAX
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    // Initialize Select2 dengan tags support
+    $('.select2-blok').select2({
         theme: 'bootstrap-5',
         tags: true,
-        placeholder: 'Cari atau taip nilai baru',
-        allowClear: true,  // Enable butang X untuk clear selection
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
         createTag: function (params) {
             var term = $.trim(params.term);
-            if (term === '') {
-                return null;
-            }
+            if (term === '') return null;
+            
             return {
                 id: term,
-                text: term + ' ✓ (Baru)',
+                text: term,
                 newTag: true
             }
         },
-        // Highlight tag baru dengan warna berbeza
         templateResult: function(data) {
             if (data.newTag) {
-                return $('<span class="badge bg-success">' + data.text + '</span>');
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
             }
             return data.text;
         }
     });
 
-    // Event untuk buang option yang salah taip
-    $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').on('select2:unselecting', function(e) {
-        var data = e.params.args.data;
-        
-        // Jika option adalah tag baru yang user taip sendiri
-        if (data.newTag) {
-            // Optional: uncomment jika nak confirmation dialog
-            // if (!confirm('Buang "' + data.text + '"?')) {
-            //     e.preventDefault();
-            //     return;
-            // }
+    // Initialize Select2 for Kod Aras with tags (Blok section)
+    $('.select2-aras').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
             
-            // Auto remove option dari dropdown
-            var $select = $(this);
-            setTimeout(function() {
-                $select.find('option[value="' + data.id + '"]').remove();
-            }, 100);
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
         }
     });
 
-    // Event bila clear semua (klik X button)
-    $('.select2-blok, .select2-aras, .select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').on('select2:clear', function() {
-        var $select = $(this);
-        // Optional: Buang semua tag baru bila clear
-        $select.find('option').each(function() {
-            var $option = $(this);
-            // Check jika option ni bukan dari database (tag baru)
-            if ($option.val() && !$option.data('original')) {
-                // Uncomment line ini jika nak buang tag baru bila clear
-                // $option.remove();
+    // Initialize Select2 for Kod Aras with tags (Binaan Luar section)
+    $('.select2-aras-binaan').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
+        }
+    });
+
+    // Initialize Select2 for Kod Binaan Luar with tags
+    $('.select2-binaan-luar').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
+        }
+    });
+
+    // Initialize other Select2 dropdowns
+    $('.select2-ruang, .select2-nama-ruang, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip nilai baru',
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            return {
+                id: term,
+                text: term + ' (Baru)',
+                newTag: true
+            }
+        }
+    });
+
+    // ========================================
+    // AUTOFILL MAGIC - Kod Blok
+    // ========================================
+    let typingTimerBlok;
+    const doneTypingInterval = 500;
+
+    $('#kod_blok').on('select2:select select2:unselect change', function(e) {
+        clearTimeout(typingTimerBlok);
+        
+        const kodValue = $(this).val();
+        
+        if (!kodValue) {
+            $('#nama-blok-row').hide();
+            $('#kod-blok-status').html('');
+            return;
+        }
+
+        typingTimerBlok = setTimeout(function() {
+            checkKodBlok(kodValue);
+        }, doneTypingInterval);
+    });
+
+    function checkKodBlok(kod) {
+        if (!kod) return;
+
+        $('#kod-blok-status').html('<span class="badge bg-secondary">Menyemak...</span>');
+        $('#nama-blok-row').show();
+        $('#nama_blok').prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '{{ route("api.check-kod-blok") }}',
+            method: 'POST',
+            data: { kod: kod },
+            success: function(response) {
+                if (response.exists) {
+                    $('#kod-blok-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $('#nama_blok').val(response.data.nama).prop('readonly', true);
+                    $('#nama-blok-hint').text('✓ Kod ini sudah wujud dalam database');
+                    $('#autofill-indicator-blok').hide();
+                } else {
+                    $('#kod-blok-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $('#nama_blok').val(response.suggestion).prop('readonly', false);
+                    $('#nama-blok-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#autofill-indicator-blok').show();
+                }
+            },
+            error: function() {
+                $('#kod-blok-status').html('<span class="badge bg-danger">Ralat</span>');
+                $('#nama_blok').val('').prop('readonly', false);
+                $('#nama-blok-hint').text('');
             }
         });
+    }
+
+    $('#nama_blok').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-blok').hide();
     });
 
-    // Mark original options (dari database)
-    $('.select2-blok option, .select2-aras option, .select2-ruang option, .select2-nama-ruang option, .select2-binaan-luar option, .select2-aras-binaan option, .select2-ruang-binaan option, .select2-nama-ruang-binaan option').each(function() {
-        if ($(this).val()) {
-            $(this).data('original', true);
+    // ========================================
+    // AUTOFILL MAGIC - Kod Aras
+    // ========================================
+    let typingTimerAras;
+
+    $('#kod_aras').on('select2:select select2:unselect change', function(e) {
+        clearTimeout(typingTimerAras);
+        
+        const kodValue = $(this).val();
+        
+        if (!kodValue) {
+            $('#nama-aras-row').hide();
+            $('#kod-aras-status').html('');
+            return;
         }
+
+        typingTimerAras = setTimeout(function() {
+            checkKodAras(kodValue);
+        }, doneTypingInterval);
     });
 
-    // Toggle Blok Section
+    function checkKodAras(kod) {
+        if (!kod) return;
+
+        $('#kod-aras-status').html('<span class="badge bg-secondary">Menyemak...</span>');
+        $('#nama-aras-row').show();
+        $('#nama_aras').prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '{{ route("api.check-kod-aras") }}',
+            method: 'POST',
+            data: { kod: kod },
+            success: function(response) {
+                if (response.exists) {
+                    $('#kod-aras-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $('#nama_aras').val(response.data.nama).prop('readonly', true);
+                    $('#nama-aras-hint').text('✓ Kod ini sudah wujud dalam database');
+                    $('#autofill-indicator-aras').hide();
+                } else {
+                    $('#kod-aras-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $('#nama_aras').val(response.suggestion).prop('readonly', false);
+                    $('#nama-aras-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#autofill-indicator-aras').show();
+                }
+            },
+            error: function() {
+                $('#kod-aras-status').html('<span class="badge bg-danger">Ralat</span>');
+                $('#nama_aras').val('').prop('readonly', false);
+                $('#nama-aras-hint').text('');
+            }
+        });
+    }
+
+    $('#nama_aras').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-aras').hide();
+    });
+
+    // ========================================
+    // AUTOFILL MAGIC - Kod Aras Binaan Luar (NEW!)
+    // ========================================
+    let typingTimerArasBinaan;
+
+    $('#kod_aras_binaan').on('select2:select select2:unselect change', function(e) {
+        clearTimeout(typingTimerArasBinaan);
+        
+        const kodValue = $(this).val();
+        
+        if (!kodValue) {
+            $('#nama-aras-binaan-row').hide();
+            $('#kod-aras-binaan-status').html('');
+            return;
+        }
+
+        typingTimerArasBinaan = setTimeout(function() {
+            checkKodArasBinaan(kodValue);
+        }, doneTypingInterval);
+    });
+
+    function checkKodArasBinaan(kod) {
+        if (!kod) return;
+
+        // Show loading
+        $('#kod-aras-binaan-status').html('<span class="badge bg-secondary">Menyemak...</span>');
+        $('#nama-aras-binaan-row').show();
+        $('#nama_aras_binaan').prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '{{ route("api.check-kod-aras") }}',
+            method: 'POST',
+            data: { kod: kod },
+            success: function(response) {
+                if (response.exists) {
+                    // Kod already exists
+                    $('#kod-aras-binaan-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $('#nama_aras_binaan').val(response.data.nama).prop('readonly', true);
+                    $('#nama-aras-binaan-hint').text('✓ Kod ini sudah wujud dalam database');
+                    $('#autofill-indicator-aras-binaan').hide();
+                } else {
+                    // New kod - show suggestion
+                    $('#kod-aras-binaan-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $('#nama_aras_binaan').val(response.suggestion).prop('readonly', false);
+                    $('#nama-aras-binaan-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#autofill-indicator-aras-binaan').show();
+                }
+            },
+            error: function() {
+                $('#kod-aras-binaan-status').html('<span class="badge bg-danger">Ralat</span>');
+                $('#nama_aras_binaan').val('').prop('readonly', false);
+                $('#nama-aras-binaan-hint').text('');
+            }
+        });
+    }
+
+    // Allow user to edit auto-filled name for Aras Binaan
+    $('#nama_aras_binaan').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-aras-binaan').hide();
+    });
+
+    // ========================================
+    // Toggle sections
+    // ========================================
     $('#ada_blok').on('change', function() {
-        if ($(this).is(':checked')) {
-            $('#blok_section').slideDown(300);
-        } else {
-            $('#blok_section').slideUp(300);
-        }
+        $('#blok_section').slideToggle(300);
     });
 
-    // Toggle Binaan Luar Section
     $('#ada_binaan_luar').on('change', function() {
-        if ($(this).is(':checked')) {
-            $('#binaan_section').slideDown(300);
-        } else {
-            $('#binaan_section').slideUp(300);
-        }
+        $('#binaan_section').slideToggle(300);
     });
 
+    // ========================================
     // Check on page load
+    // ========================================
     if ($('#ada_blok').is(':checked')) {
         $('#blok_section').show();
+        
+        const kodBlokValue = $('#kod_blok').val();
+        if (kodBlokValue) {
+            checkKodBlok(kodBlokValue);
+        }
+        
+        const kodArasValue = $('#kod_aras').val();
+        if (kodArasValue) {
+            checkKodAras(kodArasValue);
+        }
     }
+    
     if ($('#ada_binaan_luar').is(':checked')) {
         $('#binaan_section').show();
+        
+        const kodArasBinaanValue = $('#kod_aras_binaan').val();
+        if (kodArasBinaanValue) {
+            checkKodArasBinaan(kodArasBinaanValue);
+        }
     }
-
-    // Tambah CSS untuk highlight new tags
-    $('<style>')
-        .text('.select2-results__option--highlighted .badge { background-color: #198754 !important; color: white !important; }')
-        .appendTo('head');
 });
 </script>
 @endsection

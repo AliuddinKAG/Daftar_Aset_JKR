@@ -1,5 +1,3 @@
-{{-- File: resources/views/components/create-component.blade.php (ENHANCED) --}}
-
 @extends('layouts.app')
 
 @section('title', 'Borang Pengumpulan Data - Peringkat Komponen')
@@ -259,7 +257,7 @@
                                                             <option value="{{ $binaan->kod }}" 
                                                                     data-nama="{{ $binaan->nama }}"
                                                                     {{ old('kod_binaan_luar') == $binaan->kod ? 'selected' : '' }}>
-                                                                {{ $binaan->kod }} - {{ $binaan->nama }}
+                                                                {{ $binaan->kod }}
                                                             </option>
                                                         @endforeach
                                                     @endif
@@ -288,7 +286,10 @@
                                         <td colspan="2" class="fw-bold">Diisi Jika Binaan Luar Mempunyai Aras dan Ruang</td>
                                     </tr>
                                     <tr>
-                                        <td>Kod Aras</td>
+                                        <td>
+                                            Kod Aras
+                                            <span id="kod-aras-binaan-status" class="ms-2"></span>
+                                        </td>
                                         <td>
                                             <div class="input-group">
                                                 <select class="form-select select2-aras-binaan" name="kod_aras_binaan" id="kod_aras_binaan">
@@ -297,13 +298,26 @@
                                                         <option value="{{ $aras->kod }}" 
                                                                 data-nama="{{ $aras->nama }}"
                                                                 {{ old('kod_aras_binaan') == $aras->kod ? 'selected' : '' }}>
-                                                            {{ $aras->kod }} - {{ $aras->nama }}
+                                                            {{ $aras->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                                             </div>
-                                            <input type="hidden" name="nama_aras_binaan" id="nama_aras_binaan" value="{{ old('nama_aras_binaan') }}">
+                                        </td>
+                                    </tr>
+                                    <tr id="nama-aras-binaan-row" style="display: none;">
+                                        <td>Nama Aras</td>
+                                        <td>
+                                            <div class="nama-field-wrapper">
+                                                <input type="text" class="form-control" id="nama_aras_binaan" name="nama_aras_binaan" 
+                                                       value="{{ old('nama_aras_binaan') }}"
+                                                       placeholder="Nama akan dijana automatik atau anda boleh edit">
+                                                <span class="autofill-indicator" id="autofill-indicator-aras-binaan" style="display: none;">
+                                                    <i class="bi bi-magic"></i> Auto
+                                                </span>
+                                            </div>
+                                            <small class="text-success" id="nama-aras-binaan-hint"></small>
                                         </td>
                                     </tr>
                                     <tr>
@@ -412,7 +426,7 @@ $(document).ready(function() {
         }
     });
 
-    // Initialize Select2 for Kod Aras with tags
+    // Initialize Select2 for Kod Aras with tags (Blok section)
     $('.select2-aras').select2({
         theme: 'bootstrap-5',
         tags: true,
@@ -436,8 +450,56 @@ $(document).ready(function() {
         }
     });
 
+    // Initialize Select2 for Kod Aras with tags (Binaan Luar section)
+    $('.select2-aras-binaan').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
+        }
+    });
+
+    // Initialize Select2 for Kod Binaan Luar with tags
+    $('.select2-binaan-luar').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
+        }
+    });
+
     // Initialize other Select2 dropdowns
-    $('.select2-ruang, .select2-nama-ruang, .select2-binaan-luar, .select2-aras-binaan, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
+    $('.select2-ruang, .select2-nama-ruang, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
         theme: 'bootstrap-5',
         tags: true,
         placeholder: 'Pilih atau taip nilai baru',
@@ -579,6 +641,68 @@ $(document).ready(function() {
     });
 
     // ========================================
+    // AUTOFILL MAGIC - Kod Aras Binaan Luar (NEW!)
+    // ========================================
+    let typingTimerArasBinaan;
+
+    $('#kod_aras_binaan').on('select2:select select2:unselect change', function(e) {
+        clearTimeout(typingTimerArasBinaan);
+        
+        const kodValue = $(this).val();
+        
+        if (!kodValue) {
+            $('#nama-aras-binaan-row').hide();
+            $('#kod-aras-binaan-status').html('');
+            return;
+        }
+
+        typingTimerArasBinaan = setTimeout(function() {
+            checkKodArasBinaan(kodValue);
+        }, doneTypingInterval);
+    });
+
+    function checkKodArasBinaan(kod) {
+        if (!kod) return;
+
+        // Show loading
+        $('#kod-aras-binaan-status').html('<span class="badge bg-secondary">Menyemak...</span>');
+        $('#nama-aras-binaan-row').show();
+        $('#nama_aras_binaan').prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '{{ route("api.check-kod-aras") }}',
+            method: 'POST',
+            data: { kod: kod },
+            success: function(response) {
+                if (response.exists) {
+                    // Kod already exists
+                    $('#kod-aras-binaan-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $('#nama_aras_binaan').val(response.data.nama).prop('readonly', true);
+                    $('#nama-aras-binaan-hint').text('✓ Kod ini sudah wujud dalam database');
+                    $('#autofill-indicator-aras-binaan').hide();
+                } else {
+                    // New kod - show suggestion
+                    $('#kod-aras-binaan-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $('#nama_aras_binaan').val(response.suggestion).prop('readonly', false);
+                    $('#nama-aras-binaan-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#autofill-indicator-aras-binaan').show();
+                }
+            },
+            error: function() {
+                $('#kod-aras-binaan-status').html('<span class="badge bg-danger">Ralat</span>');
+                $('#nama_aras_binaan').val('').prop('readonly', false);
+                $('#nama-aras-binaan-hint').text('');
+            }
+        });
+    }
+
+    // Allow user to edit auto-filled name for Aras Binaan
+    $('#nama_aras_binaan').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-aras-binaan').hide();
+    });
+
+    // ========================================
     // Toggle sections
     // ========================================
     $('#ada_blok').on('change', function() {
@@ -608,6 +732,11 @@ $(document).ready(function() {
     
     if ($('#ada_binaan_luar').is(':checked')) {
         $('#binaan_section').show();
+        
+        const kodArasBinaanValue = $('#kod_aras_binaan').val();
+        if (kodArasBinaanValue) {
+            checkKodArasBinaan(kodArasBinaanValue);
+        }
     }
 });
 </script>
