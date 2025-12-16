@@ -196,5 +196,179 @@ $(document).ready(function() {
         nextButton.style.display = 'none';
     }
 });
+
+// =====================================================
+// FUNGSI UNTUK SUB-COMPONENT SPECIFICATIONS
+// =====================================================
+let categoryCounter = 0;
+
+// ===========================================
+// FUNGSI SPESIFIKASI (Saiz, Kadaran, Kapasiti)
+// ===========================================
+window.addSpesifikasi = function(type) {
+    console.log('addSpesifikasi called for:', type);
+    
+    const card = document.querySelector(`.spesifikasi-card[data-type="${type}"]`);
+    if (!card) {
+        console.error(`Card untuk type "${type}" tidak dijumpai`);
+        return;
+    }
+    
+    const container = card.querySelector('.spesifikasi-rows');
+    if (!container) {
+        console.error('Container .spesifikasi-rows tidak dijumpai');
+        return;
+    }
+    
+    const newRow = document.createElement('div');
+    newRow.className = 'row mb-2 spesifikasi-row';
+    
+    let placeholderValue = '';
+    let placeholderUnit = '';
+    
+    if (type === 'saiz') {
+        placeholderValue = 'Contoh: 1200x400x500 atau 1200';
+        placeholderUnit = 'Unit (mm/cm/m)';
+    } else if (type === 'kadaran') {
+        placeholderValue = 'Nilai';
+        placeholderUnit = 'Unit (kW/HP/A)';
+    } else if (type === 'kapasiti') {
+        placeholderValue = 'Nilai';
+        placeholderUnit = 'Unit (L/kg/ton)';
+    }
+    
+    newRow.innerHTML = `
+        <div class="col-md-7">
+            <input type="text" class="form-control" name="${type}[]" placeholder="${placeholderValue}">
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="${type}_unit[]" placeholder="${placeholderUnit}">
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeSpesifikasi(this)">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(newRow);
+    console.log('Spesifikasi baru ditambah');
+};
+
+window.removeSpesifikasi = function(button) {
+    button.closest('.spesifikasi-row').remove();
+};
+
+// ===========================================
+// FUNGSI KATEGORI DOKUMEN
+// ===========================================
+window.addDocumentCategory = function() {
+    categoryCounter++;
+    const categoryName = 'kategori_' + categoryCounter;
+    const container = document.getElementById('documentCategoriesContainer');
+    
+    if (!container) {
+        console.error('documentCategoriesContainer tidak dijumpai');
+        return;
+    }
+    
+    const categoryCard = document.createElement('div');
+    categoryCard.className = 'document-category-card card mb-3';
+    categoryCard.setAttribute('data-category', categoryName);
+    
+    categoryCard.innerHTML = `
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <strong>Kategori:</strong>
+                <input type="text" class="form-control form-control-sm d-inline-block" style="width: 200px;" 
+                       name="doc_category[]" value="${categoryName}" placeholder="Nama Kategori">
+            </div>
+            <div>
+                <button type="button" class="btn btn-sm btn-success me-2" onclick="addDocumentToCategory(this)">
+                    <i class="bi bi-plus"></i> Tambah Dokumen
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeCategory(this)">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th width="5%">Bil</th>
+                        <th width="35%">Nama Dokumen</th>
+                        <th width="30%">No Rujukan</th>
+                        <th width="25%">Catatan</th>
+                        <th width="5%"></th>
+                    </tr>
+                </thead>
+                <tbody class="documents-tbody">
+                    <tr class="document-row">
+                        <td><input type="number" class="form-control form-control-sm" name="doc_bil[${categoryName}][]" value="1"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_nama[${categoryName}][]" placeholder="Nama Dokumen"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[${categoryName}][]" placeholder="No Rujukan"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[${categoryName}][]" placeholder="Catatan"></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.appendChild(categoryCard);
+    console.log('Kategori baru ditambah:', categoryName);
+};
+
+// ===========================================
+// FUNGSI TAMBAH DOKUMEN DALAM KATEGORI
+// ===========================================
+window.addDocumentToCategory = function(button) {
+    console.log('addDocumentToCategory called');
+    
+    const categoryCard = button.closest('.document-category-card');
+    if (!categoryCard) {
+        console.error('Kategori card tidak dijumpai');
+        return;
+    }
+    
+    const tbody = categoryCard.querySelector('.documents-tbody');
+    if (!tbody) {
+        console.error('tbody tidak dijumpai');
+        return;
+    }
+    
+    const categoryInput = categoryCard.querySelector('input[name="doc_category[]"]');
+    const categoryName = categoryInput ? categoryInput.value : 'umum';
+    
+    const rowCount = tbody.querySelectorAll('.document-row').length;
+    const newBil = rowCount + 1;
+    
+    const newRow = document.createElement('tr');
+    newRow.className = 'document-row';
+    newRow.innerHTML = `
+        <td><input type="number" class="form-control form-control-sm" name="doc_bil[${categoryName}][]" value="${newBil}"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_nama[${categoryName}][]" placeholder="Nama Dokumen"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_rujukan[${categoryName}][]" placeholder="No Rujukan"></td>
+        <td><input type="text" class="form-control form-control-sm" name="doc_catatan[${categoryName}][]" placeholder="Catatan"></td>
+        <td>
+            <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">
+                <i class="bi bi-x"></i>
+            </button>
+        </td>
+    `;
+    
+    tbody.appendChild(newRow);
+    console.log('Dokumen baru ditambah ke kategori:', categoryName);
+};
+
+// ===========================================
+// FUNGSI BUANG KATEGORI
+// ===========================================
+window.removeCategory = function(button) {
+    if (confirm('Adakah anda pasti mahu membuang kategori dokumen ini?')) {
+        button.closest('.document-category-card').remove();
+    }
+};
 </script>
 @endsection
