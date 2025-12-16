@@ -185,7 +185,7 @@
                                             <td><input type="date" class="form-control form-control-sm" name="tarikh_perolehan" value="{{ old('tarikh_perolehan') }}"></td>
                                         </tr>
                                         <tr>
-                                            <td>Kos Perolehan/Kontrak</td>
+                                            <td>Kos Perolehan/Kontrak (RM)</td>
                                             <td><input type="text" class="form-control form-control-sm" name="kos_perolehan" value="{{ old('kos_perolehan') }}" placeholder="contoh: 20000.00"></td>
                                         </tr>
                                         <tr>

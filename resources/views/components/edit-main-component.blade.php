@@ -191,7 +191,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Kos Perolehan/Kontrak</td>
+                                            <td>Kos Perolehan/Kontrak (RM)</td>
                                             <td><input type="text" class="form-control form-control-sm" name="kos_perolehan" value="{{ old('kos_perolehan', $mainComponent->kos_perolehan) }}" placeholder="contoh: 20000.00"></td>
                                         </tr>
                                         <tr>

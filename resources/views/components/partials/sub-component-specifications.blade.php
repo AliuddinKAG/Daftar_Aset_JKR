@@ -394,10 +394,6 @@
                 @foreach($dokumenByCategory as $category => $documents)
                 <div class="document-category-card card mb-3" data-category="{{ $category }}">
                     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                            <strong>Kategori:</strong>
-                            <input type="text" class="form-control form-control-sm d-inline-block" style="width: 200px;" name="doc_category[]" value="{{ $category }}" placeholder="Nama Kategori">
-                        </div>
                         <div>
                             <button type="button" class="btn btn-sm btn-success me-2" onclick="addDocumentToCategory(this)">
                                 <i class="bi bi-plus"></i> Tambah Dokumen
