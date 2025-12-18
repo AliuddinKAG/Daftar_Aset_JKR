@@ -8,6 +8,8 @@ use App\Models\KodAras;
 use App\Models\KodRuang;
 use App\Models\NamaRuang;
 use App\Models\KodBinaanLuar;
+use App\Models\Sistem;
+use App\Models\SubSistem;
 use Illuminate\Http\Request;
 
 class MasterDataController extends Controller
@@ -26,7 +28,6 @@ class MasterDataController extends Controller
             ]);
         }
 
-        // Check if exists in database
         $existing = KodBlok::where('kod', $kod)->first();
         
         if ($existing) {
@@ -42,7 +43,6 @@ class MasterDataController extends Controller
             ]);
         }
 
-        // Generate smart suggestion for new kod
         $suggestion = $this->generateBlokNamaSuggestion($kod);
         
         return response()->json([
@@ -66,7 +66,6 @@ class MasterDataController extends Controller
             ]);
         }
 
-        // Check if exists in database
         $existing = KodAras::where('kod', $kod)->first();
         
         if ($existing) {
@@ -82,7 +81,6 @@ class MasterDataController extends Controller
             ]);
         }
 
-        // Generate smart suggestion for new kod
         $suggestion = $this->generateArasNamaSuggestion($kod);
         
         return response()->json([
@@ -93,33 +91,115 @@ class MasterDataController extends Controller
     }
 
     /**
+     * Check if kod sistem exists and return info or generate suggestion (NEW)
+     */
+    public function checkKodSistem(Request $request)
+    {
+        $kod = trim($request->input('kod'));
+        
+        if (empty($kod)) {
+            return response()->json([
+                'exists' => false,
+                'message' => 'Kod kosong'
+            ]);
+        }
+
+        $existing = Sistem::where('kod', $kod)->first();
+        
+        if ($existing) {
+            return response()->json([
+                'exists' => true,
+                'data' => [
+                    'id' => $existing->id,
+                    'kod' => $existing->kod,
+                    'nama' => $existing->nama,
+                    'status' => $existing->is_active ? 'aktif' : 'tidak_aktif'
+                ],
+                'message' => 'Kod sudah wujud dalam database'
+            ]);
+        }
+
+        $suggestion = $this->generateSistemNamaSuggestion($kod);
+        
+        return response()->json([
+            'exists' => false,
+            'suggestion' => $suggestion,
+            'message' => 'Kod baru - Nama disarankan'
+        ]);
+    }
+
+    /**
+     * Check if kod subsistem exists and return info or generate suggestion (NEW)
+     */
+    public function checkKodSubSistem(Request $request)
+    {
+        $kod = trim($request->input('kod'));
+        $sistemId = $request->input('sistem_id');
+        
+        if (empty($kod)) {
+            return response()->json([
+                'exists' => false,
+                'message' => 'Kod kosong'
+            ]);
+        }
+
+        $query = SubSistem::where('kod', $kod);
+        
+        // If sistem_id provided, check within that sistem
+        if ($sistemId) {
+            $query->where('sistem_id', $sistemId);
+        }
+        
+        $existing = $query->first();
+        
+        if ($existing) {
+            return response()->json([
+                'exists' => true,
+                'data' => [
+                    'id' => $existing->id,
+                    'kod' => $existing->kod,
+                    'nama' => $existing->nama,
+                    'sistem_id' => $existing->sistem_id,
+                    'sistem_nama' => $existing->sistem->nama ?? null,
+                    'status' => $existing->is_active ? 'aktif' : 'tidak_aktif'
+                ],
+                'message' => 'Kod sudah wujud dalam database'
+            ]);
+        }
+
+        $suggestion = $this->generateSubSistemNamaSuggestion($kod);
+        
+        return response()->json([
+            'exists' => false,
+            'suggestion' => $suggestion,
+            'message' => 'Kod baru - Nama disarankan',
+            'sistem_id' => $sistemId
+        ]);
+    }
+
+    /**
      * Generate smart name suggestion based on kod pattern
      */
     private function generateBlokNamaSuggestion($kod)
     {
         $kod = strtoupper(trim($kod));
         
-        // Pattern 1: Single letter (A, B, C) -> "Blok A", "Blok B"
         if (preg_match('/^[A-Z]$/', $kod)) {
             return "Blok {$kod}";
         }
         
-        // Pattern 2: Letter + Number (A1, B2) -> "Blok A1"
         if (preg_match('/^[A-Z]\d+$/', $kod)) {
             return "Blok {$kod}";
         }
         
-        // Pattern 3: B + Number (B01, B02) -> "Blok 1", "Blok 2"
         if (preg_match('/^B0*(\d+)$/i', $kod, $matches)) {
             return "Blok " . (int)$matches[1];
         }
         
-        // Pattern 4: BLK- prefix -> "Blok X"
         if (preg_match('/^BLK-?(.+)$/i', $kod, $matches)) {
             return "Blok " . strtoupper($matches[1]);
         }
         
-        // Pattern 5: Direction words (UTARA, SELATAN, etc)
         $directions = [
             'UTARA' => 'Blok Utara',
             'SELATAN' => 'Blok Selatan',
@@ -136,7 +216,6 @@ class MasterDataController extends Controller
             return $directions[$kod];
         }
         
-        // Pattern 6: Specific building types
         $types = [
             'ADMIN' => 'Blok Pentadbiran',
             'LIBRARY' => 'Blok Perpustakaan',
@@ -150,13 +229,11 @@ class MasterDataController extends Controller
             return $types[$kod];
         }
         
-        // Pattern 7: Contains "WING" -> "Sayap X"
         if (stripos($kod, 'WING') !== false) {
             $wing = str_replace(['WING', '-', '_'], '', $kod);
             return "Sayap " . ucfirst(strtolower($wing));
         }
         
-        // Default: Just add "Blok" prefix
         return "Blok " . ucwords(strtolower(str_replace(['-', '_'], ' ', $kod)));
     }
 
@@ -167,21 +244,19 @@ class MasterDataController extends Controller
     {
         $kod = strtoupper(trim($kod));
         
-        // Pattern 1: Pure numbers (1, 2, 3, 10, 25) -> "Tingkat 1", "Tingkat 2"
         if (preg_match('/^(\d+)$/', $kod, $matches)) {
             $num = (int)$matches[1];
             return "Tingkat {$num}";
         }
         
-        // Pattern 2: Basement variants
         $basementPatterns = [
-            '/^B(\d*)$/i' => 'Bawah Tanah', // B, B1, B2
-            '/^BT(\d*)$/i' => 'Bawah Tanah', // BT, BT1, BT2
-            '/^BASEMENT(\d*)$/i' => 'Bawah Tanah', // BASEMENT, BASEMENT1
-            '/^LB(\d*)$/i' => 'Bawah Tanah Bawah', // LB, LB1 (Lower Basement)
-            '/^UB(\d*)$/i' => 'Bawah Tanah Atas', // UB, UB1 (Upper Basement)
-            '/^LG(\d*)$/i' => 'Bawah Tanah Bawah', // LG, LG1 (Lower Ground)
-            '/^UG(\d*)$/i' => 'Bawah Tanah Atas', // UG, UG1 (Upper Ground)
+            '/^B(\d*)$/i' => 'Bawah Tanah',
+            '/^BT(\d*)$/i' => 'Bawah Tanah',
+            '/^BASEMENT(\d*)$/i' => 'Bawah Tanah',
+            '/^LB(\d*)$/i' => 'Bawah Tanah Bawah',
+            '/^UB(\d*)$/i' => 'Bawah Tanah Atas',
+            '/^LG(\d*)$/i' => 'Bawah Tanah Bawah',
+            '/^UG(\d*)$/i' => 'Bawah Tanah Atas',
         ];
         
         foreach ($basementPatterns as $pattern => $name) {
@@ -191,7 +266,6 @@ class MasterDataController extends Controller
             }
         }
         
-        // Pattern 3: Ground floor variants
         $groundPatterns = [
             '/^G$/i' => 'Tingkat Bawah',
             '/^GF$/i' => 'Tingkat Bawah',
@@ -203,7 +277,6 @@ class MasterDataController extends Controller
             return $groundPatterns[$kod];
         }
         
-        // Pattern 4: Mezzanine variants
         $mezzaninePatterns = [
             '/^M(\d*)$/i' => 'Mezanin',
             '/^MZ(\d*)$/i' => 'Mezanin',
@@ -218,7 +291,6 @@ class MasterDataController extends Controller
             }
         }
         
-        // Pattern 5: Level/Floor prefix (L1, L2, F1, F2, LV1)
         $levelPatterns = [
             '/^L(\d+)$/i' => 'Tingkat',
             '/^F(\d+)$/i' => 'Tingkat',
@@ -234,7 +306,6 @@ class MasterDataController extends Controller
             }
         }
         
-        // Pattern 6: Rooftop/Penthouse variants
         $specialPatterns = [
             '/^R$/i' => 'Tingkat Bumbung',
             '/^RF$/i' => 'Tingkat Bumbung',
@@ -252,18 +323,140 @@ class MasterDataController extends Controller
             }
         }
         
-        // Pattern 7: Tingkat prefix already in kod (T1, T2, TK1)
         if (preg_match('/^T[K]?(\d+)$/i', $kod, $matches)) {
             return "Tingkat " . (int)$matches[1];
         }
         
-        // Pattern 8: Starts with number followed by text (1A, 2B, 3ST)
         if (preg_match('/^(\d+)[A-Z]+$/i', $kod, $matches)) {
             return "Tingkat " . (int)$matches[1];
         }
         
-        // Default: Just add "Aras" prefix
         return "Aras " . ucwords(strtolower(str_replace(['-', '_'], ' ', $kod)));
+    }
+
+    /**
+     * Generate smart name suggestion for Sistem (NEW)
+     */
+    private function generateSistemNamaSuggestion($kod)
+    {
+        $kod = strtoupper(trim($kod));
+        
+        // Common system patterns
+        $patterns = [
+            // HVAC
+            '/^HVAC$/i' => 'Sistem Penghawa Dingin dan Pengudaraan',
+            '/^AC$/i' => 'Sistem Penghawa Dingin',
+            '/^VENT$/i' => 'Sistem Pengudaraan',
+            
+            // Electrical
+            '/^ELEC$/i' => 'Sistem Elektrikal',
+            '/^POWER$/i' => 'Sistem Bekalan Kuasa',
+            '/^LIGHT$/i' => 'Sistem Pencahayaan',
+            
+            // Plumbing
+            '/^PLUMB$/i' => 'Sistem Paip',
+            '/^WATER$/i' => 'Sistem Bekalan Air',
+            '/^DRAIN$/i' => 'Sistem Perparitan',
+            
+            // Fire
+            '/^FIRE$/i' => 'Sistem Kebakaran',
+            '/^SPRINK$/i' => 'Sistem Pemercik',
+            '/^ALARM$/i' => 'Sistem Penggera',
+            
+            // Security
+            '/^SEC$/i' => 'Sistem Keselamatan',
+            '/^CCTV$/i' => 'Sistem CCTV',
+            '/^ACCESS$/i' => 'Sistem Kawalan Akses',
+            
+            // Lift
+            '/^LIFT$/i' => 'Sistem Lif',
+            '/^ELEV$/i' => 'Sistem Lif',
+            
+            // IT
+            '/^IT$/i' => 'Sistem Teknologi Maklumat',
+            '/^NET$/i' => 'Sistem Rangkaian',
+            '/^TEL$/i' => 'Sistem Telefon',
+        ];
+        
+        foreach ($patterns as $pattern => $name) {
+            if (preg_match($pattern, $kod)) {
+                return $name;
+            }
+        }
+        
+        // If kod contains number at end, might be version/type
+        if (preg_match('/^([A-Z]+)(\d+)$/i', $kod, $matches)) {
+            $base = $matches[1];
+            $num = $matches[2];
+            return "Sistem " . ucfirst(strtolower($base)) . " " . $num;
+        }
+        
+        // Default: "Sistem [Kod]"
+        return "Sistem " . ucwords(strtolower(str_replace(['-', '_'], ' ', $kod)));
+    }
+
+    /**
+     * Generate smart name suggestion for SubSistem (NEW)
+     */
+    private function generateSubSistemNamaSuggestion($kod)
+    {
+        $kod = strtoupper(trim($kod));
+        
+        // Common subsystem patterns
+        $patterns = [
+            // HVAC subsystems
+            '/^AHU$/i' => 'Unit Pengendalian Udara',
+            '/^FCU$/i' => 'Unit Kipas Gegelung',
+            '/^CHILLER$/i' => 'Chiller',
+            '/^COOL$/i' => 'Menara Penyejuk',
+            '/^PUMP$/i' => 'Pam',
+            
+            // Electrical subsystems
+            '/^MSB$/i' => 'Papan Suis Utama',
+            '/^DB$/i' => 'Papan Pengedaran',
+            '/^GEN$/i' => 'Penjana',
+            '/^UPS$/i' => 'Bekalan Kuasa Tanpa Gangguan',
+            '/^PANEL$/i' => 'Panel Elektrik',
+            
+            // Plumbing subsystems
+            '/^TANK$/i' => 'Tangki Air',
+            '/^VALVE$/i' => 'Injap',
+            '/^PIPE$/i' => 'Paip',
+            
+            // Fire subsystems
+            '/^HYDRANT$/i' => 'Hidran',
+            '/^HOSE$/i' => 'Hos Reel',
+            '/^DETECT$/i' => 'Pengesan',
+            
+            // Lift subsystems
+            '/^PASS$/i' => 'Lif Penumpang',
+            '/^CARGO$/i' => 'Lif Barang',
+            '/^MOTOR$/i' => 'Motor',
+        ];
+        
+        foreach ($patterns as $pattern => $name) {
+            if (preg_match($pattern, $kod)) {
+                return $name;
+            }
+        }
+        
+        // If kod has prefix and number (like AHU-1, FCU-2)
+        if (preg_match('/^([A-Z]+)[_-]?(\d+)$/i', $kod, $matches)) {
+            $base = $matches[1];
+            $num = $matches[2];
+            
+            // Check if base matches any pattern
+            foreach ($patterns as $pattern => $name) {
+                if (preg_match($pattern, $base)) {
+                    return $name . " " . $num;
+                }
+            }
+            
+            return "Sub " . ucfirst(strtolower($base)) . " " . $num;
+        }
+        
+        // Default: "SubSistem [Kod]"
+        return "SubSistem " . ucwords(strtolower(str_replace(['-', '_'], ' ', $kod)));
     }
 
     /**

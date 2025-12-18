@@ -9,7 +9,7 @@
             <div class="card-header bg-primary text-white">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="mb-0">PAPARAN DETAIL KOMPONEN</h5>
+                        <h5 class="mb-0">PAPARAN PERINCIAN KOMPONEN</h5>
                         <small>Peringkat Komponen</small>
                     </div>
                     <div>
@@ -30,7 +30,7 @@
                         <i class="bi bi-file-pdf"></i> Download PDF
                     </a>
                     <a href="{{ route('export.complete-report.pdf', $component) }}" class="btn btn-primary">
-                        <i class="bi bi-file-earmark-pdf"></i> Download Report Penuh
+                        <i class="bi bi-file-earmark-pdf"></i> Download Laporan Penuh
                     </a>
                     <a href="{{ route('components.edit', $component) }}" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Edit

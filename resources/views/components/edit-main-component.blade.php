@@ -92,7 +92,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label">SubSistem<<span class="text-danger">*</span></label>
+                                            <label class="form-label">SubSistem<span class="text-danger">*</span></label>
                                             <div class="input-group">
                                                 <select class="form-select select2-subsistem" name="subsistem" id="subsistem">
                                                     <option value="">-- Pilih atau Taip SubSistem --</option>
