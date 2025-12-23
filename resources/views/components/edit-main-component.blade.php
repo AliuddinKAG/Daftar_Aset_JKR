@@ -72,44 +72,106 @@
                                     </div>                   
 
                                     <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <label class="form-label">Sistem<span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <select class="form-select select2-sistem" name="sistem" id="sistem">
-                                                    <option value="">-- Pilih atau Taip Sistem --</option>
-                                                    @foreach($sistems as $sistem)
-                                                        <option value="{{ $sistem->kod }}" 
-                                                            data-id="{{ $sistem->id }}"
-                                                            {{ old('sistem', $mainComponent->sistem) == $sistem->kod ? 'selected' : '' }}>
-                                                            {{ $sistem->kod }} - {{ $sistem->nama }}
-                                                        </option>
-                                                    @endforeach
-                                                    @if($mainComponent->sistem && !$sistems->contains('kod', $mainComponent->sistem))
-                                                        <option value="{{ $mainComponent->sistem }}" selected>{{ $mainComponent->sistem }}</option>
-                                                    @endif
-                                                </select>
-                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                            </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">
+                                            Sistem
+                                            <span class="text-danger">*</span>
+                                            <span id="kod-sistem-status" class="ms-2"></span>
+                                        </label>
+                                        <div class="input-group">
+                                            <select class="form-select select2-sistem" name="sistem" id="sistem">
+                                                <option value="">-- Pilih atau Taip Sistem --</option>
+                                                @foreach($sistems as $sistem)
+                                                    <option value="{{ $sistem->kod }}" 
+                                                        data-id="{{ $sistem->id }}"
+                                                        {{ old('sistem', $mainComponent->sistem) == $sistem->kod ? 'selected' : '' }}>
+                                                        {{ $sistem->kod }} - {{ $sistem->nama }}
+                                                    </option>
+                                                @endforeach
+                                                {{-- Jika kod tidak wujud dalam database, tetap tunjuk --}}
+                                                @if($mainComponent->sistem && !$sistems->contains('kod', $mainComponent->sistem))
+                                                    <option value="{{ $mainComponent->sistem }}" selected>
+                                                        {{ $mainComponent->sistem }}
+                                                    </option>
+                                                @endif
+                                            </select>
+                                            <span class="input-group-text"><i class="bi bi-search"></i></span>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">SubSistem<span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <select class="form-select select2-subsistem" name="subsistem" id="subsistem">
-                                                    <option value="">-- Pilih atau Taip SubSistem --</option>
-                                                    @foreach($subsistems as $subsistem)
-                                                        <option value="{{ $subsistem->kod }}" 
-                                                            data-sistem-id="{{ $subsistem->sistem_id }}"
-                                                            {{ old('subsistem', $mainComponent->subsistem) == $subsistem->kod ? 'selected' : '' }}>
-                                                            {{ $subsistem->kod }} - {{ $subsistem->nama }}
-                                                        </option>
-                                                    @endforeach
-                                                    @if($mainComponent->subsistem && !$subsistems->contains('kod', $mainComponent->subsistem))
-                                                        <option value="{{ $mainComponent->subsistem }}" selected>{{ $mainComponent->subsistem }}</option>
-                                                    @endif
-                                                </select>
-                                                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                            </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <label class="form-label">
+                                            SubSistem
+                                            <span class="text-danger">*</span>
+                                            <span id="kod-subsistem-status" class="ms-2"></span>
+                                        </label>
+                                        <div class="input-group">
+                                            <select class="form-select select2-subsistem" name="subsistem" id="subsistem">
+                                                <option value="">-- Pilih atau Taip SubSistem --</option>
+                                                @foreach($subsistems as $subsistem)
+                                                    <option value="{{ $subsistem->kod }}" 
+                                                        data-sistem-id="{{ $subsistem->sistem_id }}"
+                                                        {{ old('subsistem', $mainComponent->subsistem) == $subsistem->kod ? 'selected' : '' }}>
+                                                        {{ $subsistem->kod }} - {{ $subsistem->nama }}
+                                                    </option>
+                                                @endforeach
+                                                {{-- Jika kod tidak wujud dalam database, tetap tunjuk --}}
+                                                @if($mainComponent->subsistem && !$subsistems->contains('kod', $mainComponent->subsistem))
+                                                    <option value="{{ $mainComponent->subsistem }}" selected>
+                                                        {{ $mainComponent->subsistem }}
+                                                    </option>
+                                                @endif
+                                            </select>
+                                            <span class="input-group-text"><i class="bi bi-search"></i></span>
                                         </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <label class="form-label">Kuantiti<span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="kuantiti" 
+                                            value="{{ old('kuantiti', $mainComponent->kuantiti ?? 1) }}" min="1">
+                                    </div>
+                                </div>
+
+                                <!-- Hidden row untuk Nama Sistem (auto-populated) -->
+                                <div class="row mb-3" id="nama-sistem-row" style="display: none;">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nama Sistem</label>
+                                        <div class="nama-field-wrapper">
+                                            <input type="text" class="form-control" id="nama_sistem" name="nama_sistem" 
+                                                value="{{ old('nama_sistem', $mainComponent->nama_sistem ?? '') }}"
+                                                placeholder="Nama akan dijana automatik atau anda boleh edit">
+                                            <span class="autofill-indicator" id="autofill-indicator-sistem" style="display: none;">
+                                                <i class="bi bi-magic"></i> Auto
+                                            </span>
+                                        </div>
+                                        <small class="text-success" id="nama-sistem-hint"></small>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden row untuk Nama SubSistem (auto-populated) -->
+                                <div class="row mb-3" id="nama-subsistem-row" style="display: none;">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nama SubSistem</label>
+                                        <div class="nama-field-wrapper">
+                                            <input type="text" class="form-control" id="nama_subsistem" name="nama_subsistem" 
+                                                value="{{ old('nama_subsistem', $mainComponent->nama_subsistem ?? '') }}"
+                                                placeholder="Nama akan dijana automatik atau anda boleh edit">
+                                            <span class="autofill-indicator" id="autofill-indicator-subsistem" style="display: none;">
+                                                <i class="bi bi-magic"></i> Auto
+                                            </span>
+                                        </div>
+                                        <small class="text-success" id="nama-subsistem-hint"></small>
+                                    </div>
+                                </div>
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <label class="form-label">No. Perolehan (1GFMAS)<span class="text-danger">*</span></label>
+        <input type="text" class="form-control" name="no_perolehan_1gfmas" 
+               value="{{ old('no_perolehan_1gfmas', $mainComponent->no_perolehan_1gfmas) }}"> 
+    </div>
+</div>
                                         <div class="col-md-4">
                                             <label class="form-label">Kuantiti<span class="text-danger">*</span></label>
                                             <input type="number" class="form-control" name="kuantiti" value="{{ old('kuantiti', $mainComponent->kuantiti ?? 1) }}" min="1">
@@ -369,34 +431,199 @@ function showAttributesSection() {
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
-    // ===========================
-    // Initialize Select2 untuk Sistem
-    // ===========================
-    $('.select2-sistem').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Cari atau taip sistem baru',
-        allowClear: true,
-        createTag: function(params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            return { id: term, text: term + ' ✓ (Baru)', newTag: true };
+    // CSRF Token untuk AJAX
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
     // ===========================
-    // Initialize Select2 untuk SubSistem
+    // Initialize Select2 untuk Sistem dengan Tags
     // ===========================
-    $('.select2-subsistem').select2({
+    $('.select2-sistem').select2({
         theme: 'bootstrap-5',
         tags: true,
-        placeholder: 'Cari atau taip subsistem baru',
+        placeholder: 'Pilih atau taip kod baru',
         allowClear: true,
         createTag: function(params) {
             var term = $.trim(params.term);
             if (term === '') return null;
-            return { id: term, text: term + ' ✓ (Baru)', newTag: true };
+            
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
         }
+    });
+
+    // ===========================
+    // Initialize Select2 untuk SubSistem dengan Tags
+    // ===========================
+    $('.select2-subsistem').select2({
+        theme: 'bootstrap-5',
+        tags: true,
+        placeholder: 'Pilih atau taip kod baru',
+        allowClear: true,
+        createTag: function(params) {
+            var term = $.trim(params.term);
+            if (term === '') return null;
+            
+            return {
+                id: term,
+                text: term,
+                newTag: true
+            }
+        },
+        templateResult: function(data) {
+            if (data.newTag) {
+                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+            }
+            return data.text;
+        }
+    });
+
+    // ===========================
+    // AUTOFILL MAGIC - Sistem
+    // ===========================
+    let typingTimerSistem;
+    const doneTypingInterval = 500; // 0.5 second
+
+    $('#sistem').on('select2:select select2:unselect change', function(e) {
+        clearTimeout(typingTimerSistem);
+        
+        const kodValue = $(this).val();
+        
+        if (!kodValue) {
+            $('#nama-sistem-row').hide();
+            $('#kod-sistem-status').html('');
+            return;
+        }
+
+        typingTimerSistem = setTimeout(function() {
+            checkKodSistem(kodValue);
+        }, doneTypingInterval);
+    });
+
+    function checkKodSistem(kod) {
+        if (!kod) return;
+
+        // Show loading
+        $('#kod-sistem-status').html('<span class="badge bg-secondary">Menyemak...</span>');
+        $('#nama-sistem-row').show();
+        $('#nama_sistem').prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '/api/check-kod-sistem',
+            method: 'POST',
+            data: { kod: kod },
+            success: function(response) {
+                if (response.exists) {
+                    // Kod already exists
+                    $('#kod-sistem-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $('#nama_sistem').val(response.data.nama).prop('readonly', true);
+                    $('#nama-sistem-hint').text('✓ Kod ini sudah wujud dalam database');
+                    $('#autofill-indicator-sistem').hide();
+                } else {
+                    // New kod - show suggestion
+                    $('#kod-sistem-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $('#nama_sistem').val(response.suggestion).prop('readonly', false);
+                    $('#nama-sistem-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#autofill-indicator-sistem').show();
+                }
+            },
+            error: function() {
+                $('#kod-sistem-status').html('<span class="badge bg-danger">Ralat</span>');
+                $('#nama_sistem').val('').prop('readonly', false);
+                $('#nama-sistem-hint').text('');
+            }
+        });
+    }
+
+    // Allow user to edit auto-filled name for Sistem
+    $('#nama_sistem').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-sistem').hide();
+    });
+
+    // ===========================
+    // AUTOFILL MAGIC - SubSistem
+    // ===========================
+    let typingTimerSubSistem;
+
+    $('#subsistem').on('select2:select select2:unselect change', function(e) {
+        clearTimeout(typingTimerSubSistem);
+        
+        const kodValue = $(this).val();
+        
+        if (!kodValue) {
+            $('#nama-subsistem-row').hide();
+            $('#kod-subsistem-status').html('');
+            return;
+        }
+
+        typingTimerSubSistem = setTimeout(function() {
+            checkKodSubSistem(kodValue);
+        }, doneTypingInterval);
+    });
+
+    function checkKodSubSistem(kod) {
+        if (!kod) return;
+
+        // Get selected sistem_id if available
+        var sistemId = $('#sistem').find(':selected').data('id') || null;
+
+        // Show loading
+        $('#kod-subsistem-status').html('<span class="badge bg-secondary">Menyemak...</span>');
+        $('#nama-subsistem-row').show();
+        $('#nama_subsistem').prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '/api/check-kod-subsistem',
+            method: 'POST',
+            data: { 
+                kod: kod,
+                sistem_id: sistemId
+            },
+            success: function(response) {
+                if (response.exists) {
+                    // Kod already exists
+                    $('#kod-subsistem-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $('#nama_subsistem').val(response.data.nama).prop('readonly', true);
+                    
+                    var hintText = '✓ Kod ini sudah wujud dalam database';
+                    if (response.data.sistem_nama) {
+                        hintText += ' (Sistem: ' + response.data.sistem_nama + ')';
+                    }
+                    $('#nama-subsistem-hint').text(hintText);
+                    $('#autofill-indicator-subsistem').hide();
+                } else {
+                    // New kod - show suggestion
+                    $('#kod-subsistem-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $('#nama_subsistem').val(response.suggestion).prop('readonly', false);
+                    $('#nama-subsistem-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#autofill-indicator-subsistem').show();
+                }
+            },
+            error: function() {
+                $('#kod-subsistem-status').html('<span class="badge bg-danger">Ralat</span>');
+                $('#nama_subsistem').val('').prop('readonly', false);
+                $('#nama-subsistem-hint').text('');
+            }
+        });
+    }
+
+    // Allow user to edit auto-filled name for SubSistem
+    $('#nama_subsistem').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-subsistem').hide();
     });
 
     // ===========================
@@ -406,15 +633,21 @@ $(document).ready(function() {
         var sistemId = $(this).find(':selected').data('id');
         var $subsistem = $('#subsistem');
         
+        // Don't clear subsistem in edit mode, just filter
         if (sistemId) {
+            // Filter subsistem options based on sistem_id
             $subsistem.find('option').each(function() {
                 var optionSistemId = $(this).data('sistem-id');
-                $(this).toggle(!optionSistemId || optionSistemId == sistemId);
+                if (optionSistemId && optionSistemId != sistemId) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
             });
         } else {
+            // Show all options if no sistem selected
             $subsistem.find('option').show();
         }
-        $subsistem.val('').trigger('change');
     });
 
     // ===========================
@@ -429,8 +662,9 @@ $(document).ready(function() {
     // FORMAT KOS PEROLEHAN
     // ===========================
     
-    // Format initial value on page load
     var kosInput = $('input[name="kos_perolehan"]');
+    
+    // Format initial value on page load
     var initialValue = kosInput.val();
     if (initialValue) {
         // Remove RM prefix and any formatting
@@ -443,7 +677,7 @@ $(document).ready(function() {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
-            kosInput.val('RM ' + formatted);
+            kosInput.val(formatted);
         }
     }
 
@@ -463,7 +697,7 @@ $(document).ready(function() {
         $(this).val(value);
     });
 
-    // Format dengan comma separator dan RM prefix ketika blur
+    // Format dengan comma separator ketika blur
     kosInput.on('blur', function() {
         let value = $(this).val();
         
@@ -482,7 +716,6 @@ $(document).ready(function() {
                 });
                 
                 $(this).val(formatted);
-
             }
         }
     });
@@ -491,8 +724,8 @@ $(document).ready(function() {
     kosInput.on('focus', function() {
         let value = $(this).val();
         if (value) {
-            // Remove RM prefix and commas
-            value = value.replace(/RM\s*/g, '').replace(/,/g, '');
+            // Remove commas
+            value = value.replace(/,/g, '');
             $(this).val(value);
         }
     });
@@ -515,6 +748,23 @@ $(document).ready(function() {
             }
         }
     });
+
+    // ===========================
+    // Check on page load for EDIT mode
+    // ===========================
+    const sistemValue = $('#sistem').val();
+    if (sistemValue) {
+        // Don't auto-check in edit mode unless user changes
+        // Just trigger filter for subsistem
+        $('#sistem').trigger('change');
+    }
+
+    // If subsistem already selected, keep it
+    const subsistemValue = $('#subsistem').val();
+    if (subsistemValue) {
+        // Keep the selected value
+        $('#subsistem').val(subsistemValue).trigger('change.select2');
+    }
 });
 </script>
 @endsection
