@@ -8,6 +8,7 @@ use App\Models\Sistem;
 use App\Models\Subsistem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class MainComponentController extends Controller
 {
@@ -17,6 +18,84 @@ class MainComponentController extends Controller
 
         DB::beginTransaction();
         try {
+            // ============================================
+            // VALIDATION: Check duplicate Kod Lokasi
+            // ============================================
+            $duplicateKodLokasi = MainComponent::where('kod_lokasi', $request->kod_lokasi)
+                ->where('component_id', $request->component_id)
+                ->exists();
+            
+            if ($duplicateKodLokasi) {
+                throw ValidationException::withMessages([
+                    'kod_lokasi' => 'Kod Lokasi "' . $request->kod_lokasi . '" sudah digunakan untuk premis ini. Sila gunakan kod yang berlainan.'
+                ]);
+            }
+
+            // ============================================
+            // HANDLE SISTEM - Check if exists or create new
+            // ============================================
+            if (!empty($validated['sistem'])) {
+                $existingSistem = Sistem::where('kod', $validated['sistem'])->first();
+                
+                if (!$existingSistem) {
+                    // Kod BARU - MESTI ada nama_sistem
+                    if (empty($request->nama_sistem)) {
+                        throw ValidationException::withMessages([
+                            'nama_sistem' => 'Kod sistem "' . $validated['sistem'] . '" adalah baru. Sila masukkan nama sistem.'
+                        ]);
+                    }
+                    
+                    // Create new Sistem dengan nama dari form
+                    Sistem::create([
+                        'kod' => $validated['sistem'],
+                        'nama' => $request->nama_sistem,
+                        'is_active' => true
+                    ]);
+                    
+                    \Log::info('New Sistem created: ' . $validated['sistem'] . ' - ' . $request->nama_sistem);
+                } else {
+                    // Kod sudah wujud - ignore nama_sistem if provided
+                    if (!empty($request->nama_sistem)) {
+                        \Log::info('Sistem "' . $validated['sistem'] . '" already exists. Ignoring provided nama_sistem.');
+                    }
+                }
+            }
+
+            // ============================================
+            // HANDLE SUBSISTEM - Check if exists or create new
+            // ============================================
+            if (!empty($validated['subsistem'])) {
+                $existingSubSistem = Subsistem::where('kod', $validated['subsistem'])->first();
+                
+                if (!$existingSubSistem) {
+                    // Kod BARU - MESTI ada nama_subsistem
+                    if (empty($request->nama_subsistem)) {
+                        throw ValidationException::withMessages([
+                            'nama_subsistem' => 'Kod subsistem "' . $validated['subsistem'] . '" adalah baru. Sila masukkan nama subsistem.'
+                        ]);
+                    }
+                    
+                    // Get sistem_id
+                    $sistem = Sistem::where('kod', $validated['sistem'])->first();
+                    $sistemId = $sistem ? $sistem->id : null;
+                    
+                    // Create new SubSistem dengan nama dari form
+                    Subsistem::create([
+                        'kod' => $validated['subsistem'],
+                        'nama' => $request->nama_subsistem,
+                        'sistem_id' => $sistemId,
+                        'is_active' => true
+                    ]);
+                    
+                    \Log::info('New SubSistem created: ' . $validated['subsistem'] . ' - ' . $request->nama_subsistem);
+                } else {
+                    // Kod sudah wujud - ignore nama_subsistem if provided
+                    if (!empty($request->nama_subsistem)) {
+                        \Log::info('SubSistem "' . $validated['subsistem'] . '" already exists. Ignoring provided nama_subsistem.');
+                    }
+                }
+            }
+
             // Handle checkboxes
             $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
             $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
@@ -29,7 +108,7 @@ class MainComponentController extends Controller
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-            // Atribut tambahan - PASTIKAN kod_ptj dan no_perolehan_1gfmas disimpan
+            // Atribut tambahan
             $validated['jenis'] = $request->input('jenis');
             $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
             $validated['bahan'] = $request->input('bahan');
@@ -39,19 +118,9 @@ class MainComponentController extends Controller
             $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
             $validated['nota'] = $request->input('nota');
             
-            // IMPORTANT: Explicitly set kod_ptj and no_perolehan_1gfmas
+            // IMPORTANT: Explicitly set
             $validated['kod_ptj'] = $request->input('kod_ptj');
             $validated['no_perolehan_1gfmas'] = $request->input('no_perolehan_1gfmas');
-
-            // Save Sistem & Subsistem
-            if (!empty($validated['sistem'])) {
-                $this->saveSistem($validated['sistem']);
-            }
-            
-            if (!empty($validated['subsistem'])) {
-                $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
-            }
-
             $validated['status'] = $request->input('status', 'aktif');
             
             // Create main component
@@ -67,11 +136,16 @@ class MainComponentController extends Controller
             DB::commit();
 
             return redirect()->route('components.index')
-                ->with('success', 'Komponen Utama berjaya ditambah');
+                ->with('success', 'Komponen Utama berjaya ditambah!');
 
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e; // Re-throw validation exception
+            
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error creating main component: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             
             return redirect()->back()
                 ->with('error', 'Gagal menyimpan: ' . $e->getMessage())
@@ -85,6 +159,75 @@ class MainComponentController extends Controller
 
         DB::beginTransaction();
         try {
+            // ============================================
+            // VALIDATION: Check duplicate Kod Lokasi (exclude current)
+            // ============================================
+            $duplicateKodLokasi = MainComponent::where('kod_lokasi', $request->kod_lokasi)
+                ->where('component_id', $request->component_id)
+                ->where('id', '!=', $mainComponent->id)
+                ->exists();
+            
+            if ($duplicateKodLokasi) {
+                throw ValidationException::withMessages([
+                    'kod_lokasi' => 'Kod Lokasi "' . $request->kod_lokasi . '" sudah digunakan untuk premis ini. Sila gunakan kod yang berlainan.'
+                ]);
+            }
+
+            // ============================================
+            // HANDLE SISTEM - Check if exists or create new
+            // ============================================
+            if (!empty($validated['sistem'])) {
+                $existingSistem = Sistem::where('kod', $validated['sistem'])->first();
+                
+                if (!$existingSistem) {
+                    // Kod BARU - MESTI ada nama_sistem
+                    if (empty($request->nama_sistem)) {
+                        throw ValidationException::withMessages([
+                            'nama_sistem' => 'Kod sistem "' . $validated['sistem'] . '" adalah baru. Sila masukkan nama sistem.'
+                        ]);
+                    }
+                    
+                    // Create new Sistem
+                    Sistem::create([
+                        'kod' => $validated['sistem'],
+                        'nama' => $request->nama_sistem,
+                        'is_active' => true
+                    ]);
+                    
+                    \Log::info('New Sistem created during update: ' . $validated['sistem'] . ' - ' . $request->nama_sistem);
+                }
+            }
+
+            // ============================================
+            // HANDLE SUBSISTEM - Check if exists or create new
+            // ============================================
+            if (!empty($validated['subsistem'])) {
+                $existingSubSistem = Subsistem::where('kod', $validated['subsistem'])->first();
+                
+                if (!$existingSubSistem) {
+                    // Kod BARU - MESTI ada nama_subsistem
+                    if (empty($request->nama_subsistem)) {
+                        throw ValidationException::withMessages([
+                            'nama_subsistem' => 'Kod subsistem "' . $validated['subsistem'] . '" adalah baru. Sila masukkan nama subsistem.'
+                        ]);
+                    }
+                    
+                    // Get sistem_id
+                    $sistem = Sistem::where('kod', $validated['sistem'])->first();
+                    $sistemId = $sistem ? $sistem->id : null;
+                    
+                    // Create new SubSistem
+                    Subsistem::create([
+                        'kod' => $validated['subsistem'],
+                        'nama' => $request->nama_subsistem,
+                        'sistem_id' => $sistemId,
+                        'is_active' => true
+                    ]);
+                    
+                    \Log::info('New SubSistem created during update: ' . $validated['subsistem'] . ' - ' . $request->nama_subsistem);
+                }
+            }
+
             // Handle checkboxes
             $validated['awam_arkitek'] = $request->has('awam_arkitek') ? 1 : 0;
             $validated['elektrikal'] = $request->has('elektrikal') ? 1 : 0;
@@ -97,7 +240,7 @@ class MainComponentController extends Controller
             unset($validated['kadaran'], $validated['kadaran_unit']);
             unset($validated['kapasiti'], $validated['kapasiti_unit']);
 
-            // Atribut tambahan - PASTIKAN kod_ptj dan no_perolehan_1gfmas dikemaskini
+            // Atribut tambahan
             $validated['jenis'] = $request->input('jenis');
             $validated['bekalan_elektrik'] = $request->input('bekalan_elektrik');
             $validated['bahan'] = $request->input('bahan');
@@ -107,17 +250,9 @@ class MainComponentController extends Controller
             $validated['catatan_dokumen'] = $request->input('catatan_dokumen');
             $validated['nota'] = $request->input('nota');
             
-            // IMPORTANT: Explicitly set kod_ptj and no_perolehan_1gfmas untuk update
+            // IMPORTANT: Explicitly set
             $validated['kod_ptj'] = $request->input('kod_ptj');
             $validated['no_perolehan_1gfmas'] = $request->input('no_perolehan_1gfmas');
-
-            if (!empty($validated['sistem'])) {
-                $this->saveSistem($validated['sistem']);
-            }
-            
-            if (!empty($validated['subsistem'])) {
-                $this->saveSubsistem($validated['subsistem'], $validated['sistem'] ?? null);
-            }
 
             // Update main component
             $mainComponent->update($validated);
@@ -136,11 +271,16 @@ class MainComponentController extends Controller
             DB::commit();
 
             return redirect()->route('components.index')
-                ->with('success', 'Komponen Utama berjaya dikemaskini');
+                ->with('success', 'Komponen Utama berjaya dikemaskini!');
 
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e; // Re-throw validation exception
+            
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error updating main component: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             
             return redirect()->back()
                 ->with('error', 'Gagal mengemaskini: ' . $e->getMessage())
@@ -241,6 +381,8 @@ class MainComponentController extends Controller
             'nama_komponen_utama' => 'required|string|max:255',
             'sistem' => 'nullable|string|max:255',
             'subsistem' => 'nullable|string|max:255',
+            'nama_sistem' => 'nullable|string|max:255', // NEW
+            'nama_subsistem' => 'nullable|string|max:255', // NEW
             'kuantiti' => 'nullable|integer|min:1',
             'awam_arkitek' => 'nullable',
             'elektrikal' => 'nullable',
@@ -304,12 +446,13 @@ class MainComponentController extends Controller
 
     /**
      * ========================================
-     * HELPER METHODS
+     * HELPER METHODS (DEPRECATED - now handled in store/update)
      * ========================================
      */
     
     private function saveSistem(string $kod): void
     {
+        // DEPRECATED: Now handled directly in store() and update()
         $exists = Sistem::where('kod', $kod)->exists();
         
         if (!$exists) {
@@ -322,6 +465,7 @@ class MainComponentController extends Controller
 
     private function saveSubsistem(string $kod, ?string $sistemKod = null): void
     {
+        // DEPRECATED: Now handled directly in store() and update()
         $exists = Subsistem::where('kod', $kod)->exists();
         
         if (!$exists) {
