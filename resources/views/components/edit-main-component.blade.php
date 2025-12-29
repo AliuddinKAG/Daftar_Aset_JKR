@@ -91,9 +91,7 @@
                                 <div class="col-md-4">
                                     <label class="form-label">Nombor DPA</label>
                                     <input type="text" class="form-control bg-light" id="display_dpa" readonly 
-                                           value="{{ $mainComponent->component->nombor_dpa ?? '' }}"
-                                           placeholder="Auto-fill dari komponen">
-                                    <small class="text-muted">Auto-fill berdasarkan komponen dipilih</small>
+                                           value="{{ $mainComponent->component->nombor_dpa ?? '' }}">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Kod Lokasi <span class="text-danger">*</span></label>
@@ -102,7 +100,6 @@
                                         name="kod_lokasi" 
                                         id="kod_lokasi"
                                         value="{{ old('kod_lokasi', $mainComponent->kod_lokasi) }}" 
-                                        placeholder="Contoh: KU-01-123"
                                         required>
                                     @error('kod_lokasi')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -231,7 +228,7 @@
                                         <div class="col-md-4">
                                             <label class="form-label">No. Perolehan (1GFMAS)<span class="text-danger">*</span></label>
                                             <input type="text" class="form-control" name="no_perolehan_1gfmas" 
-                                                value="{{ old('no_perolehan_1gfmas', $mainComponent->no_perolehan_1gfmas) }}" required>
+                                                   value="{{ old('no_perolehan_1gfmas', $mainComponent->no_perolehan_1gfmas) }}" required>
                                         </div>
                                     </div>
                                 </div>
@@ -448,19 +445,14 @@
                         </div>
                     </div>
 
-                    <!-- Button to show attributes section -->
+                    <!-- Buttons -->
                     <div class="d-flex justify-content-between" id="mainButtons">
                         <a href="{{ route('components.index') }}" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Kembali
                         </a>
-                        <button type="button" class="btn btn-info text-white" onclick="showAttributesSection()">
-                            Seterusnya: Atribut Spesifikasi <i class="bi bi-arrow-right"></i>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save"></i> Kemaskini
                         </button>
-                    </div>
-
-                    <!-- Hidden section for attributes -->
-                    <div id="attributesSection" style="display: none; margin-top: 20px;">
-                        @include('components.partials.main-component-attributes')
                     </div>
 
                 </form>
@@ -482,38 +474,34 @@ function showAttributesSection() {
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
-    // CSRF Token untuk AJAX
+    // ===========================
+    // CSRF Token untuk AJAX - ENHANCED
+    // ===========================
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    
+    if (!csrfToken) {
+        console.error('CRITICAL: CSRF token not found in meta tag!');
+        console.error('Please add this to your <head> section:');
+        console.error('<meta name="csrf-token" content="{{ csrf_token() }}">');
+    } else {
+        console.log('✓ CSRF Token found:', csrfToken.substring(0, 10) + '...');
+    }
+    
     $.ajaxSetup({
         headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            'X-CSRF-TOKEN': csrfToken
         }
     });
 
     // ===========================
-    // Initialize Select2 untuk Sistem dengan Tags
+    // DEBUG: Check if everything is loaded properly
     // ===========================
-    $('.select2-sistem').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Pilih atau taip kod baru',
-        allowClear: true,
-        createTag: function(params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            
-            return {
-                id: term,
-                text: term,
-                newTag: true
-            }
-        },
-        templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
-            }
-            return data.text;
-        }
-    });
+    console.log('=== SYSTEM CHECK ===');
+    console.log('jQuery loaded:', typeof $ !== 'undefined');
+    console.log('CSRF Token:', csrfToken ? '✓ Present' : '✗ MISSING');
+    console.log('Base URL:', window.location.origin);
+    console.log('API URL (Sistem):', window.location.origin + '/api/check-kod-sistem');
+    console.log('API URL (SubSistem):', window.location.origin + '/api/check-kod-subsistem');
 
     // ===========================
     // Initialize Select2 untuk SubSistem dengan Tags
@@ -545,7 +533,7 @@ $(document).ready(function() {
     // AUTOFILL MAGIC - Sistem
     // ===========================
     let typingTimerSistem;
-    const doneTypingInterval = 500;
+    const doneTypingInterval = 500; // 0.5 second
 
     $('#sistem').on('select2:select select2:unselect change', function(e) {
         clearTimeout(typingTimerSistem);
@@ -566,36 +554,78 @@ $(document).ready(function() {
     function checkKodSistem(kod) {
         if (!kod) return;
 
+        console.log('Checking Kod Sistem:', kod);
+
+        // Show loading
         $('#kod-sistem-status').html('<span class="badge bg-secondary"><i class="bi bi-hourglass-split"></i> Menyemak...</span>');
 
         $.ajax({
             url: '/api/check-kod-sistem',
             method: 'POST',
-            data: { kod: kod },
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            data: { 
+                kod: kod,
+                _token: csrfToken // Send token in body as backup
+            },
             success: function(response) {
+                console.log('API Response for Sistem:', response);
+                
                 if (response.exists) {
+                    // Kod already exists - HIDE nama field but POPULATE it
                     $('#kod-sistem-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
                     $('#nama-sistem-row').slideUp(300);
+                    
+                    // IMPORTANT: Set hidden value untuk form submission
                     $('#nama_sistem').val(response.data.nama);
+                    
+                    console.log('Sistem exists:', response.data.nama);
                 } else {
+                    // New kod - SHOW nama field with suggestion
                     $('#kod-sistem-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    
+                    // IMPORTANT: Always populate the field with suggestion
                     $('#nama_sistem').val(response.suggestion).prop('readonly', false).removeClass('bg-light');
                     $('#nama-sistem-hint').text('💡 ' + response.suggestion + ' (Anda boleh edit)');
                     $('#autofill-indicator-sistem').show();
                     $('#nama-sistem-row').slideDown(300);
+                    
+                    console.log('Sistem is new, suggestion:', response.suggestion);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Error checking kod sistem:', error);
-                $('#kod-sistem-status').html('<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ralat</span>');
+                console.error('=== AJAX ERROR FOR SISTEM ===');
+                console.error('Status:', status);
+                console.error('Error:', error);
+                console.error('Status Code:', xhr.status);
+                console.error('Response Text:', xhr.responseText);
+                console.error('URL:', '/api/check-kod-sistem');
+                console.error('Data sent:', { kod: kod });
+                
+                // Try to parse error response
+                try {
+                    var errorData = JSON.parse(xhr.responseText);
+                    console.error('Parsed Error:', errorData);
+                } catch(e) {
+                    console.error('Could not parse error response');
+                }
+                
+                // Show error with details
+                $('#kod-sistem-status').html('<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ralat ' + xhr.status + '</span>');
+                
+                // IMPORTANT: Still populate field with default nama
                 $('#nama_sistem').val('Sistem ' + kod).prop('readonly', false).removeClass('bg-light');
-                $('#nama-sistem-hint').html('<span class="text-warning">⚠️ Tidak dapat menyemak database. Sila masukkan nama sistem.</span>');
+                $('#nama-sistem-hint').html('<span class="text-warning">⚠️ Tidak dapat menyemak database (Error ' + xhr.status + '). Sila masukkan nama sistem.</span>');
                 $('#autofill-indicator-sistem').hide();
                 $('#nama-sistem-row').slideDown(300);
             }
         });
     }
 
+    // Allow user to edit auto-filled name for Sistem
     $('#nama_sistem').on('focus', function() {
         $(this).prop('readonly', false);
         $('#autofill-indicator-sistem').fadeOut();
@@ -631,42 +661,85 @@ $(document).ready(function() {
     function checkKodSubSistem(kod) {
         if (!kod) return;
 
-        var sistemId = $('#sistem').find(':selected').data('id') || null;
+        console.log('Checking Kod SubSistem:', kod);
 
+        // Get selected sistem_id if available
+        var sistemId = $('#sistem').find(':selected').data('id') || null;
+        console.log('Selected Sistem ID:', sistemId);
+
+        // Show loading
         $('#kod-subsistem-status').html('<span class="badge bg-secondary"><i class="bi bi-hourglass-split"></i> Menyemak...</span>');
 
         $.ajax({
             url: '/api/check-kod-subsistem',
             method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
             data: { 
                 kod: kod,
-                sistem_id: sistemId
+                sistem_id: sistemId,
+                _token: csrfToken // Send token in body as backup
             },
             success: function(response) {
+                console.log('API Response for SubSistem:', response);
+                
                 if (response.exists) {
+                    // Kod already exists - HIDE nama field but POPULATE it
                     $('#kod-subsistem-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
                     $('#nama-subsistem-row').slideUp(300);
+                    
+                    // IMPORTANT: Set hidden value untuk form submission
                     $('#nama_subsistem').val(response.data.nama);
+                    
+                    console.log('SubSistem exists:', response.data.nama);
                 } else {
+                    // New kod - SHOW nama field with suggestion
                     $('#kod-subsistem-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    
+                    // IMPORTANT: Always populate the field with suggestion
                     $('#nama_subsistem').val(response.suggestion).prop('readonly', false).removeClass('bg-light');
+                    
                     var hintText = '💡 ' + response.suggestion + ' (Anda boleh edit)';
                     $('#nama-subsistem-hint').text(hintText);
                     $('#autofill-indicator-subsistem').show();
                     $('#nama-subsistem-row').slideDown(300);
+                    
+                    console.log('SubSistem is new, suggestion:', response.suggestion);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Error checking kod subsistem:', error);
-                $('#kod-subsistem-status').html('<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ralat</span>');
+                console.error('=== AJAX ERROR FOR SUBSISTEM ===');
+                console.error('Status:', status);
+                console.error('Error:', error);
+                console.error('Status Code:', xhr.status);
+                console.error('Response Text:', xhr.responseText);
+                console.error('URL:', '/api/check-kod-subsistem');
+                console.error('Data sent:', { kod: kod, sistem_id: sistemId });
+                
+                // Try to parse error response
+                try {
+                    var errorData = JSON.parse(xhr.responseText);
+                    console.error('Parsed Error:', errorData);
+                } catch(e) {
+                    console.error('Could not parse error response');
+                }
+                
+                // Show error with details
+                $('#kod-subsistem-status').html('<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ralat ' + xhr.status + '</span>');
+                
+                // IMPORTANT: Still populate field with default nama
                 $('#nama_subsistem').val('SubSistem ' + kod).prop('readonly', false).removeClass('bg-light');
-                $('#nama-subsistem-hint').html('<span class="text-warning">⚠️ Tidak dapat menyemak database. Sila masukkan nama subsistem.</span>');
+                $('#nama-subsistem-hint').html('<span class="text-warning">⚠️ Tidak dapat menyemak database (Error ' + xhr.status + '). Sila masukkan nama subsistem.</span>');
                 $('#autofill-indicator-subsistem').hide();
                 $('#nama-subsistem-row').slideDown(300);
             }
         });
     }
 
+    // Allow user to edit auto-filled name for SubSistem
     $('#nama_subsistem').on('focus', function() {
         $(this).prop('readonly', false);
         $('#autofill-indicator-subsistem').fadeOut();
@@ -679,13 +752,15 @@ $(document).ready(function() {
     });
 
     // ===========================
-    // Filter SubSistem berdasarkan Sistem
+    // Filter SubSistem berdasarkan Sistem yang dipilih
     // ===========================
     $('#sistem').on('change', function() {
         var sistemId = $(this).find(':selected').data('id');
         var $subsistem = $('#subsistem');
         
+        // Don't clear subsistem in edit mode, just filter
         if (sistemId) {
+            // Filter subsistem options based on sistem_id
             $subsistem.find('option').each(function() {
                 var optionSistemId = $(this).data('sistem-id');
                 if (optionSistemId && optionSistemId != sistemId) {
@@ -695,6 +770,7 @@ $(document).ready(function() {
                 }
             });
         } else {
+            // Show all options if no sistem selected
             $subsistem.find('option').show();
         }
     });
@@ -706,10 +782,6 @@ $(document).ready(function() {
         var $selected = $(this).find(':selected');
         $('#display_dpa').val($selected.data('dpa') || '');
     });
-    
-    if ($('#component_id').val()) {
-        $('#component_id').trigger('change');
-    }
 
     // ===========================
     // FORMAT KOS PEROLEHAN
@@ -720,10 +792,12 @@ $(document).ready(function() {
     // Format initial value on page load
     var initialValue = kosInput.val();
     if (initialValue) {
+        // Remove RM prefix and any formatting
         var cleanValue = initialValue.replace(/RM\s*/g, '').replace(/,/g, '').trim();
         var number = parseFloat(cleanValue);
         
         if (!isNaN(number)) {
+            // Display with formatting
             var formatted = number.toLocaleString('en-MY', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
@@ -732,70 +806,127 @@ $(document).ready(function() {
         }
     }
 
+    // Format input kos perolehan - hanya angka dan titik
     kosInput.on('input', function() {
         let value = $(this).val();
+        
+        // Remove non-numeric characters except dots
         value = value.replace(/[^0-9.]/g, '');
+        
+        // Remove multiple dots
         const parts = value.split('.');
         if (parts.length > 2) {
             value = parts[0] + '.' + parts.slice(1).join('');
         }
+        
         $(this).val(value);
     });
 
+    // Format dengan comma separator ketika blur
     kosInput.on('blur', function() {
         let value = $(this).val();
         
         if (value) {
+            // Remove any existing RM and spaces
             value = value.replace(/RM\s*/g, '').trim();
+            
+            // Parse as number
             let number = parseFloat(value);
             
             if (!isNaN(number)) {
+                // Format dengan 2 decimal places dan thousand separator
                 let formatted = number.toLocaleString('en-MY', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
+                
                 $(this).val(formatted);
             }
         }
     });
 
+    // Remove formatting ketika focus untuk mudah edit
     kosInput.on('focus', function() {
         let value = $(this).val();
         if (value) {
+            // Remove commas
             value = value.replace(/,/g, '');
             $(this).val(value);
         }
     });
 
     // ===========================
-    // FORM SUBMIT
+    // FORM SUBMIT - Clean format untuk database
     // ===========================
     $('#mainComponentForm').on('submit', function(e) {
         let kosInput = $('input[name="kos_perolehan"]');
         let value = kosInput.val();
         
         if (value) {
+            // Clean value untuk database: RM20000.00
             value = value.replace(/RM\s*/g, '').replace(/,/g, '');
             let number = parseFloat(value);
             
             if (!isNaN(number)) {
+                // Format: RM20000.00 (no comma, with RM prefix)
                 kosInput.val('RM' + number.toFixed(2));
             }
         }
     });
 
     // ===========================
-    // Trigger filter on page load
+    // IMPORTANT: Don't auto-check in EDIT mode on page load
+    // Only check when user actively changes the value
     // ===========================
+    
+    // Just trigger filter for subsistem based on selected sistem
     const sistemValue = $('#sistem').val();
     if (sistemValue) {
-        $('#sistem').trigger('change');
+        $('#sistem').trigger('change'); // This only triggers the filter, not the API check
     }
 
+    // Keep the selected subsistem value
     const subsistemValue = $('#subsistem').val();
     if (subsistemValue) {
         $('#subsistem').val(subsistemValue).trigger('change.select2');
     }
+
+    // ===========================
+    // Mark that we should only check when user makes changes
+    // ===========================
+    var userHasChangedSistem = false;
+    var userHasChangedSubsistem = false;
+
+    // Track user interaction for Sistem
+    $('#sistem').on('select2:select', function(e) {
+        userHasChangedSistem = true;
+    });
+
+    // Track user interaction for SubSistem
+    $('#subsistem').on('select2:select', function(e) {
+        userHasChangedSubsistem = true;
+    });
+
+    // Override the change event to only check if user has interacted
+    $('#sistem').on('change', function(e) {
+        if (userHasChangedSistem && e.originalEvent) {
+            // User actively changed it, proceed with check
+            var sistemId = $(this).find(':selected').data('id');
+            var $subsistem = $('#subsistem');
+            
+            if (sistemId) {
+                $subsistem.find('option').each(function() {
+                    var optionSistemId = $(this).data('sistem-id');
+                    if (optionSistemId && optionSistemId != sistemId) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+            } else {
+                $subsistem.find('option').show();
+            }
+        }
+    });
 });
 </script>
-@endsection

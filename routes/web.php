@@ -6,7 +6,7 @@ use App\Http\Controllers\MainComponentController;
 use App\Http\Controllers\SubComponentController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\KodBinaanLuarController;
-use App\Http\Controllers\Api\MasterDataController;
+use App\Http\Controllers\MasterDataController;
 
 /*
 |--------------------------------------------------------------------------
