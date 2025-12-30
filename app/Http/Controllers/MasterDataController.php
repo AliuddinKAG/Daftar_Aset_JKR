@@ -2,6 +2,14 @@
 
 namespace App\Http\Controllers; // ✅ FIXED: Remove Api subfolder
 
+use App\Http\Controllers\Controller;
+use App\Models\KodBlok;
+use App\Models\KodAras;
+use App\Models\KodRuang;
+use App\Models\NamaRuang;
+use App\Models\KodBinaanLuar;
+use App\Models\Sistem;
+use App\Models\SubSistem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
