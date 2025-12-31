@@ -4,101 +4,115 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col">
-            <h2><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
-            <p class="text-muted">Selamat datang, {{ Auth::user()->username }}!</p>
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1"><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+            <p class="text-muted mb-0">Selamat datang, {{ Auth::user()->name }}!</p>
+        </div>
+        <div>
+            <span class="badge bg-danger fs-6">Administrator</span>
         </div>
     </div>
 
     <!-- Statistics Cards -->
     <div class="row g-3 mb-4">
+        <!-- Users Stats -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <div class="display-4 text-primary mb-2">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <h3 class="mb-0">{{ $stats['total_users'] }}</h3>
-                    <p class="text-muted mb-0">Total Users</p>
-                    <small class="text-success">
-                        <i class="bi bi-check-circle-fill"></i> 
-                        {{ $stats['active_users'] }} Active
-                    </small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <div class="display-4 text-info mb-2">
-                        <i class="bi bi-box-seam"></i>
-                    </div>
-                    <h3 class="mb-0">{{ $stats['total_components'] }}</h3>
-                    <p class="text-muted mb-0">Komponen</p>
-                    <small class="text-muted">Borang 1</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <div class="display-4 text-success mb-2">
-                        <i class="bi bi-layers"></i>
-                    </div>
-                    <h3 class="mb-0">{{ $stats['total_main_components'] }}</h3>
-                    <p class="text-muted mb-0">Main Komponen</p>
-                    <small class="text-muted">Borang 2</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <div class="display-4 text-warning mb-2">
-                        <i class="bi bi-diagram-3"></i>
-                    </div>
-                    <h3 class="mb-0">{{ $stats['total_sub_components'] }}</h3>
-                    <p class="text-muted mb-0">Sub Komponen</p>
-                    <small class="text-muted">Borang 3</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="bi bi-lightning-fill text-warning"></i> Quick Actions</h5>
-                </div>
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-md-3">
-                            <a href="{{ route('admin.users') }}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-people"></i> Manage Users
-                            </a>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Jumlah Pengguna</p>
+                            <h3 class="mb-0">{{ $stats['total_users'] }}</h3>
+                            <small class="text-success">
+                                <i class="bi bi-check-circle"></i> {{ $stats['active_users'] }} Aktif
+                            </small>
                         </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('admin.sistem.index') }}" class="btn btn-outline-info w-100">
-                                <i class="bi bi-gear"></i> Manage Sistem
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('admin.subsistem.index') }}" class="btn btn-outline-success w-100">
-                                <i class="bi bi-sliders"></i> Manage SubSistem
-                            </a>
-                        </div>
-                        <div class="col-md-3">
-                            <a href="{{ route('components.index') }}" class="btn btn-outline-secondary w-100">
-                                <i class="bi bi-list-ul"></i> View All Data
-                            </a>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-people fs-3 text-primary"></i>
                         </div>
                     </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ route('admin.users.index') }}" class="text-decoration-none small">
+                        Urus Pengguna <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Components Stats -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Jumlah Komponen</p>
+                            <h3 class="mb-0">{{ $stats['total_components'] }}</h3>
+                            <small class="text-info">
+                                <i class="bi bi-check-circle"></i> {{ $stats['active_components'] }} Aktif
+                            </small>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-box-seam fs-3 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ route('components.index') }}" class="text-decoration-none small">
+                        Lihat Semua <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main & Sub Components -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Komponen Utama/Sub</p>
+                            <h3 class="mb-0">{{ $stats['total_main_components'] }}/{{ $stats['total_sub_components'] }}</h3>
+                            <small class="text-warning">
+                                Total: {{ $stats['total_main_components'] + $stats['total_sub_components'] }}
+                            </small>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-layers fs-3 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ route('components.index') }}" class="text-decoration-none small">
+                        Lihat Detail <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistem Stats -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">Sistem/Subsistem</p>
+                            <h3 class="mb-0">{{ $stats['total_sistem'] }}/{{ $stats['total_subsistem'] }}</h3>
+                            <small class="text-danger">
+                                Total: {{ $stats['total_sistem'] + $stats['total_subsistem'] }}
+                            </small>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 p-3 rounded">
+                            <i class="bi bi-diagram-3 fs-3 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{{ route('admin.sistem.index') }}" class="text-decoration-none small">
+                        Urus Sistem <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -106,54 +120,52 @@
 
     <div class="row">
         <!-- User Activity -->
-        <div class="col-md-6 mb-4">
+        <div class="col-md-8 mb-4">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-activity text-primary"></i> User Activity</h5>
-                    <a href="{{ route('admin.users') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-activity"></i> Aktiviti Pengguna</h5>
+                        <span class="badge bg-secondary">Top 10</span>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
+                                    <th>Pengguna</th>
                                     <th>Username</th>
-                                    <th class="text-center">Role</th>
-                                    <th class="text-center">Components</th>
-                                    <th class="text-center">Status</th>
+                                    <th>Role</th>
+                                    <th class="text-center">Komponen Didaftar</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($userActivity->take(5) as $user)
+                                @forelse($userActivity as $activity)
                                 <tr>
                                     <td>
-                                        <i class="bi bi-person-circle text-primary"></i>
-                                        {{ $user->username }}
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                                <i class="bi bi-person-fill text-primary"></i>
+                                            </div>
+                                            <span class="fw-semibold">{{ $activity->name }}</span>
+                                        </div>
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-{{ $user->isAdmin() ? 'danger' : 'primary' }}">
-                                            {{ ucfirst($user->role) }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="{{ route('admin.users.components', $user) }}" class="text-decoration-none">
-                                            <span class="badge bg-info">
-                                                {{ $user->components_count + $user->main_components_count + $user->sub_components_count }}
-                                            </span>
-                                        </a>
-                                    </td>
-                                    <td class="text-center">
-                                        @if($user->is_active)
-                                            <span class="badge bg-success">Active</span>
+                                    <td><code>{{ $activity->username }}</code></td>
+                                    <td>
+                                        @if($activity->role === 'admin')
+                                        <span class="badge bg-danger">Admin</span>
                                         @else
-                                            <span class="badge bg-secondary">Inactive</span>
+                                        <span class="badge bg-primary">User</span>
                                         @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success fs-6">{{ $activity->total_components }}</span>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-3">
-                                        Tiada data user
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        Tiada data aktiviti
                                     </td>
                                 </tr>
                                 @endforelse
@@ -164,30 +176,97 @@
             </div>
         </div>
 
-        <!-- Recent Components -->
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-clock-history text-info"></i> Recent Components</h5>
-                    <a href="{{ route('components.index') }}" class="btn btn-sm btn-outline-info">View All</a>
+        <!-- Recent Users & Sistem Stats -->
+        <div class="col-md-4">
+            <!-- Recent Users -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="bi bi-person-plus"></i> Pengguna Terkini</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
-                        @forelse($recentComponents as $component)
-                        <a href="{{ route('components.show', $component) }}" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ $component->nama_kemudahan }}</h6>
-                                <small class="text-muted">{{ $component->created_at->diffForHumans() }}</small>
+                        @forelse($recentUsers as $user)
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">{{ $user->name }}</div>
+                                    <small class="text-muted">@{{ $user->username }}</small>
+                                </div>
+                                <div>
+                                    @if($user->role === 'admin')
+                                    <span class="badge bg-danger">Admin</span>
+                                    @else
+                                    <span class="badge bg-primary">User</span>
+                                    @endif
+                                </div>
                             </div>
-                            <p class="mb-1">
-                                <small class="text-muted">
-                                    <i class="bi bi-person"></i> {{ $component->user->username ?? 'N/A' }}
-                                </small>
-                            </p>
-                        </a>
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ $user->created_at->diffForHumans() }}
+                            </small>
+                        </div>
                         @empty
                         <div class="list-group-item text-center text-muted">
-                            Tiada komponen terkini
+                            Tiada pengguna terkini
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Akses Pantas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                            <i class="bi bi-person-plus"></i> Tambah Pengguna
+                        </a>
+                        <a href="{{ route('admin.sistem.create') }}" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Tambah Sistem
+                        </a>
+                        <a href="{{ route('components.create') }}" class="btn btn-info text-white">
+                            <i class="bi bi-box-seam"></i> Tambah Komponen
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sistem Statistics -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3"></i> Statistik Sistem & Subsistem</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        @forelse($sistemStats as $sistem)
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-0">{{ $sistem->kod }}</h6>
+                                        <small class="text-muted">{{ $sistem->nama }}</small>
+                                    </div>
+                                    @if($sistem->is_active)
+                                    <span class="badge bg-success">Aktif</span>
+                                    @else
+                                    <span class="badge bg-secondary">Tidak Aktif</span>
+                                    @endif
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-diagram-2 text-primary me-2"></i>
+                                    <span>{{ $sistem->subsistems_count }} Subsistem</span>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12 text-center text-muted py-4">
+                            Tiada data sistem
                         </div>
                         @endforelse
                     </div>
@@ -196,4 +275,30 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('styles')
+<style>
+    .card {
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>
 @endsection
