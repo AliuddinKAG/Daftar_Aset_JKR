@@ -326,7 +326,7 @@
         <!-- Pengilang, Pembekal, Kontraktor -->
         <div class="row mt-3">
             <div class="col-md-4">
-                <h6 class="fw-bold small">Pengilang</h6>
+                <h6 class="fw-bold small">Pengilang <span class="text-danger">*</span></h6>
                 <div class="mb-2">
                     <input type="text" class="form-control form-control-sm" name="nama_pengilang"
                            value="{{ $namaPengilang }}" placeholder="Nama">
@@ -334,32 +334,44 @@
             </div>
 
             <div class="col-md-4">
-                <h6 class="fw-bold small">Pembekal</h6>
+                <h6 class="fw-bold small">Pembekal <span class="text-danger">*</span></h6>
                 <div class="mb-2">
                     <input type="text" class="form-control form-control-sm" name="nama_pembekal"
                            value="{{ $namaPembekal }}" placeholder="Nama">
                 </div>
                 <div class="mb-2">
+                    <label class="fw-bold small">
+                    Alamat <span class="text-danger">*</span>
+                    </label>
                     <textarea class="form-control form-control-sm" name="alamat_pembekal"
                               rows="2" placeholder="Alamat">{{ $alamatPembekal }}</textarea>
                 </div>
                 <div class="mb-2">
+                    <label class="fw-bold small">
+                    No. Telefon <span class="text-danger">*</span>
+                    </label>
                     <input type="text" class="form-control form-control-sm" name="no_telefon_pembekal"
                            value="{{ $noTelPembekal }}" placeholder="No. Telefon">
                 </div>
             </div>
 
             <div class="col-md-4">
-                <h6 class="fw-bold small">Kontraktor</h6>
+                <h6 class="fw-bold small">Kontraktor <span class="text-danger">*</span></h6>
                 <div class="mb-2">
                     <input type="text" class="form-control form-control-sm" name="nama_kontraktor"
                            value="{{ $namaKontraktor }}" placeholder="Nama">
                 </div>
                 <div class="mb-2">
+                    <label class="fw-bold small">
+                    Alamat <span class="text-danger">*</span>
+                    </label>
                     <textarea class="form-control form-control-sm" name="alamat_kontraktor"
                               rows="2" placeholder="Alamat">{{ $alamatKontraktor }}</textarea>
                 </div>
                 <div class="mb-2">
+                    <label class="fw-bold small">
+                    No. Telefon <span class="text-danger">*</span>
+                    </label>
                     <input type="text" class="form-control form-control-sm" name="no_telefon_kontraktor"
                            value="{{ $noTelKontraktor }}" placeholder="No. Telefon">
                 </div>
