@@ -79,41 +79,62 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="{{ route('components.index') }}">
-                <i class="bi bi-building"></i> Sistem Daftar Aset Khusus
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('components.index') }}">
-                            <i class="bi bi-house-door"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-plus-circle"></i> Tambah Data
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('components.create') }}">
-                                <i class="bi bi-box-seam"></i> Borang 1: Komponen
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ route('main-components.create') }}">
-                                <i class="bi bi-layers"></i> Borang 2: Komponen Utama
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ route('sub-components.create') }}">
-                                <i class="bi bi-diagram-3"></i> Borang 3: Sub Komponen
-                            </a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+    <nav class="navbar navbar-expand-md navbar-dark mb-2">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold d-flex align-items-center"
+           href="{{ route('components.index') }}">
+            <i class="bi bi-building me-1"></i>
+            <span class="d-none d-md-inline">Sistem Daftar Aset Khusus</span>
+            <span class="d-inline d-md-none">SDAK</span>
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('components.index') }}">
+                        <i class="bi bi-house-door"></i>
+                        <span class="d-none d-lg-inline"> Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       data-bs-toggle="dropdown"
+                       data-bs-display="static">
+                        <i class="bi bi-plus-circle"></i>
+                        <span class="d-none d-lg-inline"> Tambah Data</span>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('components.create') }}">
+                                <i class="bi bi-box-seam me-2"></i> Borang 1: Komponen
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('main-components.create') }}">
+                                <i class="bi bi-layers me-2"></i> Borang 2: Komponen Utama
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('sub-components.create') }}">
+                                <i class="bi bi-diagram-3 me-2"></i> Borang 3: Sub Komponen
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
+
 
     <!-- Main Content -->
     <div class="container-fluid">
