@@ -469,6 +469,9 @@ $(document).ready(function() {
         }
     });
 
+    // Store original subsistem options
+    let allSubsistemOptions = [];
+    
     // ===========================
     // Initialize Select2 untuk Sistem dengan Tags
     // ===========================
@@ -521,21 +524,44 @@ $(document).ready(function() {
         }
     });
 
+    // Store all subsistem options on page load
+    $('#subsistem option').each(function() {
+        if ($(this).val() !== '') {
+            allSubsistemOptions.push({
+                value: $(this).val(),
+                text: $(this).text(),
+                sistemId: $(this).data('sistem-id'),
+                nama: $(this).data('nama')
+            });
+        }
+    });
+
     // ===========================
     // AUTOFILL MAGIC - Sistem
     // ===========================
     let typingTimerSistem;
-    const doneTypingInterval = 500; // 0.5 second
+    const doneTypingInterval = 500;
 
     $('#sistem').on('select2:select select2:unselect change', function(e) {
         clearTimeout(typingTimerSistem);
         
         const kodValue = $(this).val();
+        const sistemId = $(this).find(':selected').data('id');
         
         if (!kodValue) {
             $('#nama-sistem-row').slideUp(300);
             $('#kod-sistem-status').html('');
+            // Reset subsistem to show all when no sistem selected
+            resetSubsistemOptions();
             return;
+        }
+
+        // Filter subsistem based on selected sistem
+        if (sistemId) {
+            filterSubsistemOptions(sistemId);
+        } else {
+            // If new sistem (no ID), show all subsistem for now
+            resetSubsistemOptions();
         }
 
         typingTimerSistem = setTimeout(function() {
@@ -546,7 +572,6 @@ $(document).ready(function() {
     function checkKodSistem(kod) {
         if (!kod) return;
 
-        // Show loading
         $('#kod-sistem-status').html('<span class="badge bg-secondary"><i class="bi bi-hourglass-split"></i> Menyemak...</span>');
 
         $.ajax({
@@ -555,14 +580,15 @@ $(document).ready(function() {
             data: { kod: kod },
             success: function(response) {
                 if (response.exists) {
-                    // Kod already exists - HIDE nama field
                     $('#kod-sistem-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
                     $('#nama-sistem-row').slideUp(300);
-                    
-                    // Set hidden value untuk reference
                     $('#nama_sistem').val(response.data.nama);
+                    
+                    // Filter subsistem based on the existing sistem
+                    if (response.data.id) {
+                        filterSubsistemOptions(response.data.id);
+                    }
                 } else {
-                    // New kod - SHOW nama field
                     $('#kod-sistem-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
                     $('#nama_sistem').val(response.suggestion).prop('readonly', false).removeClass('bg-light');
                     $('#nama-sistem-hint').text('💡 ' + response.suggestion + ' (Anda boleh edit)');
@@ -572,12 +598,7 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 console.error('Error checking kod sistem:', error);
-                console.error('Response:', xhr.responseText);
-                
-                // Show error with details
                 $('#kod-sistem-status').html('<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ralat</span>');
-                
-                // Still show the field for new entry
                 $('#nama_sistem').val('Sistem ' + kod).prop('readonly', false).removeClass('bg-light');
                 $('#nama-sistem-hint').html('<span class="text-warning">⚠️ Tidak dapat menyemak database. Sila masukkan nama sistem.</span>');
                 $('#autofill-indicator-sistem').hide();
@@ -586,17 +607,68 @@ $(document).ready(function() {
         });
     }
 
-    // Allow user to edit auto-filled name for Sistem
-    $('#nama_sistem').on('focus', function() {
-        $(this).prop('readonly', false);
-        $('#autofill-indicator-sistem').fadeOut();
-    });
-
-    $('#nama_sistem').on('input', function() {
-        if ($(this).val() !== '') {
-            $('#autofill-indicator-sistem').hide();
+    // ===========================
+    // FILTER SUBSISTEM FUNCTIONS
+    // ===========================
+    function filterSubsistemOptions(sistemId) {
+        const $subsistem = $('#subsistem');
+        const currentValue = $subsistem.val();
+        
+        // Clear current selection if it doesn't match the new sistem
+        const currentOption = allSubsistemOptions.find(opt => opt.value === currentValue);
+        if (currentOption && currentOption.sistemId != sistemId) {
+            $subsistem.val('').trigger('change');
+            $('#nama-subsistem-row').slideUp(300);
+            $('#kod-subsistem-status').html('');
         }
-    });
+        
+        // Remove all options except the placeholder
+        $subsistem.find('option:not([value=""])').remove();
+        
+        // Add only matching subsistem options
+        const filteredOptions = allSubsistemOptions.filter(opt => opt.sistemId == sistemId);
+        
+        if (filteredOptions.length > 0) {
+            filteredOptions.forEach(function(opt) {
+                const newOption = new Option(opt.text, opt.value, false, false);
+                $(newOption).data('sistem-id', opt.sistemId);
+                $(newOption).data('nama', opt.nama);
+                $subsistem.append(newOption);
+            });
+            
+            $subsistem.prop('disabled', false);
+            $subsistem.next('.select2-container').find('.select2-selection').removeClass('bg-light');
+        } else {
+            $subsistem.prop('disabled', false); // Still allow manual entry
+            $subsistem.next('.select2-container').find('.select2-selection').removeClass('bg-light');
+        }
+        
+        // Refresh Select2
+        $subsistem.trigger('change.select2');
+    }
+
+    function resetSubsistemOptions() {
+        const $subsistem = $('#subsistem');
+        
+        // Clear and reset
+        $subsistem.val('').trigger('change');
+        $subsistem.find('option:not([value=""])').remove();
+        
+        // Add all options back
+        allSubsistemOptions.forEach(function(opt) {
+            const newOption = new Option(opt.text, opt.value, false, false);
+            $(newOption).data('sistem-id', opt.sistemId);
+            $(newOption).data('nama', opt.nama);
+            $subsistem.append(newOption);
+        });
+        
+        $subsistem.prop('disabled', false);
+        $subsistem.next('.select2-container').find('.select2-selection').removeClass('bg-light');
+        $subsistem.trigger('change.select2');
+        
+        $('#nama-subsistem-row').slideUp(300);
+        $('#kod-subsistem-status').html('');
+    }
 
     // ===========================
     // AUTOFILL MAGIC - SubSistem
@@ -622,10 +694,8 @@ $(document).ready(function() {
     function checkKodSubSistem(kod) {
         if (!kod) return;
 
-        // Get selected sistem_id if available
         var sistemId = $('#sistem').find(':selected').data('id') || null;
 
-        // Show loading
         $('#kod-subsistem-status').html('<span class="badge bg-secondary"><i class="bi bi-hourglass-split"></i> Menyemak...</span>');
 
         $.ajax({
@@ -637,14 +707,10 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.exists) {
-                    // Kod already exists - HIDE nama field
                     $('#kod-subsistem-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
                     $('#nama-subsistem-row').slideUp(300);
-                    
-                    // Set hidden value untuk reference
                     $('#nama_subsistem').val(response.data.nama);
                 } else {
-                    // New kod - SHOW nama field
                     $('#kod-subsistem-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
                     $('#nama_subsistem').val(response.suggestion).prop('readonly', false).removeClass('bg-light');
                     
@@ -656,12 +722,7 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 console.error('Error checking kod subsistem:', error);
-                console.error('Response:', xhr.responseText);
-                
-                // Show error with details
                 $('#kod-subsistem-status').html('<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ralat</span>');
-                
-                // Still show the field for new entry
                 $('#nama_subsistem').val('SubSistem ' + kod).prop('readonly', false).removeClass('bg-light');
                 $('#nama-subsistem-hint').html('<span class="text-warning">⚠️ Tidak dapat menyemak database. Sila masukkan nama subsistem.</span>');
                 $('#autofill-indicator-subsistem').hide();
@@ -670,7 +731,18 @@ $(document).ready(function() {
         });
     }
 
-    // Allow user to edit auto-filled name for SubSistem
+    // Allow user to edit auto-filled names
+    $('#nama_sistem').on('focus', function() {
+        $(this).prop('readonly', false);
+        $('#autofill-indicator-sistem').fadeOut();
+    });
+
+    $('#nama_sistem').on('input', function() {
+        if ($(this).val() !== '') {
+            $('#autofill-indicator-sistem').hide();
+        }
+    });
+
     $('#nama_subsistem').on('focus', function() {
         $(this).prop('readonly', false);
         $('#autofill-indicator-subsistem').fadeOut();
@@ -683,44 +755,13 @@ $(document).ready(function() {
     });
 
     // ===========================
-    // Filter SubSistem berdasarkan Sistem yang dipilih
-    // ===========================
-    $('#sistem').on('change', function() {
-        var sistemId = $(this).find(':selected').data('id');
-        var $subsistem = $('#subsistem');
-        
-        // Clear subsistem when sistem changes
-        if (sistemId) {
-            // Filter subsistem options based on sistem_id
-            $subsistem.find('option').each(function() {
-                var optionSistemId = $(this).data('sistem-id');
-                if (optionSistemId && optionSistemId != sistemId) {
-                    $(this).hide();
-                } else {
-                    $(this).show();
-                }
-            });
-        } else {
-            // Show all options if no sistem selected
-            $subsistem.find('option').show();
-        }
-        
-        // Reset subsistem selection and hide nama row
-        $subsistem.val('').trigger('change');
-        $('#nama-subsistem-row').slideUp(300);
-        $('#kod-subsistem-status').html('');
-    });
-
-    // ===========================
-    // Auto-fill DPA sahaja (tanpa kod lokasi)
+    // Auto-fill DPA sahaja
     // ===========================
     $('#component_id').on('change', function() {
         var $selected = $(this).find(':selected');
-        // Hanya auto-fill DPA
         $('#display_dpa').val($selected.data('dpa') || '');
     });
     
-    // Trigger on page load if component already selected
     if ($('#component_id').val()) {
         $('#component_id').trigger('change');
     }
@@ -728,70 +769,50 @@ $(document).ready(function() {
     // ===========================
     // FORMAT KOS PEROLEHAN
     // ===========================
-    
-    // Format input kos perolehan - hanya angka dan titik
     $('input[name="kos_perolehan"]').on('input', function() {
         let value = $(this).val();
-        
-        // Remove non-numeric characters except dots
         value = value.replace(/[^0-9.]/g, '');
-        
-        // Remove multiple dots
         const parts = value.split('.');
         if (parts.length > 2) {
             value = parts[0] + '.' + parts.slice(1).join('');
         }
-        
         $(this).val(value);
     });
 
-    // Format dengan comma separator ketika blur
     $('input[name="kos_perolehan"]').on('blur', function() {
         let value = $(this).val();
-        
         if (value) {
-            // Remove any existing RM and spaces
             value = value.replace(/RM\s*/g, '').trim();
-            
-            // Parse as number
             let number = parseFloat(value);
-            
             if (!isNaN(number)) {
-                // Format dengan 2 decimal places dan thousand separator
                 let formatted = number.toLocaleString('en-MY', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
-                
                 $(this).val(formatted);
             }
         }
     });
 
-    // Remove formatting ketika focus untuk mudah edit
     $('input[name="kos_perolehan"]').on('focus', function() {
         let value = $(this).val();
         if (value) {
-            // Remove RM prefix and commas
             value = value.replace(/RM\s*/g, '').replace(/,/g, '');
             $(this).val(value);
         }
     });
 
     // ===========================
-    // FORM SUBMIT - Clean format untuk database
+    // FORM SUBMIT
     // ===========================
     $('#mainComponentForm').on('submit', function(e) {
         let kosInput = $('input[name="kos_perolehan"]');
         let value = kosInput.val();
         
         if (value) {
-            // Clean value untuk database: RM20000.00
             value = value.replace(/RM\s*/g, '').replace(/,/g, '');
             let number = parseFloat(value);
-            
             if (!isNaN(number)) {
-                // Format: RM20000.00 (no comma, with RM prefix)
                 kosInput.val('RM' + number.toFixed(2));
             }
         }

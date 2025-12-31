@@ -755,24 +755,99 @@ $(document).ready(function() {
     });
 
     // ===========================
-    // Filter SubSistem berdasarkan Sistem yang dipilih
+    // Filter SubSistem berdasarkan Sistem yang dipilih - ENHANCED
     // ===========================
-    $('#sistem').on('change', function() {
-        var sistemId = $(this).find(':selected').data('id');
+    function filterSubSistemOptions() {
+        var sistemId = $('#sistem').find(':selected').data('id');
         var $subsistem = $('#subsistem');
+        var currentSubSistemValue = $subsistem.val();
+        
+        console.log('Filtering SubSistem for Sistem ID:', sistemId);
+        console.log('Current SubSistem value:', currentSubSistemValue);
+        
+        // Destroy Select2 temporarily
+        if ($subsistem.data('select2')) {
+            $subsistem.select2('destroy');
+        }
         
         if (sistemId) {
+            // Show only related subsistems
+            var hasVisibleOptions = false;
             $subsistem.find('option').each(function() {
+                if ($(this).val() === '') {
+                    // Always show the placeholder
+                    $(this).prop('disabled', false).show();
+                    return;
+                }
+                
                 var optionSistemId = $(this).data('sistem-id');
-                if (optionSistemId && optionSistemId != sistemId) {
-                    $(this).hide();
+                console.log('Option:', $(this).val(), 'Sistem ID:', optionSistemId);
+                
+                if (optionSistemId && optionSistemId == sistemId) {
+                    $(this).prop('disabled', false).show();
+                    hasVisibleOptions = true;
                 } else {
-                    $(this).show();
+                    $(this).prop('disabled', true).hide();
                 }
             });
+            
+            // If current value is not in the filtered list, clear it
+            var currentOption = $subsistem.find('option[value="' + currentSubSistemValue + '"]');
+            var currentOptionSistemId = currentOption.data('sistem-id');
+            
+            if (currentSubSistemValue && currentOptionSistemId != sistemId) {
+                console.log('Current SubSistem does not match selected Sistem, clearing...');
+                $subsistem.val('');
+                $('#kod-subsistem-status').html('');
+                $('#nama-subsistem-row').slideUp(300);
+            }
+            
+            if (!hasVisibleOptions) {
+                console.log('No subsistems found for this sistem');
+            }
         } else {
-            $subsistem.find('option').show();
+            // No sistem selected, show all options
+            console.log('No Sistem selected, showing all SubSistem options');
+            $subsistem.find('option').prop('disabled', false).show();
         }
+        
+        // Reinitialize Select2 with filtered options
+        $subsistem.select2({
+            theme: 'bootstrap-5',
+            tags: true,
+            placeholder: 'Pilih atau taip kod baru',
+            allowClear: true,
+            createTag: function(params) {
+                var term = $.trim(params.term);
+                if (term === '') return null;
+                
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            },
+            templateResult: function(data) {
+                if (data.newTag) {
+                    return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+                }
+                return data.text;
+            }
+        });
+        
+        // Restore value if it's still valid
+        if (currentSubSistemValue) {
+            var isStillValid = $subsistem.find('option[value="' + currentSubSistemValue + '"]:not(:disabled)').length > 0;
+            if (isStillValid) {
+                $subsistem.val(currentSubSistemValue).trigger('change.select2');
+                console.log('Restored SubSistem value:', currentSubSistemValue);
+            }
+        }
+    }
+    
+    // Trigger filter on Sistem change
+    $('#sistem').on('change', function() {
+        filterSubSistemOptions();
     });
 
     // ===========================
@@ -860,6 +935,13 @@ $(document).ready(function() {
 
     if (currentSubSistemValue) {
         checkKodSubSistem(currentSubSistemValue);
+    }
+
+    // ===========================
+    // Initial filter on page load
+    // ===========================
+    if ($('#sistem').val()) {
+        filterSubSistemOptions();
     }
 });
 </script>
