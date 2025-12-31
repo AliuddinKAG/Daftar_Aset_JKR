@@ -178,7 +178,7 @@
                 <!-- Demo Credentials -->
                 <div class="demo-credentials">
                     <h6><i class="bi bi-info-circle-fill"></i> Akaun Percubaan:</h6>
-                    <p><strong>Admin:</strong> username: <code>admin</code> / password: <code>admin123</code></p>
+                    <p><strong>Admin:</strong> username: <code>admin</code> / password: <code>P@ssw0rd</code></p>
                     <p><strong>User:</strong> username: <code>user</code> / password: <code>user123</code></p>
                 </div>
 
