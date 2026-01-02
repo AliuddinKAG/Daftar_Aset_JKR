@@ -136,7 +136,7 @@
                                                             data-id="{{ $sistem->id }}"
                                                             data-nama="{{ $sistem->nama }}"
                                                             {{ old('sistem', $mainComponent->sistem) == $sistem->kod ? 'selected' : '' }}>
-                                                            {{ $sistem->kod }} - {{ $sistem->nama }}
+                                                            {{ $sistem->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -158,7 +158,7 @@
                                                             data-sistem-id="{{ $subsistem->sistem_id }}"
                                                             data-nama="{{ $subsistem->nama }}"
                                                             {{ old('subsistem', $mainComponent->subsistem) == $subsistem->kod ? 'selected' : '' }}>
-                                                            {{ $subsistem->kod }} - {{ $subsistem->nama }}
+                                                            {{ $subsistem->kod }}
                                                         </option>
                                                     @endforeach
                                                 </select>

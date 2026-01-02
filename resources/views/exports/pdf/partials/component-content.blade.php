@@ -48,7 +48,7 @@
             <tbody>
                 <tr>
                     <td class="label-col" style="width: 30%;">Kod Blok</td>
-                    <td class="value-col" style="width: 70%;">{{ $component->kod_blok ?? ' ' }}</td>
+                    <td class="value-col" style="width: 70%;">{{ $component->kod_blok ?? ' ' }} - {{ $component->nama_blok ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Aras</td>
