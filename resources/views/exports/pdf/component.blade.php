@@ -222,7 +222,7 @@
             <tbody>
                 <tr>
                     <td class="label-col">Kod Blok</td>
-                    <td class="value-col">{{ $component->kod_blok ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->kod_blok ?? ' ' }} - {{ $component->nama_blok ?? ' ' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Aras</td>

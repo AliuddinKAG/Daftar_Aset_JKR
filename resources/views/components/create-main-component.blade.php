@@ -129,7 +129,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-4">
                                             <label class="form-label">
-                                                Sistem
+                                                Kod Sistem
                                                 <span class="text-danger">*</span>
                                                 <span id="kod-sistem-status" class="ms-2"></span>
                                             </label>
@@ -151,7 +151,7 @@
                                         
                                         <div class="col-md-4">
                                             <label class="form-label">
-                                                SubSistem
+                                                Kod SubSistem
                                                 <span class="text-danger">*</span>
                                                 <span id="kod-subsistem-status" class="ms-2"></span>
                                             </label>
