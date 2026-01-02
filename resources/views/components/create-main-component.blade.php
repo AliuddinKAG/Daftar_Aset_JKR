@@ -135,7 +135,7 @@
                                             </label>
                                             <div class="input-group">
                                                 <select class="form-select select2-sistem" name="sistem" id="sistem" required>
-                                                    <option value="">-- Pilih atau Taip Sistem --</option>
+                                                    <option value="">-- Pilih atau Taip Kod Sistem --</option>
                                                     @foreach($sistems as $sistem)
                                                         <option value="{{ $sistem->kod }}" 
                                                             data-id="{{ $sistem->id }}"
@@ -157,7 +157,7 @@
                                             </label>
                                             <div class="input-group">
                                                 <select class="form-select select2-subsistem" name="subsistem" id="subsistem" required>
-                                                    <option value="">-- Pilih atau Taip SubSistem --</option>
+                                                    <option value="">-- Pilih atau Taip Kod SubSistem --</option>
                                                     @foreach($subsistems as $subsistem)
                                                         <option value="{{ $subsistem->kod }}" 
                                                             data-sistem-id="{{ $subsistem->sistem_id }}"
