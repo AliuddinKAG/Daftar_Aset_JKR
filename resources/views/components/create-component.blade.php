@@ -397,133 +397,20 @@
 $(document).ready(function() {
     // CSRF Token untuk AJAX
     $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
 
-    // Initialize Select2 dengan tags support
-    $('.select2-blok').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Pilih atau taip kod baru',
-        allowClear: true,
-        createTag: function (params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            
-            return {
-                id: term,
-                text: term,
-                newTag: true
-            }
-        },
-        templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
-            }
-            return data.text;
-        }
-    });
-
-    // Initialize Select2 for Kod Aras with tags (Blok section)
-    $('.select2-aras').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Pilih atau taip kod baru',
-        allowClear: true,
-        createTag: function (params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            
-            return {
-                id: term,
-                text: term,
-                newTag: true
-            }
-        },
-        templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
-            }
-            return data.text;
-        }
-    });
-
-    // Initialize Select2 for Kod Aras with tags (Binaan Luar section)
-    $('.select2-aras-binaan').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Pilih atau taip kod baru',
-        allowClear: true,
-        createTag: function (params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            
-            return {
-                id: term,
-                text: term,
-                newTag: true
-            }
-        },
-        templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
-            }
-            return data.text;
-        }
-    });
-
-    // Initialize Select2 for Kod Binaan Luar with tags
-    $('.select2-binaan-luar').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Pilih atau taip kod baru',
-        allowClear: true,
-        createTag: function (params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            
-            return {
-                id: term,
-                text: term,
-                newTag: true
-            }
-        },
-        templateResult: function(data) {
-            if (data.newTag) {
-                return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
-            }
-            return data.text;
-        }
-    });
-
-    // Initialize other Select2 dropdowns
-    $('.select2-ruang, .select2-nama-ruang, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
-        theme: 'bootstrap-5',
-        tags: true,
-        placeholder: 'Pilih atau taip nilai baru',
-        allowClear: true,
-        createTag: function (params) {
-            var term = $.trim(params.term);
-            if (term === '') return null;
-            return {
-                id: term,
-                text: term + ' (Baru)',
-                newTag: true
-            }
-        }
-    });
+    // Initialize all Select2 dropdowns
+    initializeSelect2();
 
     // ========================================
-    // AUTOFILL MAGIC - Kod Blok
+    // KOD BLOK - Auto Check & Save
     // ========================================
-    let typingTimerBlok;
-    const doneTypingInterval = 500; // 0.5 second
+    let typingTimerBlok, saveTimerBlok;
+    const doneTypingInterval = 500;
 
     $('#kod_blok').on('select2:select select2:unselect change', function(e) {
         clearTimeout(typingTimerBlok);
-        
         const kodValue = $(this).val();
         
         if (!kodValue) {
@@ -532,60 +419,65 @@ $(document).ready(function() {
             return;
         }
 
-        typingTimerBlok = setTimeout(function() {
-            checkKodBlok(kodValue);
-        }, doneTypingInterval);
+        typingTimerBlok = setTimeout(() => checkKodBlok(kodValue), doneTypingInterval);
     });
 
     function checkKodBlok(kod) {
         if (!kod) return;
 
-        // Show loading
         $('#kod-blok-status').html('<span class="badge bg-secondary">Menyemak...</span>');
         $('#nama-blok-row').show();
         $('#nama_blok').prop('readonly', true).val('Menyemak kod...');
 
         $.ajax({
-            url: '{{ route("api.check-kod-blok") }}',
+            url: '/api/check-kod-blok',
             method: 'POST',
             data: { kod: kod },
             success: function(response) {
                 if (response.exists) {
-                    // Kod already exists
                     $('#kod-blok-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
                     $('#nama_blok').val(response.data.nama).prop('readonly', true);
                     $('#nama-blok-hint').text('✓ Kod ini sudah wujud dalam database');
                     $('#autofill-indicator-blok').hide();
                 } else {
-                    // New kod - show suggestion
                     $('#kod-blok-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
                     $('#nama_blok').val(response.suggestion).prop('readonly', false);
-                    $('#nama-blok-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
+                    $('#nama-blok-hint').html('💡 Nama disarankan. <strong>Akan disimpan automatik</strong>.');
                     $('#autofill-indicator-blok').show();
                 }
             },
             error: function() {
                 $('#kod-blok-status').html('<span class="badge bg-danger">Ralat</span>');
                 $('#nama_blok').val('').prop('readonly', false);
-                $('#nama-blok-hint').text('');
             }
         });
     }
 
-    // Allow user to edit auto-filled name for Blok
+    $('#nama_blok').on('input', function() {
+        const kodValue = $('#kod_blok').val();
+        const namaValue = $(this).val().trim();
+        
+        clearTimeout(saveTimerBlok);
+        const isNewCode = $('#kod-blok-status').find('.new-tag-badge').length > 0;
+        
+        if (isNewCode && kodValue && namaValue) {
+            $('#nama-blok-hint').html('⏳ Menyimpan...');
+            saveTimerBlok = setTimeout(() => saveToDatabase('blok', kodValue, namaValue), 1000);
+        }
+    });
+
     $('#nama_blok').on('focus', function() {
         $(this).prop('readonly', false);
         $('#autofill-indicator-blok').hide();
     });
 
     // ========================================
-    // AUTOFILL MAGIC - Kod Aras (NEW!)
+    // KOD ARAS (Blok Section) - Auto Check & Save
     // ========================================
-    let typingTimerAras;
+    let typingTimerAras, saveTimerAras;
 
     $('#kod_aras').on('select2:select select2:unselect change', function(e) {
         clearTimeout(typingTimerAras);
-        
         const kodValue = $(this).val();
         
         if (!kodValue) {
@@ -594,60 +486,34 @@ $(document).ready(function() {
             return;
         }
 
-        typingTimerAras = setTimeout(function() {
-            checkKodAras(kodValue);
-        }, doneTypingInterval);
+        typingTimerAras = setTimeout(() => checkKodAras(kodValue, 'blok'), doneTypingInterval);
     });
 
-    function checkKodAras(kod) {
-        if (!kod) return;
+    $('#nama_aras').on('input', function() {
+        const kodValue = $('#kod_aras').val();
+        const namaValue = $(this).val().trim();
+        
+        clearTimeout(saveTimerAras);
+        const isNewCode = $('#kod-aras-status').find('.new-tag-badge').length > 0;
+        
+        if (isNewCode && kodValue && namaValue) {
+            $('#nama-aras-hint').html('⏳ Menyimpan...');
+            saveTimerAras = setTimeout(() => saveToDatabase('aras', kodValue, namaValue, 'blok'), 1000);
+        }
+    });
 
-        // Show loading
-        $('#kod-aras-status').html('<span class="badge bg-secondary">Menyemak...</span>');
-        $('#nama-aras-row').show();
-        $('#nama_aras').prop('readonly', true).val('Menyemak kod...');
-
-        $.ajax({
-            url: '{{ route("api.check-kod-aras") }}',
-            method: 'POST',
-            data: { kod: kod },
-            success: function(response) {
-                if (response.exists) {
-                    // Kod already exists
-                    $('#kod-aras-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
-                    $('#nama_aras').val(response.data.nama).prop('readonly', true);
-                    $('#nama-aras-hint').text('✓ Kod ini sudah wujud dalam database');
-                    $('#autofill-indicator-aras').hide();
-                } else {
-                    // New kod - show suggestion
-                    $('#kod-aras-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
-                    $('#nama_aras').val(response.suggestion).prop('readonly', false);
-                    $('#nama-aras-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
-                    $('#autofill-indicator-aras').show();
-                }
-            },
-            error: function() {
-                $('#kod-aras-status').html('<span class="badge bg-danger">Ralat</span>');
-                $('#nama_aras').val('').prop('readonly', false);
-                $('#nama-aras-hint').text('');
-            }
-        });
-    }
-
-    // Allow user to edit auto-filled name for Aras
     $('#nama_aras').on('focus', function() {
         $(this).prop('readonly', false);
         $('#autofill-indicator-aras').hide();
     });
 
     // ========================================
-    // AUTOFILL MAGIC - Kod Aras Binaan Luar (NEW!)
+    // KOD ARAS (Binaan Luar Section) - Auto Check & Save
     // ========================================
-    let typingTimerArasBinaan;
+    let typingTimerArasBinaan, saveTimerArasBinaan;
 
     $('#kod_aras_binaan').on('select2:select select2:unselect change', function(e) {
         clearTimeout(typingTimerArasBinaan);
-        
         const kodValue = $(this).val();
         
         if (!kodValue) {
@@ -656,51 +522,153 @@ $(document).ready(function() {
             return;
         }
 
-        typingTimerArasBinaan = setTimeout(function() {
-            checkKodArasBinaan(kodValue);
-        }, doneTypingInterval);
+        typingTimerArasBinaan = setTimeout(() => checkKodAras(kodValue, 'binaan'), doneTypingInterval);
     });
 
-    function checkKodArasBinaan(kod) {
-        if (!kod) return;
+    $('#nama_aras_binaan').on('input', function() {
+        const kodValue = $('#kod_aras_binaan').val();
+        const namaValue = $(this).val().trim();
+        
+        clearTimeout(saveTimerArasBinaan);
+        const isNewCode = $('#kod-aras-binaan-status').find('.new-tag-badge').length > 0;
+        
+        if (isNewCode && kodValue && namaValue) {
+            $('#nama-aras-binaan-hint').html('⏳ Menyimpan...');
+            saveTimerArasBinaan = setTimeout(() => saveToDatabase('aras', kodValue, namaValue, 'binaan'), 1000);
+        }
+    });
 
-        // Show loading
-        $('#kod-aras-binaan-status').html('<span class="badge bg-secondary">Menyemak...</span>');
-        $('#nama-aras-binaan-row').show();
-        $('#nama_aras_binaan').prop('readonly', true).val('Menyemak kod...');
-
-        $.ajax({
-            url: '{{ route("api.check-kod-aras") }}',
-            method: 'POST',
-            data: { kod: kod },
-            success: function(response) {
-                if (response.exists) {
-                    // Kod already exists
-                    $('#kod-aras-binaan-status').html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
-                    $('#nama_aras_binaan').val(response.data.nama).prop('readonly', true);
-                    $('#nama-aras-binaan-hint').text('✓ Kod ini sudah wujud dalam database');
-                    $('#autofill-indicator-aras-binaan').hide();
-                } else {
-                    // New kod - show suggestion
-                    $('#kod-aras-binaan-status').html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
-                    $('#nama_aras_binaan').val(response.suggestion).prop('readonly', false);
-                    $('#nama-aras-binaan-hint').text('💡 Nama disarankan. Anda boleh edit jika perlu.');
-                    $('#autofill-indicator-aras-binaan').show();
-                }
-            },
-            error: function() {
-                $('#kod-aras-binaan-status').html('<span class="badge bg-danger">Ralat</span>');
-                $('#nama_aras_binaan').val('').prop('readonly', false);
-                $('#nama-aras-binaan-hint').text('');
-            }
-        });
-    }
-
-    // Allow user to edit auto-filled name for Aras Binaan
     $('#nama_aras_binaan').on('focus', function() {
         $(this).prop('readonly', false);
         $('#autofill-indicator-aras-binaan').hide();
     });
+
+    // ========================================
+    // HELPER FUNCTIONS
+    // ========================================
+    function checkKodAras(kod, context) {
+        if (!kod) return;
+
+        const suffix = context === 'binaan' ? '-binaan' : '';
+        const statusEl = `#kod-aras${suffix}-status`;
+        const rowEl = `#nama-aras${suffix}-row`;
+        const inputEl = `#nama_aras${suffix === '-binaan' ? '_binaan' : ''}`;
+        const hintEl = `#nama-aras${suffix}-hint`;
+        const indicatorEl = `#autofill-indicator-aras${suffix}`;
+
+        $(statusEl).html('<span class="badge bg-secondary">Menyemak...</span>');
+        $(rowEl).show();
+        $(inputEl).prop('readonly', true).val('Menyemak kod...');
+
+        $.ajax({
+            url: '/api/check-kod-aras',
+            method: 'POST',
+            data: { kod: kod },
+            success: function(response) {
+                if (response.exists) {
+                    $(statusEl).html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                    $(inputEl).val(response.data.nama).prop('readonly', true);
+                    $(hintEl).text('✓ Kod ini sudah wujud dalam database');
+                    $(indicatorEl).hide();
+                } else {
+                    $(statusEl).html('<span class="new-tag-badge"><i class="bi bi-sparkles"></i> Kod Baru</span>');
+                    $(inputEl).val(response.suggestion).prop('readonly', false);
+                    $(hintEl).html('💡 Nama disarankan. <strong>Akan disimpan automatik</strong>.');
+                    $(indicatorEl).show();
+                }
+            },
+            error: function() {
+                $(statusEl).html('<span class="badge bg-danger">Ralat</span>');
+                $(inputEl).val('').prop('readonly', false);
+            }
+        });
+    }
+
+    function saveToDatabase(type, kod, nama, context = null) {
+        const routes = {
+            'blok': '/api/save-kod-blok',
+            'aras': '/api/save-kod-aras'
+        };
+
+        const suffix = context === 'binaan' ? '-binaan' : '';
+        const statusEl = type === 'blok' ? '#kod-blok-status' : `#kod-aras${suffix}-status`;
+        const hintEl = type === 'blok' ? '#nama-blok-hint' : `#nama-aras${suffix}-hint`;
+
+        $.ajax({
+            url: routes[type],
+            method: 'POST',
+            data: { kod: kod, nama: nama },
+            success: function(response) {
+                if (response.success) {
+                    if (response.action === 'created') {
+                        $(statusEl).html('<span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Disimpan</span>');
+                        $(hintEl).html('✅ Kod baru telah disimpan ke database!');
+                        
+                        setTimeout(function() {
+                            $(statusEl).html('<span class="existing-tag-badge"><i class="bi bi-check-circle"></i> Sedia Ada</span>');
+                            $(`#nama_${type}${suffix === '-binaan' ? '_binaan' : ''}`).prop('readonly', true);
+                            $(hintEl).text('✓ Kod ini sudah wujud dalam database');
+                        }, 2000);
+                    } else {
+                        $(hintEl).html('✅ Kod telah dikemaskini!');
+                    }
+
+                    showToast('success', response.message);
+                }
+            },
+            error: function(xhr) {
+                $(statusEl).html('<span class="badge bg-danger">Ralat Simpan</span>');
+                $(hintEl).html('❌ Gagal menyimpan. Cuba lagi.');
+                console.error('Error saving:', xhr.responseJSON);
+            }
+        });
+    }
+
+    function showToast(icon, title) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: title,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+    }
+
+    function initializeSelect2() {
+        $('.select2-blok, .select2-aras, .select2-aras-binaan, .select2-binaan-luar').select2({
+            theme: 'bootstrap-5',
+            tags: true,
+            placeholder: 'Pilih atau taip kod baru',
+            allowClear: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: term, text: term, newTag: true }
+            },
+            templateResult: function(data) {
+                if (data.newTag) {
+                    return $('<span><i class="bi bi-plus-circle text-success"></i> ' + data.text + ' <span class="new-tag-badge">✨ Kod Baru</span></span>');
+                }
+                return data.text;
+            }
+        });
+
+        $('.select2-ruang, .select2-nama-ruang, .select2-ruang-binaan, .select2-nama-ruang-binaan').select2({
+            theme: 'bootstrap-5',
+            tags: true,
+            placeholder: 'Pilih atau taip nilai baru',
+            allowClear: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: term, text: term + ' (Baru)', newTag: true }
+            }
+        });
+    }
 
     // ========================================
     // Toggle sections
@@ -714,29 +682,23 @@ $(document).ready(function() {
     });
 
     // ========================================
-    // Check on page load
+    // Check on page load (for validation errors)
     // ========================================
     if ($('#ada_blok').is(':checked')) {
         $('#blok_section').show();
         
         const kodBlokValue = $('#kod_blok').val();
-        if (kodBlokValue) {
-            checkKodBlok(kodBlokValue);
-        }
+        if (kodBlokValue) checkKodBlok(kodBlokValue);
         
         const kodArasValue = $('#kod_aras').val();
-        if (kodArasValue) {
-            checkKodAras(kodArasValue);
-        }
+        if (kodArasValue) checkKodAras(kodArasValue, 'blok');
     }
     
     if ($('#ada_binaan_luar').is(':checked')) {
         $('#binaan_section').show();
         
         const kodArasBinaanValue = $('#kod_aras_binaan').val();
-        if (kodArasBinaanValue) {
-            checkKodArasBinaan(kodArasBinaanValue);
-        }
+        if (kodArasBinaanValue) checkKodAras(kodArasBinaanValue, 'binaan');
     }
 });
 </script>

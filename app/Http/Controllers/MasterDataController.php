@@ -79,6 +79,91 @@ class MasterDataController extends Controller
     }
 
     /**
+     * Save or Update Kod Blok with Nama
+     * Called via AJAX when user types new kod blok
+     */
+    public function saveKodBlok(Request $request)
+    {
+        try {
+            // Validate input
+            $validated = $request->validate([
+                'kod' => 'required|string|max:50',
+                'nama' => 'required|string|max:255'
+            ]);
+
+            Log::info('===== SAVE KOD BLOK =====');
+            Log::info('Kod: ' . $validated['kod']);
+            Log::info('Nama: ' . $validated['nama']);
+
+            // Check if kod already exists
+            $existingKod = DB::table('kod_bloks')
+                ->where('kod', $validated['kod'])
+                ->first();
+
+            if ($existingKod) {
+                // Update existing record
+                DB::table('kod_bloks')
+                    ->where('kod', $validated['kod'])
+                    ->update([
+                        'nama' => $validated['nama'],
+                        'updated_at' => now()
+                    ]);
+
+                Log::info('Kod Blok UPDATED: ' . $validated['kod']);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod blok berjaya dikemaskini',
+                    'data' => [
+                        'kod' => $validated['kod'],
+                        'nama' => $validated['nama']
+                    ],
+                    'action' => 'updated'
+                ]);
+            } else {
+                // Create new record
+                DB::table('kod_bloks')->insert([
+                    'kod' => $validated['kod'],
+                    'nama' => $validated['nama'],
+                    'status' => 'aktif', // Default status
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                Log::info('Kod Blok CREATED: ' . $validated['kod']);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod blok baru berjaya disimpan ke database',
+                    'data' => [
+                        'kod' => $validated['kod'],
+                        'nama' => $validated['nama']
+                    ],
+                    'action' => 'created'
+                ]);
+            }
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error in saveKodBlok: ' . json_encode($e->errors()));
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat validasi',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            Log::error('ERROR in saveKodBlok: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Check if kod aras exists and return info or generate suggestion
      */
     public function checkKodAras(Request $request)
@@ -138,6 +223,96 @@ class MasterDataController extends Controller
                 'error' => true,
                 'message' => 'Ralat server: ' . $e->getMessage(),
                 'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
+        }
+    }
+
+    /**
+     * Save or Update Kod Aras with Nama
+     * Called via AJAX when user types new kod aras
+     */
+    public function saveKodAras(Request $request)
+    {
+        try {
+            // Validate input
+            $validated = $request->validate([
+                'kod' => 'required|string|max:50',
+                'nama' => 'required|string|max:255'
+            ]);
+
+            Log::info('===== SAVE KOD ARAS =====');
+            Log::info('Kod: ' . $validated['kod']);
+            Log::info('Nama: ' . $validated['nama']);
+
+            // Check if kod already exists
+            $existingKod = DB::table('kod_aras')
+                ->where('kod', $validated['kod'])
+                ->first();
+
+            if ($existingKod) {
+                // Update existing record
+                DB::table('kod_aras')
+                    ->where('kod', $validated['kod'])
+                    ->update([
+                        'nama' => $validated['nama'],
+                        'updated_at' => now()
+                    ]);
+
+                Log::info('Kod Aras UPDATED: ' . $validated['kod']);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod aras berjaya dikemaskini',
+                    'data' => [
+                        'kod' => $validated['kod'],
+                        'nama' => $validated['nama']
+                    ],
+                    'action' => 'updated'
+                ]);
+            } else {
+                // Create new record
+                // Try to determine tingkat from kod
+                $tingkat = $this->extractTingkatFromKod($validated['kod']);
+                
+                DB::table('kod_aras')->insert([
+                    'kod' => $validated['kod'],
+                    'nama' => $validated['nama'],
+                    'tingkat' => $tingkat,
+                    'status' => 'aktif', // Default status
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                Log::info('Kod Aras CREATED: ' . $validated['kod'] . ' (Tingkat: ' . $tingkat . ')');
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod aras baru berjaya disimpan ke database',
+                    'data' => [
+                        'kod' => $validated['kod'],
+                        'nama' => $validated['nama'],
+                        'tingkat' => $tingkat
+                    ],
+                    'action' => 'created'
+                ]);
+            }
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error in saveKodAras: ' . json_encode($e->errors()));
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat validasi',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            Log::error('ERROR in saveKodAras: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat sistem: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -316,6 +491,87 @@ class MasterDataController extends Controller
     }
 
     /**
+     * Get existing master data for Select2
+     */
+    public function getMasterData($type)
+    {
+        try {
+            $data = [];
+            
+            switch ($type) {
+                case 'blok':
+                    $data = DB::table('kod_bloks')
+                        ->where(function($q) {
+                            $q->where('status', 'aktif')
+                              ->orWhere('is_active', 1);
+                        })
+                        ->orderBy('kod')
+                        ->get(['kod', 'nama', 'keterangan'])
+                        ->map(function ($item) {
+                            return [
+                                'id' => $item->kod,
+                                'text' => "{$item->kod} - {$item->nama}",
+                                'nama' => $item->nama
+                            ];
+                        });
+                    break;
+
+                case 'aras':
+                    $data = DB::table('kod_aras')
+                        ->where(function($q) {
+                            $q->where('status', 'aktif')
+                              ->orWhere('is_active', 1);
+                        })
+                        ->orderBy('tingkat')
+                        ->get(['kod', 'nama'])
+                        ->map(function ($item) {
+                            return [
+                                'id' => $item->kod,
+                                'text' => "{$item->kod} - {$item->nama}",
+                                'nama' => $item->nama
+                            ];
+                        });
+                    break;
+
+                case 'ruang':
+                    $data = DB::table('kod_ruangs')
+                        ->where(function($q) {
+                            $q->where('status', 'aktif')
+                              ->orWhere('is_active', 1);
+                        })
+                        ->orderBy('kod')
+                        ->get(['kod', 'nama'])
+                        ->map(function ($item) {
+                            return [
+                                'id' => $item->kod,
+                                'text' => "{$item->kod} - {$item->nama}",
+                                'nama' => $item->nama
+                            ];
+                        });
+                    break;
+
+                default:
+                    return response()->json(['error' => 'Invalid type'], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Error in getMasterData({$type}): " . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ===== HELPER METHODS =====
+
+    /**
      * Helper: Check status from either 'status' or 'is_active' column
      */
     private function checkStatus($record)
@@ -329,6 +585,50 @@ class MasterDataController extends Controller
         }
         
         return 'aktif';
+    }
+
+    /**
+     * Helper: Extract tingkat number from kod
+     * Private helper method for saveKodAras
+     */
+    private function extractTingkatFromKod($kod)
+    {
+        $kod = strtoupper(trim($kod));
+        
+        // Basement levels (negative)
+        if (preg_match('/^B(\d*)$/i', $kod, $matches)) {
+            $num = $matches[1] !== '' ? (int)$matches[1] : 1;
+            return -$num;
+        }
+        
+        // Ground floor
+        if (in_array($kod, ['G', 'GF', 'GROUND', 'TB', '0'])) {
+            return 0;
+        }
+        
+        // Numeric levels
+        if (preg_match('/^(\d+)$/', $kod, $matches)) {
+            return (int)$matches[1];
+        }
+        
+        // L1, F1, T1, TK1 patterns
+        if (preg_match('/^[LFT]K?(\d+)$/i', $kod, $matches)) {
+            return (int)$matches[1];
+        }
+        
+        // Roof (usually highest floor)
+        if (in_array($kod, ['R', 'RF', 'ROOF', 'ROOFTOP'])) {
+            return 99; // Arbitrary high number
+        }
+        
+        // Mezzanine (between floors)
+        if (preg_match('/^M[Z]?(\d*)$/i', $kod, $matches)) {
+            $num = $matches[1] !== '' ? (int)$matches[1] : 1;
+            return $num; // Or could be 0.5, 1.5, etc. for true mezzanine
+        }
+        
+        // Default
+        return 0;
     }
 
     /**
@@ -499,84 +799,5 @@ class MasterDataController extends Controller
         }
         
         return "SubSistem " . ucwords(strtolower(str_replace(['-', '_'], ' ', $kod)));
-    }
-
-    /**
-     * Get existing master data for Select2
-     */
-    public function getMasterData($type)
-    {
-        try {
-            $data = [];
-            
-            switch ($type) {
-                case 'blok':
-                    $data = DB::table('kod_bloks')
-                        ->where(function($q) {
-                            $q->where('status', 'aktif')
-                              ->orWhere('is_active', 1);
-                        })
-                        ->orderBy('kod')
-                        ->get(['kod', 'nama', 'keterangan'])
-                        ->map(function ($item) {
-                            return [
-                                'id' => $item->kod,
-                                'text' => "{$item->kod} - {$item->nama}",
-                                'nama' => $item->nama
-                            ];
-                        });
-                    break;
-
-                case 'aras':
-                    $data = DB::table('kod_aras')
-                        ->where(function($q) {
-                            $q->where('status', 'aktif')
-                              ->orWhere('is_active', 1);
-                        })
-                        ->orderBy('tingkat')
-                        ->get(['kod', 'nama'])
-                        ->map(function ($item) {
-                            return [
-                                'id' => $item->kod,
-                                'text' => "{$item->kod} - {$item->nama}",
-                                'nama' => $item->nama
-                            ];
-                        });
-                    break;
-
-                case 'ruang':
-                    $data = DB::table('kod_ruangs')
-                        ->where(function($q) {
-                            $q->where('status', 'aktif')
-                              ->orWhere('is_active', 1);
-                        })
-                        ->orderBy('kod')
-                        ->get(['kod', 'nama'])
-                        ->map(function ($item) {
-                            return [
-                                'id' => $item->kod,
-                                'text' => "{$item->kod} - {$item->nama}",
-                                'nama' => $item->nama
-                            ];
-                        });
-                    break;
-
-                default:
-                    return response()->json(['error' => 'Invalid type'], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $data
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error("Error in getMasterData({$type}): " . $e->getMessage());
-            
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage()
-            ], 500);
-        }
     }
 }

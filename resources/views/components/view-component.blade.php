@@ -66,7 +66,7 @@
                         <table class="table table-bordered">
                             <tr>
                                 <td width="30%" class="fw-bold bg-light">Kod Blok</td>
-                                <td>{{ $component->kod_blok ?? '-' }}</td>
+                                <td>{{ $component->kod_blok ?? '-' }} - {{ $component->nama_blok }}</td>
                             </tr>
                             <tr>
                                 <td class="fw-bold bg-light">Kod Aras</td>

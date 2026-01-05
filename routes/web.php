@@ -31,13 +31,24 @@ Route::prefix('api')->name('api.')->group(function () {
     Route::post('/check-kod-aras', [MasterDataController::class, 'checkKodAras'])
         ->name('check-kod-aras');
     
-    // Check Kod Sistem dan auto-populate nama (NEW)
+    // Check Kod Sistem dan auto-populate nama
     Route::post('/check-kod-sistem', [MasterDataController::class, 'checkKodSistem'])
         ->name('check-kod-sistem');
     
-    // Check Kod SubSistem dan auto-populate nama (NEW)
+    // Check Kod SubSistem dan auto-populate nama
     Route::post('/check-kod-subsistem', [MasterDataController::class, 'checkKodSubSistem'])
         ->name('check-kod-subsistem');
+    
+    // ==========================================
+    // AUTO-SAVE ROUTES (NEW)
+    // ==========================================
+    // Save Kod Blok + Nama to database
+    Route::post('/save-kod-blok', [MasterDataController::class, 'saveKodBlok'])
+        ->name('save-kod-blok');
+    
+    // Save Kod Aras + Nama to database
+    Route::post('/save-kod-aras', [MasterDataController::class, 'saveKodAras'])
+        ->name('save-kod-aras');
     
     // Get master data by type (kod-blok, kod-aras, kod-ruang, nama-ruang)
     Route::get('/master-data/{type}', [MasterDataController::class, 'getMasterData'])

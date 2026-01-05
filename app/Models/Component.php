@@ -15,7 +15,9 @@ class Component extends Model
         'nombor_dpa',
         'ada_blok',
         'kod_blok',
+        'nama_blok',
         'kod_aras',
+        'nama_aras',
         'kod_ruang',
         'nama_ruang',
         'catatan_blok',
@@ -29,6 +31,7 @@ class Component extends Model
         'tinggi',           // TAMBAH
         'unit_ukuran',      // TAMBAH
         'kod_aras_binaan',
+        'nama_aras_binaan',
         'kod_ruang_binaan',
         'nama_ruang_binaan',
         'catatan_binaan',

@@ -53,8 +53,9 @@ class ComponentController extends Controller
             'nombor_dpa' => 'required|string|max:255',
             'ada_blok' => 'nullable|boolean',
             'kod_blok' => 'nullable|string|max:100',
-            'nama_blok' => 'nullable|string|max:255', // Accept nama from form
+            'nama_blok' => 'nullable|string|max:255',
             'kod_aras' => 'nullable|string|max:50',
+            'nama_aras' => 'nullable|string|max:255',
             'kod_ruang' => 'nullable|string|max:50',
             'nama_ruang' => 'nullable|string|max:255',
             'catatan_blok' => 'nullable|string',
@@ -64,6 +65,7 @@ class ComponentController extends Controller
             'koordinat_x' => 'nullable|string|max:50',
             'koordinat_y' => 'nullable|string|max:50',
             'kod_aras_binaan' => 'nullable|string|max:50',
+            'nama_aras_binaan' => 'nullable|string|max:255',
             'kod_ruang_binaan' => 'nullable|string|max:50',
             'nama_ruang_binaan' => 'nullable|string|max:255',
             'catatan_binaan' => 'nullable|string',
@@ -75,15 +77,16 @@ class ComponentController extends Controller
             // Auto-create master records with nama support
             $this->autoCreateMasterRecords($request);
 
-            // Remove nama_blok from validated data before creating component
-            $componentData = collect($validated)->except('nama_blok')->toArray();
+            // Convert checkboxes to boolean
+            $validated['ada_blok'] = $request->has('ada_blok') ? 1 : 0;
+            $validated['ada_binaan_luar'] = $request->has('ada_binaan_luar') ? 1 : 0;
 
             // Create component
-            Component::create($componentData);
+            $component = Component::create($validated);
 
             DB::commit();
 
-            return redirect()->route('components.index')
+            return redirect()->route('components.show', $component)
                 ->with('success', 'Komponen berjaya ditambah');
                 
         } catch (\Exception $e) {
@@ -125,6 +128,7 @@ class ComponentController extends Controller
 
     /**
      * Update the specified component with auto-create master records
+     * ✅ FIXED: Guna $component->update() instead of Component::create()
      */
     public function update(Request $request, Component $component)
     {
@@ -133,8 +137,9 @@ class ComponentController extends Controller
             'nombor_dpa' => 'required|string|max:255',
             'ada_blok' => 'nullable|boolean',
             'kod_blok' => 'nullable|string|max:100',
-            'nama_blok' => 'nullable|string|max:255', // Accept nama from form
+            'nama_blok' => 'nullable|string|max:255',
             'kod_aras' => 'nullable|string|max:50',
+            'nama_aras' => 'nullable|string|max:255',
             'kod_ruang' => 'nullable|string|max:50',
             'nama_ruang' => 'nullable|string|max:255',
             'catatan_blok' => 'nullable|string',
@@ -144,6 +149,7 @@ class ComponentController extends Controller
             'koordinat_x' => 'nullable|string|max:50',
             'koordinat_y' => 'nullable|string|max:50',
             'kod_aras_binaan' => 'nullable|string|max:50',
+            'nama_aras_binaan' => 'nullable|string|max:255',
             'kod_ruang_binaan' => 'nullable|string|max:50',
             'nama_ruang_binaan' => 'nullable|string|max:255',
             'catatan_binaan' => 'nullable|string',
@@ -155,15 +161,16 @@ class ComponentController extends Controller
             // Auto-create master records
             $this->autoCreateMasterRecords($request);
 
-            // Remove nama_blok before update
-            $componentData = collect($validated)->except('nama_blok')->toArray();
+            // Convert checkboxes to boolean
+            $validated['ada_blok'] = $request->has('ada_blok') ? 1 : 0;
+            $validated['ada_binaan_luar'] = $request->has('ada_binaan_luar') ? 1 : 0;
 
-            // Update component
-            $component->update($componentData);
+            // ✅ UPDATE component yang sedia ada (BUKAN create baru!)
+            $component->update($validated);
 
             DB::commit();
 
-            return redirect()->route('components.index')
+            return redirect()->route('components.show', $component)
                 ->with('success', 'Komponen berjaya dikemaskini');
                 
         } catch (\Exception $e) {
@@ -224,6 +231,199 @@ class ComponentController extends Controller
     }
 
     /**
+     * Check if Kod Blok exists and return suggestion
+     * Called via AJAX from edit/create forms
+     */
+    public function checkKodBlok(Request $request)
+    {
+        try {
+            $kod = trim($request->input('kod'));
+            
+            if (empty($kod)) {
+                return response()->json([
+                    'exists' => false,
+                    'suggestion' => ''
+                ]);
+            }
+
+            $existing = KodBlok::where('kod', $kod)->first();
+
+            if ($existing) {
+                return response()->json([
+                    'exists' => true,
+                    'data' => [
+                        'kod' => $existing->kod,
+                        'nama' => $existing->nama
+                    ]
+                ]);
+            }
+
+            // Generate suggestion for new kod
+            $suggestion = $this->generateBlokNamaSuggestion($kod);
+
+            return response()->json([
+                'exists' => false,
+                'suggestion' => $suggestion
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'exists' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Check if Kod Aras exists and return suggestion
+     * Called via AJAX from edit/create forms
+     */
+    public function checkKodAras(Request $request)
+    {
+        try {
+            $kod = trim($request->input('kod'));
+            
+            if (empty($kod)) {
+                return response()->json([
+                    'exists' => false,
+                    'suggestion' => ''
+                ]);
+            }
+
+            $existing = KodAras::where('kod', $kod)->first();
+
+            if ($existing) {
+                return response()->json([
+                    'exists' => true,
+                    'data' => [
+                        'kod' => $existing->kod,
+                        'nama' => $existing->nama,
+                        'tingkat' => $existing->tingkat
+                    ]
+                ]);
+            }
+
+            // Generate suggestion for new kod
+            $suggestion = $this->generateArasNamaSuggestion($kod);
+
+            return response()->json([
+                'exists' => false,
+                'suggestion' => $suggestion
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'exists' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Save or Update Kod Blok
+     * Called via AJAX when user types new kod blok
+     */
+    public function saveKodBlok(Request $request)
+    {
+        try {
+            $request->validate([
+                'kod' => 'required|string|max:50',
+                'nama' => 'required|string|max:255'
+            ]);
+
+            $existingKod = KodBlok::where('kod', $request->kod)->first();
+
+            if ($existingKod) {
+                $existingKod->update([
+                    'nama' => $request->nama,
+                    'updated_at' => now()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod blok berjaya dikemaskini',
+                    'data' => $existingKod,
+                    'action' => 'updated'
+                ]);
+            } else {
+                $newKod = KodBlok::create([
+                    'kod' => $request->kod,
+                    'nama' => $request->nama,
+                    'is_active' => true,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod blok baru berjaya disimpan',
+                    'data' => $newKod,
+                    'action' => 'created'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Save or Update Kod Aras
+     * Called via AJAX when user types new kod aras
+     */
+    public function saveKodAras(Request $request)
+    {
+        try {
+            $request->validate([
+                'kod' => 'required|string|max:50',
+                'nama' => 'required|string|max:255'
+            ]);
+
+            $existingKod = KodAras::where('kod', $request->kod)->first();
+
+            if ($existingKod) {
+                $existingKod->update([
+                    'nama' => $request->nama,
+                    'updated_at' => now()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod aras berjaya dikemaskini',
+                    'data' => $existingKod,
+                    'action' => 'updated'
+                ]);
+            } else {
+                // Extract tingkat from kod
+                $tingkat = $this->extractTingkatFromKod($request->kod);
+                
+                $newKod = KodAras::create([
+                    'kod' => $request->kod,
+                    'nama' => $request->nama,
+                    'tingkat' => $tingkat,
+                    'is_active' => true,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kod aras baru berjaya disimpan',
+                    'data' => $newKod,
+                    'action' => 'created'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Auto-create master records with proper nama handling
      * This method checks if user typed new values and creates them in master tables
      */
@@ -252,16 +452,23 @@ class ComponentController extends Controller
         }
 
         // ========================================
-        // Kod Aras - simple auto-create
+        // Kod Aras (Blok Section) - with nama support
         // ========================================
         if ($request->filled('kod_aras')) {
             $kodAras = trim($request->kod_aras);
             
+            // ✅ Use provided nama_aras or fallback to kod
+            $namaAras = $request->filled('nama_aras') 
+                ? trim($request->nama_aras) 
+                : $kodAras;
+            
+            $tingkat = $this->extractTingkatFromKod($kodAras);
+            
             KodAras::firstOrCreate(
                 ['kod' => $kodAras],
                 [
-                    'nama' => $kodAras,
-                    'tingkat' => 0, // Default tingkat
+                    'nama' => $namaAras,
+                    'tingkat' => $tingkat,
                     'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
@@ -322,16 +529,23 @@ class ComponentController extends Controller
         }
 
         // ========================================
-        // Binaan: Kod Aras
+        // Binaan: Kod Aras - with nama support
         // ========================================
         if ($request->filled('kod_aras_binaan')) {
             $kodArasBinaan = trim($request->kod_aras_binaan);
             
+            // ✅ Use provided nama_aras_binaan or fallback
+            $namaArasBinaan = $request->filled('nama_aras_binaan') 
+                ? trim($request->nama_aras_binaan) 
+                : $kodArasBinaan;
+            
+            $tingkat = $this->extractTingkatFromKod($kodArasBinaan);
+            
             KodAras::firstOrCreate(
                 ['kod' => $kodArasBinaan],
                 [
-                    'nama' => $kodArasBinaan,
-                    'tingkat' => 0,
+                    'nama' => $namaArasBinaan,
+                    'tingkat' => $tingkat,
                     'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now()
@@ -373,5 +587,114 @@ class ComponentController extends Controller
                 ]
             );
         }
+    }
+
+    /**
+     * Generate nama suggestion for Blok
+     */
+    private function generateBlokNamaSuggestion($kod)
+    {
+        $kod = strtoupper(trim($kod));
+        
+        // Common patterns
+        $patterns = [
+            '/^[A-Z]$/' => 'Blok ' . $kod,
+            '/^BLK[A-Z]$/' => 'Blok ' . substr($kod, 3),
+            '/^\d+$/' => 'Blok ' . $kod,
+        ];
+        
+        foreach ($patterns as $pattern => $format) {
+            if (preg_match($pattern, $kod)) {
+                return $format;
+            }
+        }
+        
+        return 'Blok ' . $kod;
+    }
+
+    /**
+     * Generate nama suggestion for Aras
+     */
+    private function generateArasNamaSuggestion($kod)
+    {
+        $kod = strtoupper(trim($kod));
+        
+        // Basement
+        if (preg_match('/^B(\d*)$/i', $kod, $matches)) {
+            $num = $matches[1] !== '' ? $matches[1] : '1';
+            return 'Tingkat Bawah Tanah ' . $num;
+        }
+        
+        // Ground floor
+        if (in_array($kod, ['G', 'GF', 'GROUND', 'TB', '0'])) {
+            return 'Tingkat Bawah';
+        }
+        
+        // Numeric
+        if (preg_match('/^(\d+)$/', $kod, $matches)) {
+            return 'Tingkat ' . $matches[1];
+        }
+        
+        // L1, F1, T1, TK1
+        if (preg_match('/^[LFT]K?(\d+)$/i', $kod, $matches)) {
+            return 'Tingkat ' . $matches[1];
+        }
+        
+        // Roof
+        if (in_array($kod, ['R', 'RF', 'ROOF', 'ROOFTOP'])) {
+            return 'Tingkat Bumbung';
+        }
+        
+        // Mezzanine
+        if (preg_match('/^M[Z]?(\d*)$/i', $kod, $matches)) {
+            $num = $matches[1] !== '' ? ' ' . $matches[1] : '';
+            return 'Tingkat Mezanin' . $num;
+        }
+        
+        return 'Tingkat ' . $kod;
+    }
+
+    /**
+     * Helper: Extract tingkat number from kod
+     * Used for auto-creating Kod Aras records
+     */
+    private function extractTingkatFromKod($kod)
+    {
+        $kod = strtoupper(trim($kod));
+        
+        // Basement levels (negative)
+        if (preg_match('/^B(\d*)$/i', $kod, $matches)) {
+            $num = $matches[1] !== '' ? (int)$matches[1] : 1;
+            return -$num;
+        }
+        
+        // Ground floor
+        if (in_array($kod, ['G', 'GF', 'GROUND', 'TB', '0'])) {
+            return 0;
+        }
+        
+        // Numeric levels
+        if (preg_match('/^(\d+)$/', $kod, $matches)) {
+            return (int)$matches[1];
+        }
+        
+        // L1, F1, T1, TK1 patterns
+        if (preg_match('/^[LFT]K?(\d+)$/i', $kod, $matches)) {
+            return (int)$matches[1];
+        }
+        
+        // Roof (usually highest floor)
+        if (in_array($kod, ['R', 'RF', 'ROOF', 'ROOFTOP'])) {
+            return 99; // Arbitrary high number
+        }
+        
+        // Mezzanine (between floors)
+        if (preg_match('/^M[Z]?(\d*)$/i', $kod, $matches)) {
+            $num = $matches[1] !== '' ? (int)$matches[1] : 1;
+            return $num;
+        }
+        
+        // Default
+        return 0;
     }
 }
