@@ -2,42 +2,152 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
+        'name',
         'username',
+        'email',
         'password',
         'role',
+        'phone',
+        'department',
         'is_active',
+        'last_login_at',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    /**
+     * The attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
+            'last_login_at' => 'datetime',
+        ];
+    }
 
-    // Check if user is admin
+    /**
+     * Check if user is admin
+     */
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }
 
-    // Check if user is active
-    public function isActive(): bool
+    /**
+     * Check if user is regular user
+     */
+    public function isUser(): bool
     {
-        return $this->is_active;
+        return $this->role === 'user';
     }
 
-    // Relationships
+    /**
+     * Check if user account is active
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active === true;
+    }
+
+    /**
+     * Scope: Filter active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope: Filter admin users
+     */
+    public function scopeAdmins($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    /**
+     * Scope: Filter regular users
+     */
+    public function scopeRegularUsers($query)
+    {
+        return $query->where('role', 'user');
+    }
+
+    /**
+     * Scope: Search by username or name
+     */
+    public function scopeSearch($query, $search)
+    {
+        return $query->where(function($q) use ($search) {
+            $q->where('username', 'like', "%{$search}%")
+              ->orWhere('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
+    }
+
+    /**
+     * Get role badge color
+     */
+    public function getRoleBadgeAttribute(): string
+    {
+        return $this->role === 'admin' ? 'danger' : 'primary';
+    }
+
+    /**
+     * Get role display text
+     */
+    public function getRoleDisplayAttribute(): string
+    {
+        return $this->role === 'admin' ? 'Administrator' : 'Pengguna Biasa';
+    }
+
+    /**
+     * Update last login timestamp
+     */
+    public function updateLastLogin(): void
+    {
+        $this->last_login_at = now();
+        $this->save();
+    }
+
+    /**
+     * Get display name with username
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->name . ' (@' . $this->username . ')';
+    }
+
+    /**
+     * Relationships
+     */
     public function components()
     {
         return $this->hasMany(\App\Models\Component::class);
