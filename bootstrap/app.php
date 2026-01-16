@@ -11,11 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Register middleware aliases
+        // Register middleware alias
         $middleware->alias([
-            'auth' => \App\Http\Middleware\CheckAuth::class,
             'admin' => \App\Http\Middleware\CheckAdmin::class,
-            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
