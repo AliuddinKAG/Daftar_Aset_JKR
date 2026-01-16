@@ -65,7 +65,7 @@ class AuthController extends Controller
                 return redirect()->route('admin.dashboard')
                     ->with('success', 'Selamat datang, ' . Auth::user()->name . '!');
             } else {
-                return redirect()->route('components.index')
+                return redirect()->route('dashboard')
                     ->with('success', 'Selamat datang, ' . Auth::user()->name . '!');
             }
         }
