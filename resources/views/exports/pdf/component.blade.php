@@ -203,14 +203,12 @@
     <!-- BLOK Section -->
     <div class="checkbox-section">
         <div class="checkbox-header">
-            {{-- <span class="checkbox-box">{{ $component->ada_blok ? 'checked' : '' }}</span> --}}
             <span class="checkbox-box">
                 @if($component->ada_blok)
                     ✓
                 @endif
             </span>
             <span class="checkbox-label">Blok   (Tandakan '✓' jika berkenaan)</span>
-            {{-- <span style="margin-left: 10px; font-size: 10pt;">(Tandakan '✓' jika berkenaan)</span> --}}
         </div>
         
         <table>
@@ -222,25 +220,35 @@
             <tbody>
                 <tr>
                     <td class="label-col">Kod Blok</td>
-                    <td class="value-col">{{ $component->kod_blok ?? ' ' }} - {{ $component->nama_blok ?? ' ' }}</td>
+                    <td class="value-col">
+                        @if($component->ada_blok == 1)
+                            @if(!empty($component->kod_blok) && !empty($component->nama_blok))
+                                {{ $component->kod_blok }} - {{ $component->nama_blok }}
+                            @elseif(!empty($component->kod_blok))
+                                {{ $component->kod_blok }}
+                            @elseif(!empty($component->nama_blok))
+                                {{ $component->nama_blok }}
+                            @endif
+                        @endif
+                    </td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Aras</td>
-                    <td class="value-col">{{ $component->kod_aras ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_blok == 1 ? ($component->kod_aras ?? '') : '' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Ruang</td>
-                    <td class="value-col">{{ $component->kod_ruang ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_blok == 1 ? ($component->kod_ruang ?? '') : '' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Nama Ruang</td>
-                    <td class="value-col">{{ $component->nama_ruang ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_blok == 1 ? ($component->nama_ruang ?? '') : '' }}</td>
                 </tr>
                 <!-- CATATAN MERGED DALAM TABLE -->
                 <tr>
                     <td colspan="2" class="catatan-row">
                         <strong>Catatan:</strong><br>
-                        {{ $component->catatan_blok ?? '' }}
+                        {{ $component->ada_blok == 1 ? ($component->catatan_blok ?? '') : '' }}
                     </td>
                 </tr>
             </tbody>
@@ -250,7 +258,6 @@
     <!-- BINAAN LUAR Section -->
     <div class="checkbox-section">
         <div class="checkbox-header">
-         {{--  <span class="checkbox-box ">{{ $component->ada_binaan_luar ? 'checked' : '' }}</span> --}}
             <span class="checkbox-box">
                 @if($component->ada_binaan_luar)
                     ✓
@@ -269,21 +276,26 @@
             <tbody>
                 <tr>
                     <td class="label-col">Nama Binaan Luar</td>
-                    <td class="value-col">{{ $component->nama_binaan_luar ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_binaan_luar == 1 ? ($component->nama_binaan_luar ?? '') : '' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Binaan Luar</td>
-                    <td class="value-col">{{ $component->kod_binaan_luar ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_binaan_luar == 1 ? ($component->kod_binaan_luar ?? '') : '' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Koordinat GPS (WGS 84)</td>
                     <td class="value-col">
-                        @if($component->koordinat_x || $component->koordinat_y)
-                            X : {{ $component->koordinat_x ?? '' }}<br>
-                            Y : {{ $component->koordinat_y ?? '' }}
+                        @if($component->ada_binaan_luar == 1)
+                            @if($component->koordinat_x || $component->koordinat_y)
+                                X : {{ $component->koordinat_x ?? '' }}<br>
+                                Y : {{ $component->koordinat_y ?? '' }}
+                            @else
+                                X : <span style="margin-left: 100px;"></span> <br>
+                                Y : <span style="margin-left: 100px;"></span> 
+                            @endif
                         @else
                             X : <span style="margin-left: 100px;"></span> <br>
-                            Y : <span style="margin-left: 100px;"></span> 
+                            Y : <span style="margin-left: 100px;"></span>
                         @endif
                     </td>
                 </tr>
@@ -294,21 +306,21 @@
                 </tr>
                 <tr>
                     <td class="label-col">Kod Aras</td>
-                    <td class="value-col">{{ $component->kod_aras_binaan ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_binaan_luar == 1 ? ($component->kod_aras_binaan ?? '') : '' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Kod Ruang</td>
-                    <td class="value-col">{{ $component->kod_ruang_binaan ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_binaan_luar == 1 ? ($component->kod_ruang_binaan ?? '') : '' }}</td>
                 </tr>
                 <tr>
                     <td class="label-col">Nama Ruang</td>
-                    <td class="value-col">{{ $component->nama_ruang_binaan ?? ' ' }}</td>
+                    <td class="value-col">{{ $component->ada_binaan_luar == 1 ? ($component->nama_ruang_binaan ?? '') : '' }}</td>
                 </tr>
                 <!-- CATATAN MERGED DALAM TABLE -->
                 <tr>
                     <td colspan="2" class="catatan-row">
                         <strong>Catatan:</strong><br>
-                        {{ $component->catatan_binaan ?? '' }}
+                        {{ $component->ada_binaan_luar == 1 ? ($component->catatan_binaan ?? '') : '' }}
                     </td>
                 </tr>
             </tbody>
