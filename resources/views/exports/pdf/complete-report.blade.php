@@ -850,7 +850,7 @@
             {{ $hasSaiz && isset($saizFizikalData->values()[$i]) ? $saizFizikalData->values()[$i]->unit ?? '' : '' }}
         </td>
         @if($i === 0)
-        <td style="width: 120px;" rowspan="{{ $maxRows }}"><span>(Panjang/Lebar/Tinggi/Diameter dll)</span></td>
+        <td style="width: 120px;" rowspan="{{ $maxRows }}"><span>(Panjang/Lebar/Tinggi/Lebar/Luas/<br>Dalam/Tebal/Diameter/Jejari dll)</span></td>
         @endif
         <td style="text-align: center;">
             {{ $hasKadaran && isset($kadaranData->values()[$i]) ? $kadaranData->values()[$i]->value ?? '' : '' }}
