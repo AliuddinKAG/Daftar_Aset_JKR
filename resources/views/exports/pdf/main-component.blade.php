@@ -347,7 +347,7 @@
         <td style="text-align: center; width: 120px;">
             {{ $hasSaiz && isset($saizFizikalData->values()[$i]) ? $saizFizikalData->values()[$i]->value ?? '' : '' }}
         </td>
-        <td style="width: 120px;">
+        <td style="text-align: center; width: 120px;">
             {{ $hasSaiz && isset($saizFizikalData->values()[$i]) ? $saizFizikalData->values()[$i]->unit ?? '' : '' }}
         </td>
         @if($i === 0)
@@ -356,7 +356,7 @@
         <td style="text-align: center;">
             {{ $hasKadaran && isset($kadaranData->values()[$i]) ? $kadaranData->values()[$i]->value ?? '' : '' }}
         </td>
-        <td>
+        <td style="text-align: center;">
             {{ $hasKadaran && isset($kadaranData->values()[$i]) ? $kadaranData->values()[$i]->unit ?? '' : '' }}
         </td>
         @if($i === 0)
