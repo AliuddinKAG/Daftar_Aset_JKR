@@ -42,56 +42,6 @@
             </div>
         </div>
 
-        <!-- Components Stats -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1 small">Jumlah Komponen</p>
-                            <h3 class="mb-0">{{ $stats['total_components'] }}</h3>
-                            <small class="text-info">
-                                <i class="bi bi-check-circle"></i> {{ $stats['active_components'] }} Aktif
-                            </small>
-                        </div>
-                        <div class="bg-success bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-box-seam fs-3 text-success"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ route('components.index') }}" class="text-decoration-none small">
-                        Lihat Semua <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main & Sub Components -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1 small">Komponen Utama/Sub</p>
-                            <h3 class="mb-0">{{ $stats['total_main_components'] }}/{{ $stats['total_sub_components'] }}</h3>
-                            <small class="text-warning">
-                                Total: {{ $stats['total_main_components'] + $stats['total_sub_components'] }}
-                            </small>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 p-3 rounded">
-                            <i class="bi bi-layers fs-3 text-warning"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ route('components.index') }}" class="text-decoration-none small">
-                        Lihat Detail <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
         <!-- Sistem Stats -->
         <div class="col-md-3">
             <div class="card border-0 shadow-sm h-100">
