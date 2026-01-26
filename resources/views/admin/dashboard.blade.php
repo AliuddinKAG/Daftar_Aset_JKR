@@ -190,7 +190,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <div class="fw-semibold">{{ $user->name }}</div>
-                                    <small class="text-muted">@{{ $user->username }}</small>
+                                    <small class="text-muted">{{ '@' . $user->username }}</small>
                                 </div>
                                 <div>
                                     @if($user->role === 'admin')
