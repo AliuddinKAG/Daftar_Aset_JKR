@@ -19,7 +19,7 @@
     <div class="row g-3 mb-4">
         <!-- Users Stats -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
@@ -44,7 +44,7 @@
 
         <!-- Sistem Stats -->
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
