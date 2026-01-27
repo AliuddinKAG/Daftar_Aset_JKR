@@ -13,7 +13,7 @@ class SubsistemController extends Controller
      */
     public function create(Sistem $sistem)
     {
-        return view('admin.sistem.subsistems.create', compact('sistem'));
+        return view('admin.subsistem.create', compact('sistem'));
     }
 
     /**
@@ -25,7 +25,6 @@ class SubsistemController extends Controller
             'kod' => 'required|string|max:50|unique:subsistems',
             'nama' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
         ], [
             'kod.required' => 'Kod subsistem diperlukan',
             'kod.unique' => 'Kod subsistem sudah wujud',
@@ -33,7 +32,7 @@ class SubsistemController extends Controller
         ]);
 
         $validated['sistem_id'] = $sistem->id;
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['is_active'] = $request->has('is_active');
 
         Subsistem::create($validated);
 
@@ -46,7 +45,7 @@ class SubsistemController extends Controller
      */
     public function edit(Sistem $sistem, Subsistem $subsistem)
     {
-        return view('admin.sistem.subsistems.edit', compact('sistem', 'subsistem'));
+        return view('admin.subsistem.edit', compact('sistem', 'subsistem'));
     }
 
     /**
@@ -58,14 +57,13 @@ class SubsistemController extends Controller
             'kod' => 'required|string|max:50|unique:subsistems,kod,' . $subsistem->id,
             'nama' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
         ], [
             'kod.required' => 'Kod subsistem diperlukan',
             'kod.unique' => 'Kod subsistem sudah wujud',
             'nama.required' => 'Nama subsistem diperlukan',
         ]);
 
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['is_active'] = $request->has('is_active');
 
         $subsistem->update($validated);
 
