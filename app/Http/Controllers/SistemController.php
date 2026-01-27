@@ -53,14 +53,14 @@ class SistemController extends Controller
             'kod' => 'required|string|max:50|unique:sistems',
             'nama' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
         ], [
             'kod.required' => 'Kod sistem diperlukan',
             'kod.unique' => 'Kod sistem sudah wujud',
             'nama.required' => 'Nama sistem diperlukan',
         ]);
 
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        // Handle checkbox - will be true if checked, false if unchecked
+        $validated['is_active'] = $request->has('is_active');
 
         Sistem::create($validated);
 
@@ -85,14 +85,14 @@ class SistemController extends Controller
             'kod' => 'required|string|max:50|unique:sistems,kod,' . $sistem->id,
             'nama' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
-            'is_active' => 'nullable|boolean',
         ], [
             'kod.required' => 'Kod sistem diperlukan',
             'kod.unique' => 'Kod sistem sudah wujud',
             'nama.required' => 'Nama sistem diperlukan',
         ]);
 
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        // Handle checkbox - will be true if checked, false if unchecked
+        $validated['is_active'] = $request->has('is_active');
 
         $sistem->update($validated);
 
