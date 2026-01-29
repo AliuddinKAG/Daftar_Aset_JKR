@@ -20,353 +20,483 @@
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --success-color: #10b981;
-            --info-color: #06b6d4;
-            --danger-color: #ef4444;
-            --dark-color: #1e293b;
-            --sidebar-width: 260px;
-            --sidebar-collapsed-width: 70px;
-        }
+/* ========================================
+   SDAK - SISTEM DAFTAR ASET KHAS
+   Custom Sidebar Layout CSS
+======================================== */
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* ===== ROOT VARIABLES ===== */
+:root {
+    --primary-color: #2563eb;
+    --success-color: #10b981;
+    --info-color: #06b6d4;
+    --danger-color: #ef4444;
+    --dark-color: #1e293b;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
+}
 
-        body {
-            background: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-        }
+/* ===== GLOBAL RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            transition: all 0.3s ease;
-            z-index: 1050;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
+body {
+    background: #f8fafc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
 
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
+/* ========================================
+   SIDEBAR CONTAINER
+======================================== */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    transition: all 0.3s ease;
+    z-index: 1050;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
 
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
+/* Sidebar bila collapse */
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
 
-        .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-        }
+/* Custom scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
 
-        .sidebar-header {
-            padding: 1.25rem 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
 
-        .sidebar-brand {
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            white-space: nowrap;
-            overflow: hidden;
-        }
+/* ========================================
+   SIDEBAR HEADER (Logo & Toggle)
+======================================== */
+.sidebar-header {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        .sidebar-brand i {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
+/* Brand/Logo */
+.sidebar-brand {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+}
 
-        .sidebar-brand-text {
-            transition: opacity 0.3s ease;
-        }
+.sidebar-brand i {
+    font-size: 1.2rem; /* ✅ Dikecilkan dari 1.5rem */
+    flex-shrink: 0;
+}
 
-        .sidebar.collapsed .sidebar-brand-text {
-            opacity: 0;
-            width: 0;
-        }
+.sidebar-brand-text {
+    transition: opacity 0.3s ease, width 0.3s ease;
+    overflow: hidden;
+}
 
-        .toggle-sidebar {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+/* ✅ Hide text bila sidebar collapse */
+.sidebar.collapsed .sidebar-brand-text {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
 
-        .toggle-sidebar:hover {
-            background: rgba(255,255,255,0.2);
-        }
+/* ✅ Hide icon building bila sidebar collapse */
+.sidebar.collapsed .sidebar-brand i {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
 
-        .sidebar-user {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+/* Toggle Button */
+.toggle-sidebar {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: white;
-        }
+.toggle-sidebar:hover {
+    background: rgba(255,255,255,0.2);
+}
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
+/* ========================================
+   USER INFO SECTION
+======================================== */
+.sidebar-user {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
 
-        .user-details {
-            overflow: hidden;
-            transition: opacity 0.3s ease;
-        }
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: white;
+}
 
-        .sidebar.collapsed .user-details {
-            opacity: 0;
-            width: 0;
-        }
+/* User Avatar Circle */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
 
-        .user-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+/* User Details */
+.user-details {
+    overflow: hidden;
+    transition: opacity 0.3s ease, width 0.3s ease;
+    flex: 1;
+}
 
-        .user-role {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
-            white-space: nowrap;
-        }
+/* ✅ Hide user details bila collapse */
+.sidebar.collapsed .user-details {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
 
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        .nav-item {
-            margin: 0.25rem 0.5rem;
-        }
+.user-role {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.7);
+    white-space: nowrap;
+}
 
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
+/* ========================================
+   NAVIGATION MENU
+======================================== */
+.sidebar-nav {
+    padding: 1rem 0;
+    flex: 1;
+}
 
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
+.nav-item {
+    margin: 0.25rem 0.5rem;
+}
 
-        .nav-link.active {
-            background: var(--primary-color);
-            color: white;
-        }
+/* Nav Links */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    position: relative;
+}
 
-        .nav-link i {
-            font-size: 1.2rem;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
+.nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
 
-        .nav-link-text {
-            transition: opacity 0.3s ease;
-        }
+.nav-link.active {
+    background: var(--primary-color);
+    color: white;
+}
 
-        .sidebar.collapsed .nav-link-text {
-            opacity: 0;
-            width: 0;
-        }
+/* Nav Icons */
+.nav-link i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
 
-        .sidebar.collapsed .nav-link {
-            justify-content: center;
-            padding: 0.75rem;
-        }
+/* Nav Text */
+.nav-link-text {
+    transition: opacity 0.3s ease, width 0.3s ease;
+    overflow: hidden;
+    flex: 1;
+}
 
-        .nav-divider {
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-            margin: 0.5rem 1rem;
-        }
+/* ✅ Hide text bila collapse */
+.sidebar.collapsed .nav-link-text {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
 
-        .sidebar-footer {
-            margin-top: auto;
-            padding: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+.sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: 0.75rem;
+    gap: 0;
+}
 
-        .logout-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: #fca5a5;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-            white-space: nowrap;
-            background: rgba(239, 68, 68, 0.1);
-            border: none;
-            width: 100%;
-            cursor: pointer;
-            text-align: left;
-        }
+/* ✅ Tooltip bila hover (sidebar collapse) */
+.sidebar.collapsed .nav-link:hover::after {
+    content: attr(data-title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+    padding: 0.5rem 0.75rem;
+    background: #1e293b;
+    color: white;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+    pointer-events: none;
+}
 
-        .logout-link:hover {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
+/* Menu Divider */
+.nav-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 0.5rem 1rem;
+}
 
-        .logout-link i {
-            font-size: 1.2rem;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
+/* ========================================
+   SIDEBAR FOOTER (LOGOUT)
+======================================== */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+}
 
-        .sidebar.collapsed .logout-link {
-            justify-content: center;
-            padding: 0.75rem;
-        }
+/* Logout Button */
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #fca5a5;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    background: rgba(239, 68, 68, 0.1);
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
+    justify-content: flex-start;
+    position: relative;
+}
 
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            min-height: 100vh;
-        }
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
 
-        .main-content.expanded {
-            margin-left: var(--sidebar-collapsed-width);
-        }
+.logout-link i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
 
-        .card {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: none;
-        }
+/* ✅ Hide logout text bila collapse */
+.sidebar.collapsed .logout-link {
+    justify-content: center;
+    padding: 0.75rem;
+    gap: 0;
+}
 
-        .card-header {
-            border-bottom: 2px solid rgba(0,0,0,0.05);
-        }
+.sidebar.collapsed .logout-link .nav-link-text {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
 
-        .btn {
-            border-radius: 6px;
-            font-weight: 500;
-        }
+/* ✅ Logout tooltip bila collapse */
+.sidebar.collapsed .logout-link:hover::after {
+    content: "Log Keluar";
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+    padding: 0.5rem 0.75rem;
+    background: #1e293b;
+    color: white;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+    pointer-events: none;
+}
 
-        .form-control, .form-select {
-            border-radius: 6px;
-        }
+/* ========================================
+   MAIN CONTENT AREA
+======================================== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+}
 
-        .alert {
-            border-radius: 8px;
-            border: none;
-        }
+/* Main content bila sidebar collapse */
+.main-content.expanded {
+    margin-left: var(--sidebar-collapsed-width);
+}
 
-        /* Select2 Custom Styles */
-        .select2-container--bootstrap-5 .select2-selection {
-            min-height: 38px;
-        }
-        
-        .input-group-text {
-            background-color: #e9ecef;
-        }
-        
-        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
-            padding-left: 12px;
-        }
+/* ✅ Main content tanpa sidebar (guest / login page) */
+.main-content.no-sidebar {
+    margin-left: 0 !important;
+}
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
+/* ========================================
+   BOOTSTRAP COMPONENT OVERRIDES
+======================================== */
+.card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: none;
+}
 
-            .sidebar.show {
-                transform: translateX(0);
-            }
+.card-header {
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+}
 
-            .main-content {
-                margin-left: 0;
-            }
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
 
-            .mobile-toggle {
-                display: flex !important;
-            }
-        }
+.form-control, .form-select {
+    border-radius: 6px;
+}
 
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 1040;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
+.alert {
+    border-radius: 8px;
+    border: none;
+}
 
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1045;
-        }
+/* ========================================
+   SELECT2 CUSTOM STYLES
+======================================== */
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px;
+}
 
-        .overlay.show {
-            display: block;
-        }
-    </style>
+.input-group-text {
+    background-color: #e9ecef;
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    padding-left: 12px;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+======================================== */
+@media (max-width: 768px) {
+    /* Sidebar tersembunyi by default di mobile */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    /* Sidebar muncul bila diklik */
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* ✅ Main content full width di mobile */
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    /* Tunjukkan mobile toggle button */
+    .mobile-toggle {
+        display: flex !important;
+    }
+}
+
+/* Mobile Toggle Button (Floating) */
+.mobile-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1040;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Overlay untuk mobile */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1045;
+}
+
+.overlay.show {
+    display: block;
+}
+
+/* ========================================
+   END OF STYLESHEET
+======================================== */
+</style>
 
     @stack('styles')
     @yield('styles')
@@ -377,10 +507,18 @@
     <aside class="sidebar" id="sidebar">
         <!-- Header -->
         <div class="sidebar-header">
-            <a href="{{ route('dashboard') }}" class="sidebar-brand">
-                <i class="bi bi-building"></i>
-                <span class="sidebar-brand-text">SDAK</span>
-            </a>
+            {{-- ✅ Dynamic link based on role --}}
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
+                    <i class="bi bi-building"></i>
+                    <span class="sidebar-brand-text">SDAK</span>
+                </a>
+            @else
+                <a href="{{ route('dashboard') }}" class="sidebar-brand">
+                    <i class="bi bi-building"></i>
+                    <span class="sidebar-brand-text">SDAK</span>
+                </a>
+            @endif
             <button class="toggle-sidebar" id="toggleSidebar">
                 <i class="bi bi-list"></i>
             </button>
@@ -407,57 +545,79 @@
 
         <!-- Navigation -->
         <nav class="sidebar-nav">
+            {{-- ✅ DASHBOARD - HANYA UNTUK USER BIASA --}}
+            @if(!auth()->user()->isAdmin())
             <div class="nav-item">
-                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') || request()->routeIs('components.index') ? 'active' : '' }}">
+                <a href="{{ route('dashboard') }}" 
+                   class="nav-link {{ request()->routeIs('dashboard') || request()->routeIs('components.index') ? 'active' : '' }}"
+                   data-title="Dashboard">
                     <i class="bi bi-house-door"></i>
                     <span class="nav-link-text">Dashboard</span>
                 </a>
             </div>
+            @endif
 
+            {{-- ✅ ADMIN DASHBOARD - HANYA UNTUK ADMIN --}}
             @if(auth()->user()->isAdmin())
             <div class="nav-item">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('admin.dashboard') }}" 
+                   class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                   data-title="Admin Dashboard">
                     <i class="bi bi-speedometer2"></i>
                     <span class="nav-link-text">Admin Dashboard</span>
                 </a>
             </div>
             @endif
 
+            {{-- ✅ BORANG 1, 2, 3 - HANYA UNTUK USER BIASA --}}
+            @if(!auth()->user()->isAdmin())
             <div class="nav-divider"></div>
 
             <div class="nav-item">
-                <a href="{{ route('components.create') }}" class="nav-link {{ request()->routeIs('components.create') ? 'active' : '' }}">
+                <a href="{{ route('components.create') }}" 
+                   class="nav-link {{ request()->routeIs('components.create') ? 'active' : '' }}"
+                   data-title="Borang 1">
                     <i class="bi bi-box-seam"></i>
                     <span class="nav-link-text">Borang 1</span>
                 </a>
             </div>
 
             <div class="nav-item">
-                <a href="{{ route('main-components.create') }}" class="nav-link {{ request()->routeIs('main-components.create') ? 'active' : '' }}">
+                <a href="{{ route('main-components.create') }}" 
+                   class="nav-link {{ request()->routeIs('main-components.create') ? 'active' : '' }}"
+                   data-title="Borang 2">
                     <i class="bi bi-layers"></i>
                     <span class="nav-link-text">Borang 2</span>
                 </a>
             </div>
 
             <div class="nav-item">
-                <a href="{{ route('sub-components.create') }}" class="nav-link {{ request()->routeIs('sub-components.create') ? 'active' : '' }}">
+                <a href="{{ route('sub-components.create') }}" 
+                   class="nav-link {{ request()->routeIs('sub-components.create') ? 'active' : '' }}"
+                   data-title="Borang 3">
                     <i class="bi bi-diagram-3"></i>
                     <span class="nav-link-text">Borang 3</span>
                 </a>
             </div>
+            @endif
 
+            {{-- ✅ MENU PENGURUSAN - HANYA UNTUK ADMIN --}}
             @if(auth()->user()->isAdmin())
             <div class="nav-divider"></div>
 
             <div class="nav-item">
-                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.users.index') }}" 
+                   class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
+                   data-title="Pengguna">
                     <i class="bi bi-people"></i>
                     <span class="nav-link-text">Pengguna</span>
                 </a>
             </div>
 
             <div class="nav-item">
-                <a href="{{ route('admin.sistem.index') }}" class="nav-link {{ request()->routeIs('admin.sistem.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.sistem.index') }}" 
+                   class="nav-link {{ request()->routeIs('admin.sistem.*') ? 'active' : '' }}"
+                   data-title="Sistem">
                     <i class="bi bi-gear"></i>
                     <span class="nav-link-text">Sistem</span>
                 </a>
@@ -465,7 +625,7 @@
             @endif
         </nav>
 
-        <!-- ✅ LOGOUT BUTTON (FIXED) -->
+        <!-- ✅ LOGOUT BUTTON -->
         <div class="sidebar-footer">
             <form action="{{ route('logout') }}" method="POST" id="logout-form">
                 @csrf
@@ -482,12 +642,12 @@
         <i class="bi bi-list"></i>
     </button>
 
-    <!-- Overlay for mobile -->
+    <!-- ✅ OVERLAY - HANYA SATU SAHAJA -->
     <div class="overlay" id="overlay"></div>
     @endauth
 
-    <!-- Main Content -->
-    <main class="main-content {{ auth()->check() ? '' : 'ms-0' }}" id="mainContent">
+    <!-- ✅ MAIN CONTENT - FIXED CLASS -->
+    <main class="main-content {{ auth()->check() ? '' : 'no-sidebar' }}" id="mainContent">
         <div class="container-fluid p-4">
             <!-- Flash Messages -->
             @if(session('success'))
@@ -522,7 +682,7 @@
     });
 
     @auth
-    // Sidebar Toggle
+    // ✅ IMPROVED SIDEBAR TOGGLE WITH SAFEGUARDS
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const toggleBtn = document.getElementById('toggleSidebar');
@@ -530,7 +690,7 @@
     const overlay = document.getElementById('overlay');
 
     // Desktop Toggle
-    if (toggleBtn) {
+    if (toggleBtn && sidebar && mainContent) {
         toggleBtn.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('expanded');
@@ -541,24 +701,27 @@
     }
 
     // Mobile Toggle
-    if (mobileToggle) {
+    if (mobileToggle && sidebar && overlay) {
         mobileToggle.addEventListener('click', function() {
             sidebar.classList.toggle('show');
             overlay.classList.toggle('show');
         });
     }
 
-    if (overlay) {
+    // Overlay Click
+    if (overlay && sidebar) {
         overlay.addEventListener('click', function() {
             sidebar.classList.remove('show');
             overlay.classList.remove('show');
         });
     }
 
-    // Restore sidebar state from localStorage
-    if (localStorage.getItem('sidebarCollapsed') === 'true') {
-        sidebar.classList.add('collapsed');
-        mainContent.classList.add('expanded');
+    // ✅ Restore sidebar state from localStorage (WITH SAFEGUARD)
+    if (sidebar && mainContent) {
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+        }
     }
     @endauth
     </script>
