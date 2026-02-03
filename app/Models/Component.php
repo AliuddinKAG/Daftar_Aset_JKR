@@ -11,6 +11,7 @@ class Component extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
         'nama_premis',
         'nombor_dpa',
         'ada_blok',
@@ -121,11 +122,6 @@ class Component extends Model
         return null;
     }
 
-    public function mainComponents()
-    {
-        return $this->hasMany(MainComponent::class);
-    }
-
     public function getKodLokasiAttribute()
     {
         if ($this->ada_blok && $this->kod_blok) {
@@ -152,5 +148,25 @@ class Component extends Model
     public function scopeTidakAktif($query)
     {
         return $query->where('status', 'tidak_aktif');
+    }
+    /**
+     * TAMBAH Relationships
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function mainComponents()
+    {
+        return $this->hasMany(MainComponent::class);
+    }
+
+    /**
+     * TAMBAH Scope untuk filter by user
+     */
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
     }
 }
