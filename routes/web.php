@@ -12,6 +12,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SistemController;
 use App\Http\Controllers\SubsistemController;
+use App\Http\Controllers\Admin\ComponentController as AdminComponentController; // ✅ TAMBAH
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
+        // Dashboard
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/user-activity', [AdminDashboardController::class, 'userActivity'])->name('user-activity');
         Route::get('/system-stats', [AdminDashboardController::class, 'systemStats'])->name('system-stats');
@@ -77,6 +79,19 @@ Route::middleware('auth')->group(function () {
         Route::get('sistem/{sistem}/subsistems/{subsistem}/edit', [SubsistemController::class, 'edit'])->name('sistem.subsistems.edit');
         Route::put('sistem/{sistem}/subsistems/{subsistem}', [SubsistemController::class, 'update'])->name('sistem.subsistems.update');
         Route::delete('sistem/{sistem}/subsistems/{subsistem}', [SubsistemController::class, 'destroy'])->name('sistem.subsistems.destroy');
+        
+        // ✅✅✅ COMPONENT MANAGEMENT (TAMBAH INI) ✅✅✅
+        Route::prefix('components')->name('components.')->group(function () {
+            Route::get('/', [AdminComponentController::class, 'index'])->name('index');
+            Route::get('/statistics', [AdminComponentController::class, 'statistics'])->name('statistics');
+            Route::get('/trashed', [AdminComponentController::class, 'trashed'])->name('trashed');
+            Route::get('/{component}', [AdminComponentController::class, 'show'])->name('show');
+            Route::delete('/{component}', [AdminComponentController::class, 'destroy'])->name('destroy');
+            Route::patch('/{component}/toggle-status', [AdminComponentController::class, 'toggleStatus'])->name('toggle-status');
+            Route::post('/{id}/restore', [AdminComponentController::class, 'restore'])->name('restore');
+            Route::delete('/{id}/force-delete', [AdminComponentController::class, 'forceDelete'])->name('force-delete');
+            Route::post('/bulk-action', [AdminComponentController::class, 'bulkAction'])->name('bulk-action');
+        });
     });
 
     /*
