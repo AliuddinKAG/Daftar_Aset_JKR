@@ -623,6 +623,19 @@ body {
                 </a>
             </div>
 
+            <div class="nav-item">
+                <a href="{{ route('admin.components.index') }}"
+                class="nav-link {{ request()->routeIs('admin.components.*') ? 'active' : '' }}" 
+                data-title="Komponen">
+                    <i class="bi bi-building"></i>
+                    <span class="nav-link-text">Komponen</span>
+                    @if(\App\Models\Component::onlyTrashed()->count() > 0)
+                        <span class="badge bg-danger ms-auto">
+                            {{ \App\Models\Component::onlyTrashed()->count() }}
+                        </span>
+                    @endif
+                </a>
+            </div>
             @endif
         </nav>
 
