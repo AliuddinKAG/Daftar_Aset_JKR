@@ -41,20 +41,16 @@ class AdminDashboardController extends Controller
         // Get recent users (last 5)
         $recentUsers = User::orderBy('created_at', 'desc')->take(5)->get();
 
-        // Get user activity summary (components registered by each user)
-        $userActivity = DB::table('users')
-            ->leftJoin('components', 'components.created_at', '>=', DB::raw('users.created_at'))
-            ->select(
-                'users.id',
-                'users.name',
-                'users.username',
-                'users.role',
-                DB::raw('COUNT(DISTINCT components.id) as total_components')
-            )
-            ->groupBy('users.id', 'users.name', 'users.username', 'users.role')
-            ->orderBy('total_components', 'desc')
+        // ✅ UBAH INI - Get user activity menggunakan relationship user_id
+        $userActivity = User::withCount('components')
+            ->orderBy('components_count', 'desc')
             ->take(10)
-            ->get();
+            ->get()
+            ->map(function($user) {
+                // Tambah total_components untuk kegunaan view
+                $user->total_components = $user->components_count;
+                return $user;
+            });
 
         // Get sistem statistics
         $sistemStats = Sistem::withCount('subsistems')->get();
@@ -67,22 +63,31 @@ class AdminDashboardController extends Controller
      */
     public function userActivity()
     {
-        // Get detailed component count per user
-        $users = User::all()->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'username' => $user->username,
-                'email' => $user->email,
-                'role' => $user->role,
-                'department' => $user->department,
-                'is_active' => $user->is_active,
-                'created_at' => $user->created_at,
-                'last_login_at' => $user->last_login_at,
-                // Count components - this is approximate based on created_at timestamps
-                'total_components' => Component::where('created_at', '>=', $user->created_at)->count(),
-            ];
-        });
+        // ✅ UBAH INI - Get detailed component count per user menggunakan relationship
+        $users = User::withCount([
+                'components',
+                'mainComponents',
+                'subComponents'
+            ])
+            ->orderBy('components_count', 'desc')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'department' => $user->department,
+                    'is_active' => $user->is_active,
+                    'created_at' => $user->created_at,
+                    'last_login_at' => $user->last_login_at,
+                    // Count komponen yang betul
+                    'total_components' => $user->components_count,
+                    'total_main_components' => $user->main_components_count,
+                    'total_sub_components' => $user->sub_components_count,
+                ];
+            });
 
         return view('admin.user-activity', compact('users'));
     }
@@ -92,13 +97,12 @@ class AdminDashboardController extends Controller
      */
     public function systemStats()
     {
-        // Component statistics by user
-        $componentsByUser = User::select('users.*')
-            ->selectRaw('(SELECT COUNT(*) FROM components WHERE components.created_at >= users.created_at) as components_count')
+        // ✅ UBAH INI - Component statistics by user menggunakan relationship
+        $componentsByUser = User::withCount('components')
             ->orderBy('components_count', 'desc')
             ->get();
 
-        // Components by month
+        // Components by month (kekal sama)
         $componentsByMonth = Component::select(
                 DB::raw('YEAR(created_at) as year'),
                 DB::raw('MONTH(created_at) as month'),
