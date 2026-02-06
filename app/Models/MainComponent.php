@@ -1,4 +1,5 @@
 <?php
+// app/Models/MainComponent.php
 
 namespace App\Models;
 
@@ -14,6 +15,7 @@ class MainComponent extends Model
      * Mass Assignment - fillable untuk keselamatan
      */
     protected $fillable = [
+        'user_id',  // ✅ TAMBAH INI
         'component_id', 'nama_komponen_utama', 'kod_lokasi', 'sistem', 'subsistem',
         'kuantiti', 'komponen_sama_jenis', 'gambar_komponen', 'awam_arkitek',
         'elektrikal', 'elv_ict', 'mekanikal', 'bio_perubatan', 'lain_lain',
@@ -58,6 +60,14 @@ class MainComponent extends Model
      * RELATIONSHIPS
      * ========================================
      */
+    
+    /**
+     * ✅ TAMBAH - Relationship ke User
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     
     public function component()
     {
