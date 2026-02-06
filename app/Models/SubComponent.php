@@ -1,4 +1,5 @@
 <?php
+// app/Models/SubComponent.php
 
 namespace App\Models;
 
@@ -14,6 +15,7 @@ class SubComponent extends Model
     protected $table = 'sub_components';
 
     protected $fillable = [
+        'user_id',  // ✅ TAMBAH
         'main_component_id',
         'nama_sub_komponen',
         'deskripsi',
@@ -71,6 +73,14 @@ class SubComponent extends Model
      * RELATIONSHIPS
      * ========================================
      */
+    
+    /**
+     * ✅ TAMBAH - Hubungan ke User
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
     
     /**
      * Hubungan ke Komponen Utama
