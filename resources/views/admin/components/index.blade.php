@@ -268,7 +268,6 @@
             <tr>
                 <th width="10%">No. DPA</th>
                 <th width="25%">Nama Premis / Lokasi</th>
-                <th width="10%">Dimensi</th>
                 <th width="20%">Dicipta Oleh</th>
                 <th width="12%">Tarikh</th>
                 <th width="8%">Status</th>
@@ -297,13 +296,6 @@
                                 @endif
                             </div>
                         </div>
-                    </td>
-                    <td>
-                        @if($component->dimensi_string)
-                            <small class="text-muted">{{ $component->dimensi_string }}</small>
-                        @else
-                            <span class="text-muted">-</span>
-                        @endif
                     </td>
                     <td>
                         @if($component->user)
