@@ -276,9 +276,6 @@
                                 </small>
                             @endif
                         </div>
-                        <a href="{{ route('main-components.show', $mainComponent) }}" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-eye"></i> Lihat
-                        </a>
                     </div>
                 </div>
                 @endforeach
@@ -397,9 +394,6 @@
                 
                 <hr>
                 
-                <a href="{{ route('components.show', $component) }}" class="btn btn-outline-primary w-100">
-                    <i class="bi bi-eye"></i> Lihat Versi Pengguna
-                </a>
             </div>
         </div>
     </div>
