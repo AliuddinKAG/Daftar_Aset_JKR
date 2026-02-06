@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/SubComponentController.php
 
 namespace App\Http\Controllers;
 
@@ -38,6 +39,9 @@ class SubComponentController extends Controller
 
             $validated['status'] = $request->input('status', 'aktif');
             
+            // ✅ TAMBAH user_id
+            $validated['user_id'] = auth()->id();
+            
             // Create sub component
             $subComponent = SubComponent::create($validated);
 
@@ -66,6 +70,7 @@ class SubComponentController extends Controller
     {
         // Load relationships including measurements
         $subComponent->load([
+            'user',  // ✅ TAMBAH
             'mainComponent.component',
             'measurements',
             'saizMeasurements',
@@ -85,6 +90,7 @@ class SubComponentController extends Controller
         
         // Load measurements dengan relationships untuk edit form
         $subComponent->load([
+            'user',  // ✅ TAMBAH
             'measurements',
             'saizMeasurements',
             'kadaranMeasurements',
@@ -111,6 +117,11 @@ class SubComponentController extends Controller
 
             // Handle dokumen berkaitan
             $validated['dokumen_berkaitan'] = $this->processDokumenBerkaitan($request);
+
+            // ✅ TAMBAH user_id jika tiada
+            if (!$subComponent->user_id) {
+                $validated['user_id'] = auth()->id();
+            }
 
             // Update sub component
             $subComponent->update($validated);
@@ -151,7 +162,7 @@ class SubComponentController extends Controller
     public function trashed()
     {
         $subComponents = SubComponent::onlyTrashed()
-            ->with(['mainComponent.component'])
+            ->with(['mainComponent.component', 'user'])  // ✅ TAMBAH user
             ->orderBy('deleted_at', 'desc')
             ->paginate(10);
         
