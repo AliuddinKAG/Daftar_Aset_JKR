@@ -124,7 +124,7 @@
 
                     <!-- Hidden section for specifications -->
                     <div id="specificationSection" style="display: none;">
-                        @include('components.partials.sub-component-specifications')
+                        @include('user.components.partials.sub-component-specifications')
                     </div>
 
                 </form>

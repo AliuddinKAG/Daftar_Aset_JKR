@@ -48,6 +48,14 @@ class Sistem extends Model
     }
 
     /**
+     * Get the components for this sistem.
+     */
+    public function components()
+    {
+        return $this->hasMany(Component::class, 'sistem_id');
+    }
+
+    /**
      * Get active subsistems only.
      */
     public function activeSubsistems()

@@ -22,7 +22,7 @@ class ExportController extends Controller
     {
         $component->load(['mainComponents.subComponents']);
         
-        $pdf = PDF::loadView('exports.pdf.component', compact('component'));
+        $pdf = PDF::loadView('user.exports.pdf.component', compact('component'));
         
         // Set paper size dan options
         $pdf->setPaper('a4', 'portrait');
@@ -43,7 +43,7 @@ class ExportController extends Controller
     {
         $mainComponent->load(['component', 'subComponents']);
         
-        $pdf = PDF::loadView('exports.pdf.main-component', compact('mainComponent'));
+        $pdf = PDF::loadView('user.exports.pdf.main-component', compact('mainComponent'));
         
         // Set paper size dan options
         $pdf->setPaper('a4', 'portrait');
@@ -63,7 +63,7 @@ class ExportController extends Controller
     {
         $subComponent->load(['mainComponent.component']);
         
-        $pdf = PDF::loadView('exports.pdf.sub-component', compact('subComponent'));
+        $pdf = PDF::loadView('user.exports.pdf.sub-component', compact('subComponent'));
         
         // Set paper size dan options
         $pdf->setPaper('a4', 'portrait');
@@ -86,7 +86,7 @@ class ExportController extends Controller
         // KIRA JUMLAH MUKA SURAT
         $totalPages = $this->calculateTotalPages($component);
         
-        $pdf = PDF::loadView('exports.pdf.complete-report', compact('component', 'totalPages'));
+        $pdf = PDF::loadView('user.exports.pdf.complete-report', compact('component', 'totalPages'));
         
         $pdf->setPaper('a4', 'portrait');
         $pdf->setOption('isHtml5ParserEnabled', true);
@@ -194,7 +194,7 @@ class ExportController extends Controller
     {
         $components = Component::with(['mainComponents.subComponents'])->get();
         
-        $pdf = PDF::loadView('exports.pdf.all-components', compact('components'));
+        $pdf = PDF::loadView('user.exports.pdf.all-components', compact('components'));
         
         $pdf->setPaper('a4', 'landscape');
         $pdf->setOption('isHtml5ParserEnabled', true);
@@ -213,7 +213,7 @@ class ExportController extends Controller
     {
         $component->load(['mainComponents.subComponents']);
         
-        $pdf = PDF::loadView('exports.pdf.component', compact('component'));
+        $pdf = PDF::loadView('user.exports.pdf.component', compact('component'));
         
         $pdf->setPaper('a4', 'portrait');
         $pdf->setOption('isHtml5ParserEnabled', true);

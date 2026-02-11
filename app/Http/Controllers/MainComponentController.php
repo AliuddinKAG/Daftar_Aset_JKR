@@ -304,7 +304,7 @@ class MainComponentController extends Controller
             'relatedDocuments'
         ]);
 
-        return view('components.edit-main-component', compact(
+        return view('user.components.edit-main-component', compact(
             'mainComponent', 'components', 'sistems', 'subsistems'
         ));
     }
@@ -558,7 +558,7 @@ class MainComponentController extends Controller
         $sistems = Sistem::orderBy('kod')->get();
         $subsistems = Subsistem::orderBy('kod')->get();
         
-        return view('components.create-main-component', compact(
+        return view('user.components.create-main-component', compact(
             'components', 'sistems', 'subsistems'
         ));
     }
@@ -576,7 +576,7 @@ class MainComponentController extends Controller
             'kapasitiMeasurements'
         ]);
         
-        return view('components.view-main-component', compact('mainComponent'));
+        return view('user.components.view-main-component', compact('mainComponent'));
     }
 
     public function destroy(MainComponent $mainComponent)

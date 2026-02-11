@@ -19,7 +19,7 @@ class RedirectIfAuthenticated
                 if (Auth::user()->isAdmin()) {
                     return redirect()->route('admin.dashboard');
                 } else {
-                    return redirect()->route('components.index');
+                    return redirect()->route('user.index');
                 }
             }
         }

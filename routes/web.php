@@ -9,10 +9,11 @@ use App\Http\Controllers\KodBinaanLuarController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SistemController;
 use App\Http\Controllers\SubsistemController;
-use App\Http\Controllers\Admin\ComponentController as AdminComponentController; // ✅ TAMBAH
+use App\Http\Controllers\Admin\ComponentController as AdminComponentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +23,6 @@ use App\Http\Controllers\Admin\ComponentController as AdminComponentController; 
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
 
 /*
@@ -42,10 +42,16 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Dashboard (Default for all users)
+    | Dashboard (Default - Redirect based on role)
     |--------------------------------------------------------------------------
     */
-    Route::get('/', [ComponentController::class, 'index'])->name('dashboard');
+    Route::get('/', function() {
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        // ✅ FIXED: Changed from 'user.components.index' to 'components.index'
+        return redirect()->route('components.index');
+    })->name('dashboard');
 
     /*
     |--------------------------------------------------------------------------
@@ -80,7 +86,7 @@ Route::middleware('auth')->group(function () {
         Route::put('sistem/{sistem}/subsistems/{subsistem}', [SubsistemController::class, 'update'])->name('sistem.subsistems.update');
         Route::delete('sistem/{sistem}/subsistems/{subsistem}', [SubsistemController::class, 'destroy'])->name('sistem.subsistems.destroy');
         
-        // ✅✅✅ COMPONENT MANAGEMENT (TAMBAH INI) ✅✅✅
+        // Component Management (Admin)
         Route::prefix('components')->name('components.')->group(function () {
             Route::get('/', [AdminComponentController::class, 'index'])->name('index');
             Route::get('/statistics', [AdminComponentController::class, 'statistics'])->name('statistics');
@@ -111,10 +117,11 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Component Routes (Borang 1)
+    | Component Routes (Borang 1) - User Dashboard & CRUD
     |--------------------------------------------------------------------------
     */
     Route::prefix('components')->name('components.')->group(function () {
+        // ✅ User Dashboard - This uses ComponentController@index (NOT UserDashboardController)
         Route::get('/', [ComponentController::class, 'index'])->name('index');
         Route::get('/trashed', [ComponentController::class, 'trashed'])->name('trashed');
         Route::post('/{id}/restore', [ComponentController::class, 'restore'])->name('restore');

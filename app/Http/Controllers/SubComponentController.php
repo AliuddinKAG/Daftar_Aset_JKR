@@ -16,7 +16,7 @@ class SubComponentController extends Controller
     public function create()
     {
         $mainComponents = MainComponent::with('component')->get();
-        return view('components.create-sub-component', compact('mainComponents'));
+        return view('user.components.create-sub-component', compact('mainComponents'));
     }
 
     /**
@@ -78,7 +78,7 @@ class SubComponentController extends Controller
             'kapasitiMeasurements'
         ]);
         
-        return view('components.view-sub-component', compact('subComponent'));
+        return view('user.components.view-sub-component', compact('subComponent'));
     }
 
     /**
@@ -97,7 +97,7 @@ class SubComponentController extends Controller
             'kapasitiMeasurements'
         ]);
         
-        return view('components.edit-sub-component', compact('subComponent', 'mainComponents'));
+        return view('user.components.edit-sub-component', compact('subComponent', 'mainComponents'));
     }
 
     /**

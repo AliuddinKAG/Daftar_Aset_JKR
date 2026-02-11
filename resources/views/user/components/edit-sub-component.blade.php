@@ -134,7 +134,7 @@
 
                     <!-- Hidden section for specifications -->
                     <div id="specificationSection" style="display: {{ $hasSpecifications ? 'block' : 'none' }};">
-                        @include('components.partials.sub-component-specifications', ['subComponent' => $subComponent])
+                        @include('user.components.partials.sub-component-specifications', ['subComponent' => $subComponent])
                     </div>
 
                 </form>

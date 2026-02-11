@@ -8,7 +8,7 @@ use App\Models\Component;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class ComponentController extends Controller
+class AdminComponentController extends Controller
 {
     /**
      * Display a listing of all components (Admin view)

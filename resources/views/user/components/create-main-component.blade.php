@@ -440,7 +440,7 @@
 
                     <!-- Hidden section for attributes -->
                     <div id="attributesSection" style="display: none; margin-top: 20px;">
-                        @include('components.partials.main-component-attributes')
+                        @include('user.components.partials.main-component-attributes')
                     </div>
 
                 </form>
