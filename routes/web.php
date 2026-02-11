@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ComponentController as AdminComponentController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post'); // ✅ MOVED HERE!
 });
 
 /*
@@ -49,7 +50,6 @@ Route::middleware('auth')->group(function () {
         if (auth()->user()->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-        // ✅ FIXED: Changed from 'user.components.index' to 'components.index'
         return redirect()->route('components.index');
     })->name('dashboard');
 
@@ -121,7 +121,6 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('components')->name('components.')->group(function () {
-        // ✅ User Dashboard - This uses ComponentController@index (NOT UserDashboardController)
         Route::get('/', [ComponentController::class, 'index'])->name('index');
         Route::get('/trashed', [ComponentController::class, 'trashed'])->name('trashed');
         Route::post('/{id}/restore', [ComponentController::class, 'restore'])->name('restore');
