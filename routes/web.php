@@ -13,7 +13,7 @@ use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SistemController;
 use App\Http\Controllers\SubsistemController;
-use App\Http\Controllers\Admin\ComponentController as AdminComponentController;
+use App\Http\Controllers\Admin\AdminComponentController as AdminComponentController;
 
 /*
 |--------------------------------------------------------------------------
