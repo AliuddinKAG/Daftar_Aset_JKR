@@ -21,7 +21,7 @@
     
     <style>
 /* ========================================
-   SDAK - SISTEM DAFTAR ASET KHAS
+   SISTEM DAFTAR ASET
    Custom Sidebar Layout CSS
 ======================================== */
 
@@ -511,12 +511,12 @@ body {
             @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
                     <i class="bi bi-building"></i>
-                    <span class="sidebar-brand-text">SDAK</span>
+                    <span class="sidebar-brand-text">Sistem Daftar <br>Aset</span>
                 </a>
             @else
                 <a href="{{ route('dashboard') }}" class="sidebar-brand">
                     <i class="bi bi-building"></i>
-                    <span class="sidebar-brand-text">SDAK</span>
+                    <span class="sidebar-brand-text">Sistem Daftar <br>Aset</span>
                 </a>
             @endif
             <button class="toggle-sidebar" id="toggleSidebar">
